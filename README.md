@@ -105,3 +105,7 @@ Proyek ini dilisensikan di bawah [Creative Commons Attribution-NonCommercial-Sha
 
 **Didukung oleh European Union**  
 Komunitas riset desentralisasi yang mengintegrasikan teknologi Web3 dengan aksi lingkungan untuk menciptakan ekonomi sirkular berkelanjutan.
+
+## Lisensi
+
+Proyek ini dilisensikan di bawah [MIT License](LICENSE).

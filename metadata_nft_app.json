@@ -1,0 +1,36 @@
+{
+  "name": "Nama Aplikasi",
+  "description": "Deskripsi singkat fungsi aplikasi",
+  "image": "ipfs://CID-logo.png", // Logo aplikasi
+  "animation_url": "ipfs://CID-ui.html", // File HTML utama
+  "external_url": "https://dapp.nyampahbersama.org",
+  "attributes": [
+    {
+      "trait_type": "Kategori",
+      "value": "Daur Ulang"
+    },
+    {
+      "trait_type": "Versi",
+      "value": "1.0"
+    }
+  ],
+  "app_schema": {
+    "version": "1.0",
+    "ui": {
+      "entry_point": "index.html",
+      "resources": [
+        "style.css",
+        "app.js",
+        "components/"
+      ]
+    },
+    "logic": {
+      "contract_address": "0x...", // Alamat SC utama
+      "abi_cid": "Qm..." // CID ABI di IPFS
+    },
+    "storage": {
+      "type": "blockchain",
+      "schema": "Qm..." // CID schema data
+    }
+  }
+}

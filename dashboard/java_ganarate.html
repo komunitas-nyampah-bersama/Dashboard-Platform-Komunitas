@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Style Standards Template</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style id="theme-styles">
+        /* CSS akan di-generate oleh JavaScript */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-palette"></i>
+            </div>
+            <h1>Template Standar Style CSS</h1>
+            <p class="subtitle">Menggunakan JSON sebagai basis pengaturan tema</p>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="colors">Warna</div>
+            <div class="tab" data-tab="components">Komponen</div>
+            <div class="tab" data-tab="typography">Tipografi</div>
+        </div>
+
+        <div class="content">
+            <!-- Tab 1: Colors -->
+            <div class="tab-content active" id="colors-content">
+                <h2>Palet Warna Tema</h2>
+                
+                <div class="color-grid">
+                    <div class="color-card primary">
+                        <div class="color-preview"></div>
+                        <div class="color-info">
+                            <h3>Primary</h3>
+                            <p>#1a5d1a</p>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card secondary">
+                        <div class="color-preview"></div>
+                        <div class="color-info">
+                            <h3>Secondary</h3>
+                            <p>#2e8b57</p>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card accent">
+                        <div class="color-preview"></div>
+                        <div class="color-info">
+                            <h3>Accent</h3>
+                            <p>#4caf50</p>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card light">
+                        <div class="color-preview"></div>
+                        <div class="color-info">
+                            <h3>Light</h3>
+                            <p>#e8f5e9</p>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card dark">
+                        <div class="color-preview"></div>
+                        <div class="color-info">
+                            <h3>Dark</h3>
+                            <p>#1b5e20</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <h2 class="mt-40">Contoh Gradien</h2>
+                <div class="gradient-example"></div>
+            </div>
+            
+            <!-- Tab 2: Components -->
+            <div class="tab-content" id="components-content">
+                <h2>Komponen UI</h2>
+                
+                <div class="components-grid">
+                    <div class="component-card">
+                        <h3>Buttons</h3>
+                        <div class="component-example">
+                            <button class="btn btn-primary">Primary Button</button>
+                            <button class="btn btn-secondary">Secondary Button</button>
+                            <button class="btn btn-outline">Outline Button</button>
+                        </div>
+                    </div>
+                    
+                    <div class="component-card">
+                        <h3>Cards</h3>
+                        <div class="component-example">
+                            <div class="example-card">
+                                <div class="card-header">
+                                    <h4>Card Title</h4>
+                                </div>
+                                <div class="card-body">
+                                    <p>This is an example card with sample content to demonstrate the styling.</p>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="btn btn-primary">Action</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-card">
+                        <h3>Alerts</h3>
+                        <div class="component-example">
+                            <div class="alert success">
+                                <i class="fas fa-check-circle"></i>
+                                <p>Success! This is a success alert message.</p>
+                            </div>
+                            <div class="alert warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>Warning! This is a warning message.</p>
+                            </div>
+                            <div class="alert error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Error! Something went wrong.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab 3: Typography -->
+            <div class="tab-content" id="typography-content">
+                <h2>Tipografi</h2>
+                
+                <div class="typography-container">
+                    <div class="typography-example">
+                        <h1>Heading 1 - Font Utama</h1>
+                        <h2>Heading 2 - Font Utama</h2>
+                        <h3>Heading 3 - Font Utama</h3>
+                        <h4>Heading 4 - Font Utama</h4>
+                    </div>
+                    
+                    <div class="typography-body">
+                        <p>Ini adalah contoh paragraf menggunakan font utama. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula.</p>
+                        
+                        <p class="secondary-font">Ini adalah contoh paragraf menggunakan font sekunder. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor.</p>
+                        
+                        <blockquote>
+                            Ini adalah contoh blockquote. The greatest glory in living lies not in never falling, but in rising every time we fall. - Nelson Mandela
+                        </blockquote>
+                    </div>
+                    
+                    <div class="text-utilities">
+                        <h3>Utility Classes</h3>
+                        <p class="text-center">Teks rata tengah</p>
+                        <p class="text-right">Teks rata kanan</p>
+                        <p class="text-uppercase">Teks dalam huruf kapital</p>
+                        <p class="text-bold">Teks tebal</p>
+                        <p class="text-italic">Teks miring</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <p>Template Standar Style CSS - Menggunakan JSON untuk konsistensi desain</p>
+            <p>© 2023 Style Standards. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- JSON Style Configuration -->
+    <script id="style-config" type="application/json">
+        {
+            "theme": {
+                "name": "Green Theme",
+                "variables": {
+                    "colors": {
+                        "primary": "#1a5d1a",
+                        "secondary": "#2e8b57",
+                        "accent": "#4caf50",
+                        "light": "#e8f5e9",
+                        "dark": "#1b5e20",
+                        "text": "#333",
+                        "text-light": "#666",
+                        "text-dark": "#111",
+                        "white": "#ffffff",
+                        "success": "#28a745",
+                        "warning": "#ffc107",
+                        "error": "#dc3545"
+                    },
+                    "fonts": {
+                        "main": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                        "heading": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                    },
+                    "spacing": {
+                        "xs": "5px",
+                        "sm": "10px",
+                        "md": "20px",
+                        "lg": "30px",
+                        "xl": "40px"
+                    },
+                    "shadows": {
+                        "soft": "0 5px 15px rgba(0,0,0,0.1)",
+                        "medium": "0 8px 20px rgba(0,0,0,0.15)",
+                        "hard": "0 10px 30px rgba(0,0,0,0.2)"
+                    },
+                    "borders": {
+                        "radius-sm": "8px",
+                        "radius-md": "12px",
+                        "radius-lg": "50%",
+                        "width": "2px"
+                    }
+                }
+            },
+            "components": {
+                "button": {
+                    "padding": "10px 20px",
+                    "border-radius": "{borders.radius-sm}",
+                    "font-weight": "600",
+                    "transition": "all 0.3s ease",
+                    "cursor": "pointer",
+                    "primary": {
+                        "background": "{colors.accent}",
+                        "color": "{colors.white}",
+                        "border": "none",
+                        "hover": {
+                            "background": "{colors.dark}"
+                        }
+                    },
+                    "secondary": {
+                        "background": "{colors.secondary}",
+                        "color": "{colors.white}",
+                        "border": "none",
+                        "hover": {
+                            "background": "#256f47"
+                        }
+                    },
+                    "outline": {
+                        "background": "transparent",
+                        "color": "{colors.accent}",
+                        "border": "2px solid {colors.accent}",
+                        "hover": {
+                            "background": "{colors.accent}",
+                            "color": "{colors.white}"
+                        }
+                    }
+                },
+                "card": {
+                    "background": "{colors.white}",
+                    "border-radius": "{borders.radius-md}",
+                    "box-shadow": "{shadows.soft}",
+                    "transition": "all 0.3s ease",
+                    "header": {
+                        "background": "{colors.light}",
+                        "padding": "{spacing.md}",
+                        "border-bottom": "1px solid #c8e6c9"
+                    },
+                    "body": {
+                        "padding": "{spacing.md}"
+                    },
+                    "footer": {
+                        "padding": "{spacing.md}",
+                        "background": "#f8f9fa",
+                        "border-top": "1px solid #e9ecef"
+                    },
+                    "hover": {
+                        "box-shadow": "{shadows.medium}",
+                        "transform": "translateY(-5px)"
+                    }
+                },
+                "alert": {
+                    "padding": "{spacing.md}",
+                    "border-radius": "{borders.radius-sm}",
+                    "margin-bottom": "{spacing.sm}",
+                    "display": "flex",
+                    "align-items": "center",
+                    "success": {
+                        "background": "rgba(40, 167, 69, 0.15)",
+                        "border": "1px solid {colors.success}",
+                        "color": "{colors.success}"
+                    },
+                    "warning": {
+                        "background": "rgba(255, 193, 7, 0.15)",
+                        "border": "1px solid {colors.warning}",
+                        "color": "{colors.warning}"
+                    },
+                    "error": {
+                        "background": "rgba(220, 53, 69, 0.15)",
+                        "border": "1px solid {colors.error}",
+                        "color": "{colors.error}"
+                    },
+                    "icon": {
+                        "margin-right": "{spacing.sm}",
+                        "font-size": "1.2rem"
+                    }
+                }
+            },
+            "layout": {
+                "container": {
+                    "max-width": "1200px",
+                    "margin": "0 auto",
+                    "padding": "{spacing.md}"
+                },
+                "header": {
+                    "background": "rgba(255, 255, 255, 0.95)",
+                    "border-radius": "{borders.radius-md}",
+                    "padding": "{spacing.lg}",
+                    "box-shadow": "{shadows.hard}",
+                    "text-align": "center",
+                    "margin-bottom": "{spacing.lg}"
+                },
+                "footer": {
+                    "background": "{colors.dark}",
+                    "color": "{colors.white}",
+                    "padding": "{spacing.lg}",
+                    "text-align": "center",
+                    "margin-top": "{spacing.xl}"
+                }
+            },
+            "utility": {
+                "flex-center": {
+                    "display": "flex",
+                    "align-items": "center",
+                    "justify-content": "center"
+                },
+                "text-center": {
+                    "text-align": "center"
+                },
+                "text-right": {
+                    "text-align": "right"
+                },
+                "text-uppercase": {
+                    "text-transform": "uppercase"
+                },
+                "text-bold": {
+                    "font-weight": "bold"
+                },
+                "text-italic": {
+                    "font-style": "italic"
+                },
+                "mt-40": {
+                    "margin-top": "40px"
+                }
+            }
+        }
+    </script>
+
+    <script>
+        // Fungsi untuk menggantikan placeholder dengan nilai sebenarnya
+        function replacePlaceholders(value, variables) {
+            if (typeof value !== 'string') return value;
+            
+            return value.replace(/\{([^{}]+)\}/g, (match, path) => {
+                const keys = path.split('.');
+                let result = variables;
+                
+                for (const key of keys) {
+                    if (result[key] === undefined) return match;
+                    result = result[key];
+                }
+                
+                return typeof result === 'string' ? result : match;
+            });
+        }
+
+        // Fungsi untuk membuat CSS dari konfigurasi JSON
+        function generateCSS(config) {
+            const variables = config.theme.variables;
+            let css = ':root {\n';
+            
+            // Generate CSS variables
+            for (const category in variables) {
+                for (const key in variables[category]) {
+                    const value = variables[category][key];
+                    if (typeof value === 'string') {
+                        const varName = `--${category}-${key}`.replace(/_/g, '-');
+                        const varValue = replacePlaceholders(value, variables);
+                        css += `  ${varName}: ${varValue};\n`;
+                    }
+                }
+            }
+            
+            css += '}\n\n';
+            
+            // Global styles
+            css += `* {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                font-family: var(--fonts-main);
+                color: var(--colors-text);
+                background: linear-gradient(135deg, var(--colors-primary) 0%, var(--colors-secondary) 100%);
+                min-height: 100vh;
+                padding: var(--spacing-md);
+            }
+            
+            h1, h2, h3, h4, h5, h6 {
+                font-family: var(--fonts-heading);
+                color: var(--colors-dark);
+                margin-bottom: var(--spacing-sm);
+            }
+            
+            .container {
+                max-width: var(--layout-container-max-width);
+                margin: var(--layout-container-margin);
+                padding: var(--layout-container-padding);
+            }`;
+            
+            // Header styles
+            css += `.header {
+                background: ${replacePlaceholders(config.layout.header.background, variables)};
+                border-radius: ${replacePlaceholders(config.layout.header['border-radius'], variables)};
+                padding: ${replacePlaceholders(config.layout.header.padding, variables)};
+                box-shadow: ${replacePlaceholders(config.layout.header['box-shadow'], variables)};
+                text-align: ${replacePlaceholders(config.layout.header['text-align'], variables)};
+                margin-bottom: ${replacePlaceholders(config.layout.header['margin-bottom'], variables)};
+            }`;
+            
+            // Footer styles
+            css += `.footer {
+                background: ${replacePlaceholders(config.layout.footer.background, variables)};
+                color: ${replacePlaceholders(config.layout.footer.color, variables)};
+                padding: ${replacePlaceholders(config.layout.footer.padding, variables)};
+                text-align: ${replacePlaceholders(config.layout.footer['text-align'], variables)};
+                margin-top: ${replacePlaceholders(config.layout.footer['margin-top'], variables)};
+            }`;
+            
+            // Button styles
+            const btnConfig = config.components.button;
+            css += `.btn {
+                padding: ${replacePlaceholders(btnConfig.padding, variables)};
+                border-radius: ${replacePlaceholders(btnConfig['border-radius'], variables)};
+                font-weight: ${replacePlaceholders(btnConfig['font-weight'], variables)};
+                transition: ${replacePlaceholders(btnConfig.transition, variables)};
+                cursor: ${replacePlaceholders(btnConfig.cursor, variables)};
+                display: inline-block;
+                text-align: center;
+                font-size: 1rem;
+                margin: 5px;
+            }
+            
+            .btn-primary {
+                background: ${replacePlaceholders(btnConfig.primary.background, variables)};
+                color: ${replacePlaceholders(btnConfig.primary.color, variables)};
+                border: ${replacePlaceholders(btnConfig.primary.border, variables)};
+            }
+            
+            .btn-primary:hover {
+                background: ${replacePlaceholders(btnConfig.primary.hover.background, variables)};
+            }
+            
+            .btn-secondary {
+                background: ${replacePlaceholders(btnConfig.secondary.background, variables)};
+                color: ${replacePlaceholders(btnConfig.secondary.color, variables)};
+                border: ${replacePlaceholders(btnConfig.secondary.border, variables)};
+            }
+            
+            .btn-secondary:hover {
+                background: ${replacePlaceholders(btnConfig.secondary.hover.background, variables)};
+            }
+            
+            .btn-outline {
+                background: ${replacePlaceholders(btnConfig.outline.background, variables)};
+                color: ${replacePlaceholders(btnConfig.outline.color, variables)};
+                border: ${replacePlaceholders(btnConfig.outline.border, variables)};
+            }
+            
+            .btn-outline:hover {
+                background: ${replacePlaceholders(btnConfig.outline.hover.background, variables)};
+                color: ${replacePlaceholders(btnConfig.outline.hover.color, variables)};
+            }`;
+            
+            // Card styles
+            const cardConfig = config.components.card;
+            css += `.example-card {
+                background: ${replacePlaceholders(cardConfig.background, variables)};
+                border-radius: ${replacePlaceholders(cardConfig['border-radius'], variables)};
+                box-shadow: ${replacePlaceholders(cardConfig['box-shadow'], variables)};
+                transition: ${replacePlaceholders(cardConfig.transition, variables)};
+                overflow: hidden;
+                max-width: 300px;
+            }
+            
+            .example-card:hover {
+                box-shadow: ${replacePlaceholders(cardConfig.hover['box-shadow'], variables)};
+                transform: ${replacePlaceholders(cardConfig.hover.transform, variables)};
+            }
+            
+            .card-header {
+                background: ${replacePlaceholders(cardConfig.header.background, variables)};
+                padding: ${replacePlaceholders(cardConfig.header.padding, variables)};
+                border-bottom: ${replacePlaceholders(cardConfig.header['border-bottom'], variables)};
+            }
+            
+            .card-body {
+                padding: ${replacePlaceholders(cardConfig.body.padding, variables)};
+            }
+            
+            .card-footer {
+                padding: ${replacePlaceholders(cardConfig.footer.padding, variables)};
+                background: ${replacePlaceholders(cardConfig.footer.background, variables)};
+                border-top: ${replacePlaceholders(cardConfig.footer['border-top'], variables)};
+            }`;
+            
+            // Alert styles
+            const alertConfig = config.components.alert;
+            css += `.alert {
+                padding: ${replacePlaceholders(alertConfig.padding, variables)};
+                border-radius: ${replacePlaceholders(alertConfig['border-radius'], variables)};
+                margin-bottom: ${replacePlaceholders(alertConfig['margin-bottom'], variables)};
+                display: ${replacePlaceholders(alertConfig.display, variables)};
+                align-items: ${replacePlaceholders(alertConfig['align-items'], variables)};
+            }
+            
+            .alert i {
+                margin-right: ${replacePlaceholders(alertConfig.icon['margin-right'], variables)};
+                font-size: ${replacePlaceholders(alertConfig.icon['font-size'], variables)};
+            }
+            
+            .alert.success {
+                background: ${replacePlaceholders(alertConfig.success.background, variables)};
+                border: ${replacePlaceholders(alertConfig.success.border, variables)};
+                color: ${replacePlaceholders(alertConfig.success.color, variables)};
+            }
+            
+            .alert.warning {
+                background: ${replacePlaceholders(alertConfig.warning.background, variables)};
+                border: ${replacePlaceholders(alertConfig.warning.border, variables)};
+                color: ${replacePlaceholders(alertConfig.warning.color, variables)};
+            }
+            
+            .alert.error {
+                background: ${replacePlaceholders(alertConfig.error.background, variables)};
+                border: ${replacePlaceholders(alertConfig.error.border, variables)};
+                color: ${replacePlaceholders(alertConfig.error.color, variables)};
+            }`;
+            
+            // Utility classes
+            for (const util in config.utility) {
+                css += `.${util} {\n`;
+                for (const prop in config.utility[util]) {
+                    css += `  ${prop}: ${replacePlaceholders(config.utility[util][prop], variables)};\n`;
+                }
+                css += '}\n\n';
+            }
+            
+            // Additional styles
+            css += `.logo {
+                width: 120px;
+                height: 120px;
+                background: var(--colors-accent);
+                border-radius: 50%;
+                margin: 0 auto 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 60px;
+                box-shadow: var(--shadows-medium);
+            }
+            
+            .tabs {
+                display: flex;
+                background: white;
+                border-radius: 12px 12px 0 0;
+                overflow: hidden;
+                box-shadow: var(--shadows-soft);
+            }
+            
+            .tab {
+                flex: 1;
+                text-align: center;
+                padding: 15px;
+                background: var(--colors-light);
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-weight: 600;
+                color: var(--colors-dark);
+            }
+            
+            .tab:hover, .tab.active {
+                background: var(--colors-accent);
+                color: white;
+            }
+            
+            .content {
+                background: rgba(255, 255, 255, 0.98);
+                border-radius: 0 0 15px 15px;
+                padding: 30px;
+                min-height: 500px;
+                box-shadow: var(--shadows-hard);
+            }
+            
+            .color-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 20px;
+                margin-top: 20px;
+            }
+            
+            .color-card {
+                background: white;
+                border-radius: var(--borders-radius-sm);
+                overflow: hidden;
+                box-shadow: var(--shadows-soft);
+            }
+            
+            .color-preview {
+                height: 100px;
+            }
+            
+            .color-card.primary .color-preview { background: var(--colors-primary); }
+            .color-card.secondary .color-preview { background: var(--colors-secondary); }
+            .color-card.accent .color-preview { background: var(--colors-accent); }
+            .color-card.light .color-preview { background: var(--colors-light); }
+            .color-card.dark .color-preview { background: var(--colors-dark); }
+            
+            .color-info {
+                padding: 15px;
+                text-align: center;
+            }
+            
+            .gradient-example {
+                height: 150px;
+                background: linear-gradient(135deg, var(--colors-primary) 0%, var(--colors-secondary) 100%);
+                border-radius: var(--borders-radius-sm);
+                margin-top: 20px;
+            }
+            
+            .components-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 25px;
+                margin-top: 20px;
+            }
+            
+            .component-card {
+                background: white;
+                border-radius: var(--borders-radius-md);
+                padding: 20px;
+                box-shadow: var(--shadows-soft);
+            }
+            
+            .component-example {
+                margin-top: 15px;
+                padding: 15px;
+                background: var(--colors-light);
+                border-radius: var(--borders-radius-sm);
+            }
+            
+            .typography-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+                margin-top: 20px;
+            }
+            
+            @media (max-width: 768px) {
+                .typography-container {
+                    grid-template-columns: 1fr;
+                }
+            }
+            
+            .typography-example, .typography-body, .text-utilities {
+                background: white;
+                padding: 20px;
+                border-radius: var(--borders-radius-md);
+                box-shadow: var(--shadows-soft);
+            }
+            
+            blockquote {
+                padding: 15px;
+                background: var(--colors-light);
+                border-left: 4px solid var(--colors-accent);
+                margin: 15px 0;
+                font-style: italic;
+            }`;
+            
+            return css;
+        }
+
+        // Fungsi untuk menginisialisasi tema
+        function initTheme() {
+            // Ambil konfigurasi dari script
+            const configElement = document.getElementById('style-config');
+            const config = JSON.parse(configElement.textContent);
+            
+            // Generate CSS
+            const css = generateCSS(config);
+            
+            // Terapkan ke style element
+            const styleElement = document.getElementById('theme-styles');
+            styleElement.textContent = css;
+            
+            // Setup tab functionality
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    
+                    // Hide all tab contents
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Show the selected tab content
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-content`).classList.add('active');
+                });
+            });
+        }
+
+        // Inisialisasi tema saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', initTheme);
+    </script>
+</body>
+</html>

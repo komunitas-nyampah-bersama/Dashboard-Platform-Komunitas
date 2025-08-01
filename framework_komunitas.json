@@ -1,0 +1,41 @@
+{
+  "app_factory": {
+    "version": "2.0",
+    "templates": {
+      "nft_reward_system": {
+        "description": "Sistem reward NFT untuk aksi lingkungan",
+        "components": [
+          {
+            "type": "nft_minting",
+            "trigger": "weight_sensor > 1kg",
+            "metadata": {
+              "name": "EcoWarrior #{serial}",
+              "image": "ipfs://QmXyz..."
+            }
+          }
+        ]
+      },
+      "token_staking": {
+        "description": "Staking token untuk manfaat lingkungan",
+        "contract": "ERC-20 Staking",
+        "parameters": {
+          "min_stake": 100,
+          "rewards": "variable"
+        }
+      }
+    },
+    "workflows": {
+      "recycle_to_reward": [
+        {"step": "scan_qr"},
+        {"step": "weigh_waste"},
+        {"step": "mint_nft"},
+        {"step": "distribute_token"}
+      ]
+    },
+    "deployment_options": {
+      "blockchain": ["Polygon", "Ethereum", "Binance"],
+      "storage": ["IPFS", "Arweave", "Filecoin"],
+      "frontend": ["Web", "Mobile", "PWA"]
+    }
+  }
+}

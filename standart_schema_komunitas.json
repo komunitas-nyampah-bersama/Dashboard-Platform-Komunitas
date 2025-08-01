@@ -1,0 +1,32 @@
+{
+  "$schema": "https://2bcycle.org/schema/nft-metadata-v1.json",
+  "required_fields": {
+    "name": "string (min 3 char)",
+    "description": "string (min 20 char)",
+    "image": "ipfs://cid/image.png",
+    "animation_url": "ipfs://cid/app.html",
+    "external_url": "https://domain.app"
+  },
+  "custom_attributes": {
+    "app_type": "string (recycle|education|reward)",
+    "app_version": "semver (1.0.0)",
+    "logic_cid": "ipfs://cid/logic.js",
+    "schema_cid": "ipfs://cid/data-schema.json",
+    "dependencies": [
+      "https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"
+    ]
+  },
+  "examples": {
+    "recycle_app": {
+      "name": "EcoRecycle Palembang",
+      "description": "Aplikasi daur ulang komunitas Kota Palembang",
+      "image": "ipfs://QmXyz/logo.png",
+      "animation_url": "ipfs://QmAbc/app.html",
+      "app_type": "recycle",
+      "logic_cid": "ipfs://QmDef/recycle-logic.js",
+      "dependencies": [
+        "https://unpkg.com/qr-scanner@1.4.2/qr-scanner.min.js"
+      ]
+    }
+  }
+}

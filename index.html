@@ -305,7 +305,39 @@
             background-color: #7a1be0;
             transform: translateY(-3px);
         }
-        
+        /* Gradient untuk teks judul */
+        .gradient-text {
+    background: linear-gradient(90deg, #2ECC71, #3498DB);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+        }
+
+/* Highlight keyword penting */
+        .highlight {
+    background: rgba(46, 204, 113, 0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+        }
+
+/* Animasi subtle untuk badges */
+        .pulse {
+    animation: pulse 2s infinite;
+        }
+    @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+        }
+
+/* Grouping tombol lebih rapi */
+        .cta-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 15px;
+    justify-content: center;
+        .
         /* Section Styles */
         section {
             padding: 80px 0;
@@ -1353,32 +1385,58 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="container">
-            <h1 class="animate">Komunitas Akar Rumput Inovasi Pengelolaan Sampah dan Lingkungan</h1>
-            <p class="animate delay-1">Tata Kelola untuk Nilai Ekonomi yang Inklusif, Pemberdayaan Komunitas, Penerapan Teknologi WEB3 dan Penyesusaian Industri 5.0 untuk menciptakan Ekonomi Sirkular yang Berkelanjutan melalui Partisipasi dan Aksi Nyata.</p>
-            
-            <div class="web3-badges animate delay-2">
-                <div class="web3-badge">
-                    <i class="fab fa-ethereum"></i> Blockchain Research
-                </div>
-                <div class="web3-badge">
-                    <i class="fas fa-seedling"></i> Ekonomi Sirkular
-                </div>
-                <div class="web3-badge">
-                    <i class="fas fa-users"></i> Komunitas Desentralisasi
-                </div>
+    <div class="container">
+        <!-- Judul lebih dinamis dengan penekanan visual -->
+        <h1 class="animate">
+            <span class="gradient-text">Komunitas Akar Rumput</span><br>
+            Inovasi Pengelolaan Sampah & Lingkungan
+        </h1>
+        
+        <!-- Deskripsi lebih ringkas dan powerful -->
+        <p class="animate delay-1">
+            Membangun ekonomi sirkular berkelanjutan melalui pemberdayaan komunitas, 
+            penerapan teknologi <span class="highlight">WEB3</span> & <span class="highlight">Industri 5.0</span>, 
+            dan penciptaan nilai ekonomi inklusif.
+            <strong>#AksiNyataUntukBumi</strong>
+        </p>
+        
+        <!-- Badges dengan layout lebih compact -->
+        <div class="web3-badges animate delay-2">
+            <div class="web3-badge pulse">
+                <i class="fab fa-ethereum"></i> Teknologi Blockchain
+            </div>
+            <div class="web3-badge pulse">
+                <i class="fas fa-recycle"></i> Ekonomi Sirkular
+            </div>
+            <div class="web3-badge pulse">
+                <i class="fas fa-hands-helping"></i> Pemberdayaan Komunitas
+            </div>
+        </div>
+        
+        <!-- Tombol CTA dengan grouping lebih jelas -->
+        <div class="cta-buttons animate delay-3">
+            <div class="cta-group">
+                <a href="#join" class="btn btn-primary">
+                    <i class="fas fa-leaf"></i> Bergabung Sekarang
+                </a>
+                <a href="https://ec.europa.eu/eusurvey/runner/d9508257-4c05-4109-74d8-cac7c261a9a6" 
+                   target="_blank" 
+                   class="btn btn-secondary">
+                    <i class="fas fa-clipboard-list"></i> Ikuti Survei EU
+                </a>
             </div>
             
-            <div class="cta-buttons animate delay-3">
-                <a href="#join" class="btn btn-primary">Bergabung Sekarang</a>
-                <a href="https://ec.europa.eu/eusurvey/runner/d9508257-4c05-4109-74d8-cac7c261a9a6" target="_blank" class="btn btn-secondary">Ikuti Survei EU</a>
-                <button id="loginEuSurveyBtn" class="btn btn-warning">Login EU Survey</button>
+            <div class="cta-group">
+                <button id="loginEuSurveyBtn" class="btn btn-light">
+                    <i class="fas fa-sign-in-alt"></i> Login EU Survey
+                </button>
                 <button class="btn btn-blockchain" id="blockchainHeroBtn">
                     <i class="fab fa-ethereum"></i> Blockchain Explorer
                 </button>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- EU Survey Modal -->
     <div id="euSurveyModal" class="modal">
@@ -1521,7 +1579,7 @@
         <div class="container">
             <div class="section-title animate">
                 <h2 style="color: white;">Teknologi Blockchain</h2>
-                <p>Memanfaatkan teknologi terdesentralisasi untuk transparansi dan keadilan</p>
+                <p>Memanfaatkan teknologi terdesentralisasi untuk transparansi dan verifikasi</p>
             </div>
             
             <div class="blockchain-stats">

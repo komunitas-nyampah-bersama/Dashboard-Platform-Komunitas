@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nyampah Builder - Drag & Drop Blockchain App Builder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-dark: #1b5e20;
+            --secondary: #ffc107;
+            --accent: #4caf50;
+            --light: #e8f5e9;
+            --dark: #1a237e;
+            --text: #333;
+            --background: #f5f5f5;
+            --sidebar-width: 300px;
+            --header-height: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            display: grid;
+            grid-template-rows: var(--header-height) 1fr;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+        }
+        
+        /* Main Container */
+        .main-container {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr 350px;
+            height: calc(100vh - var(--header-height));
+        }
+        
+        /* Komponen Sidebar */
+        .components-sidebar {
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .sidebar-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .components-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .component-item {
+            background: var(--light);
+            border: 1px dashed var(--accent);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s;
+        }
+        
+        .component-item:hover {
+            background: #c8e6c9;
+            transform: translateY(-3px);
+        }
+        
+        .component-icon {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        /* Builder Canvas */
+        .builder-canvas {
+            background: #f0f4f7;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .canvas-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+            min-height: 90%;
+            margin: 0 auto;
+            max-width: 900px;
+            position: relative;
+        }
+        
+        .resize-handle {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: nwse-resize;
+            z-index: 10;
+        }
+        
+        /* Device Preview */
+        .device-preview {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .device-btn {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .device-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* Component Styles */
+        .canvas-component {
+            border: 2px dashed transparent;
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .canvas-component.selected {
+            border-color: var(--secondary);
+            background: rgba(255, 193, 7, 0.1);
+        }
+        
+        .component-toolbar {
+            position: absolute;
+            top: -15px;
+            right: 10px;
+            background: var(--secondary);
+            border-radius: 20px;
+            padding: 5px 10px;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 20;
+        }
+        
+        .canvas-component:hover .component-toolbar {
+            opacity: 1;
+        }
+        
+        .tool-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+        
+        /* Property Panel */
+        .property-panel {
+            background: white;
+            border-left: 1px solid #e0e0e0;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .property-section {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .property-section h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary);
+            color: var(--dark);
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            background-color: #ffb300;
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+        
+        /* WYSIWYG Editor */
+        .wysiwyg-editor {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            min-height: 150px;
+            margin-top: 10px;
+        }
+        
+        .editor-toolbar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .editor-btn {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: var(--sidebar-width) 1fr;
+            }
+            
+            .property-panel {
+                position: fixed;
+                right: -400px;
+                top: var(--header-height);
+                width: 350px;
+                height: calc(100vh - var(--header-height));
+                transition: right 0.3s;
+                z-index: 200;
+            }
+            
+            .property-panel.open {
+                right: 0;
+            }
+            
+            .toggle-properties {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 220px;
+            }
+            
+            .components-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+        }
+        
+        /* Drag and Drop Styles */
+        .dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+        
+        .drop-area {
+            min-height: 100px;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            margin: 15px 0;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .drop-area.highlight {
+            border-color: var(--primary);
+            background: rgba(46, 125, 50, 0.05);
+        }
+        
+        /* Mobile Preview */
+        .mobile-preview .canvas-container {
+            max-width: 400px;
+            min-height: 600px;
+        }
+        
+        /* SDK Panel */
+        .sdk-panel {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .sdk-panel h4 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-recycle logo-icon"></i>
+            <h1>Nyampah Builder Pro</h1>
+        </div>
+        <div>
+            <button class="btn btn-primary" id="export-btn">
+                <i class="fas fa-download"></i> Export Project
+            </button>
+        </div>
+    </header>
+    
+    <div class="main-container">
+        <!-- Komponen Sidebar -->
+        <div class="components-sidebar">
+            <div class="sidebar-title">
+                <h2><i class="fas fa-shapes"></i> Komponen</h2>
+                <button class="btn" id="clear-btn">
+                    <i class="fas fa-trash"></i> Clear
+                </button>
+            </div>
+            
+            <div class="components-list">
+                <div class="component-item" draggable="true" data-type="header">
+                    <i class="fas fa-heading component-icon"></i>
+                    <h3>Header</h3>
+                </div>
+                <div class="component-item" draggable="true" data-type="hero">
+                    <i class="fas fa-image component-icon"></i>
+                    <h3>Hero Section</h3>
+                </div>
+                <div class="component-item" draggable="true" data-type="features">
+                    <i class="fas fa-th-large component-icon"></i>
+                    <h3>Fitur</h3>
+                </div>
+                <div class="component-item" draggable="true" data-type="nft">
+                    <i class="fas fa-coins component-icon"></i>
+                    <h3>NFT Gallery</h3>
+                </div>
+                <div class="component-item" draggable="true" data-type="token">
+                    <i class="fas fa-wallet component-icon"></i>
+                    <h3>Token Info</h3>
+                </div>
+                <div class="component-item" draggable="true" data-type="form">
+                    <i class="fas fa-edit component-icon"></i>
+                    <h3>Form</h3>
+                </div>
+                <div class="component-item" draggable="true" data-type="footer">
+                    <i class="fas fa-shoe-prints component-icon"></i>
+                    <h3>Footer</h3>
+                </div>
+                <div class="component-item" draggable="true" data-type="wallet">
+                    <i class="fas fa-plug component-icon"></i>
+                    <h3>Wallet Connect</h3>
+                </div>
+            </div>
+            
+            <div class="sdk-panel">
+                <h4><i class="fas fa-code"></i> SDK Integrasi</h4>
+                <p>Panggil komponen blockchain dengan kode berikut:</p>
+                <pre style="background: white; padding: 10px; border-radius: 5px; margin-top: 10px;">
+&lt;script src="https://sdk.nyampah.com/v1.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  NyampahSDK.init({
+    appId: 'APP123456',
+    theme: 'green'
+  });
+&lt;/script&gt;</pre>
+            </div>
+        </div>
+        
+        <!-- Builder Canvas -->
+        <div class="builder-canvas">
+            <div class="device-preview">
+                <button class="device-btn active" data-device="desktop">
+                    <i class="fas fa-desktop"></i> Desktop
+                </button>
+                <button class="device-btn" data-device="mobile">
+                    <i class="fas fa-mobile-alt"></i> Mobile
+                </button>
+                <button class="device-btn" id="toggle-properties">
+                    <i class="fas fa-cog"></i> Properties
+                </button>
+            </div>
+            
+            <div class="canvas-container">
+                <div class="drop-area" id="canvas-drop-area">
+                    <p style="text-align: center; color: #777;">Drag komponen ke sini untuk memulai</p>
+                </div>
+                <div class="resize-handle">
+                    <i class="fas fa-expand-alt"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Property Panel -->
+        <div class="property-panel" id="property-panel">
+            <div class="property-section">
+                <h3><i class="fas fa-sliders-h"></i> Pengaturan Komponen</h3>
+                <div id="component-properties">
+                    <p>Pilih komponen untuk mengedit properti</p>
+                </div>
+            </div>
+            
+            <div class="property-section">
+                <h3><i class="fas fa-paint-brush"></i> Pengaturan Aplikasi</h3>
+                <div class="form-group">
+                    <label>Nama Aplikasi</label>
+                    <input type="text" class="form-control" id="app-name" value="Aplikasi Komunitas Nyampah">
+                </div>
+                
+                <div class="form-group">
+                    <label>Deskripsi</label>
+                    <textarea class="form-control" id="app-description" rows="3">Platform manajemen sampah berbasis blockchain</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Tema Warna</label>
+                    <div class="color-picker">
+                        <div class="color-preview" id="primary-color-preview" style="background: #2e7d32;"></div>
+                        <input type="color" class="form-control" id="primary-color" value="#2e7d32">
+                        <span>Primary</span>
+                    </div>
+                    <div class="color-picker">
+                        <div class="color-preview" id="secondary-color-preview" style="background: #ffc107;"></div>
+                        <input type="color" class="form-control" id="secondary-color" value="#ffc107">
+                        <span>Secondary</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="property-section">
+                <h3><i class="fas fa-code"></i> Konfigurasi JSON</h3>
+                <textarea class="form-control" id="json-output" rows="10" style="font-family: monospace;"></textarea>
+                <button class="btn btn-primary btn-block" id="update-json">
+                    <i class="fas fa-sync"></i> Update dari JSON
+                </button>
+            </div>
+            
+            <button class="btn btn-primary btn-block" id="save-btn">
+                <i class="fas fa-save"></i> Simpan Konfigurasi
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // State aplikasi
+        const state = {
+            currentComponent: null,
+            components: [],
+            device: 'desktop',
+            appConfig: {
+                name: "Aplikasi Komunitas Nyampah",
+                description: "Platform manajemen sampah berbasis blockchain",
+                theme: {
+                    primary: "#2e7d32",
+                    secondary: "#ffc107"
+                }
+            }
+        };
+        
+        // Inisialisasi drag and drop
+        function initDragAndDrop() {
+            const components = document.querySelectorAll('.component-item');
+            const dropArea = document.getElementById('canvas-drop-area');
+            
+            components.forEach(comp => {
+                comp.addEventListener('dragstart', function(e) {
+                    e.dataTransfer.setData('text/plain', this.dataset.type);
+                    this.classList.add('dragging');
+                });
+                
+                comp.addEventListener('dragend', function() {
+                    this.classList.remove('dragging');
+                });
+            });
+            
+            dropArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('highlight');
+            });
+            
+            dropArea.addEventListener('dragleave', function() {
+                this.classList.remove('highlight');
+            });
+            
+            dropArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('highlight');
+                
+                const compType = e.dataTransfer.getData('text/plain');
+                addComponentToCanvas(compType);
+            });
+        }
+        
+        // Tambahkan komponen ke canvas
+        function addComponentToCanvas(type) {
+            const compId = 'comp-' + Date.now();
+            let compHtml = '';
+            
+            switch(type) {
+                case 'header':
+                    compHtml = `
+                        <div class="canvas-component" id="${compId}" data-type="header">
+                            <div class="component-toolbar">
+                                <button class="tool-btn edit-btn"><i class="fas fa-edit"></i></button>
+                                <button class="tool-btn delete-btn"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <h1>${state.appConfig.name}</h1>
+                            <p>${state.appConfig.description}</p>
+                        </div>
+                    `;
+                    break;
+                case 'hero':
+                    compHtml = `
+                        <div class="canvas-component" id="${compId}" data-type="hero">
+                            <div class="component-toolbar">
+                                <button class="tool-btn edit-btn"><i class="fas fa-edit"></i></button>
+                                <button class="tool-btn delete-btn"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <div style="background: ${state.appConfig.theme.primary}; color: white; padding: 50px 20px; text-align: center; border-radius: 10px;">
+                                <h2>Selamat Datang di Aplikasi Kami</h2>
+                                <p>Platform blockchain untuk pengelolaan sampah yang berkelanjutan</p>
+                                <button style="background: ${state.appConfig.theme.secondary}; border: none; padding: 10px 30px; border-radius: 30px; margin-top: 20px; font-weight: bold;">
+                                    Mulai Sekarang
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'features':
+                    compHtml = `
+                        <div class="canvas-component" id="${compId}" data-type="features">
+                            <div class="component-toolbar">
+                                <button class="tool-btn edit-btn"><i class="fas fa-edit"></i></button>
+                                <button class="tool-btn delete-btn"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <h2 style="text-align: center; margin-bottom: 30px;">Fitur Utama</h2>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                                <div style="text-align: center; padding: 20px; background: #f5f5f5; border-radius: 10px;">
+                                    <i class="fas fa-recycle" style="font-size: 2rem; color: ${state.appConfig.theme.primary}; margin-bottom: 15px;"></i>
+                                    <h3>Daur Ulang</h3>
+                                    <p>Kelola proses daur ulang dengan transparan</p>
+                                </div>
+                                <div style="text-align: center; padding: 20px; background: #f5f5f5; border-radius: 10px;">
+                                    <i class="fas fa-coins" style="font-size: 2rem; color: ${state.appConfig.theme.primary}; margin-bottom: 15px;"></i>
+                                    <h3>Reward Token</h3>
+                                    <p>Dapatkan token sebagai reward</p>
+                                </div>
+                                <div style="text-align: center; padding: 20px; background: #f5f5f5; border-radius: 10px;">
+                                    <i class="fas fa-certificate" style="font-size: 2rem; color: ${state.appConfig.theme.primary}; margin-bottom: 15px;"></i>
+                                    <h3>NFT Sertifikat</h3>
+                                    <p>Bukti kepemilikan dan prestasi</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'nft':
+                    compHtml = `
+                        <div class="canvas-component" id="${compId}" data-type="nft">
+                            <div class="component-toolbar">
+                                <button class="tool-btn edit-btn"><i class="fas fa-edit"></i></button>
+                                <button class="tool-btn delete-btn"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <h2 style="text-align: center; margin-bottom: 30px;">Koleksi NFT</h2>
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                                <div style="border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+                                    <div style="height: 150px; background: #eee;"></div>
+                                    <div style="padding: 15px;">
+                                        <h3>Eco Warrior</h3>
+                                        <p>NFT untuk aktivis lingkungan</p>
+                                    </div>
+                                </div>
+                                <div style="border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+                                    <div style="height: 150px; background: #eee;"></div>
+                                    <div style="padding: 15px;">
+                                        <h3>Recycle Master</h3>
+                                        <p>Ahli daur ulang level master</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                default:
+                    compHtml = `
+                        <div class="canvas-component" id="${compId}" data-type="${type}">
+                            <div class="component-toolbar">
+                                <button class="tool-btn edit-btn"><i class="fas fa-edit"></i></button>
+                                <button class="tool-btn delete-btn"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <h3>${type} Component</h3>
+                            <p>This is a ${type} component. Edit me!</p>
+                        </div>
+                    `;
+            }
+            
+            const dropArea = document.getElementById('canvas-drop-area');
+            if (dropArea.querySelector('p')) {
+                dropArea.innerHTML = '';
+            }
+            
+            dropArea.insertAdjacentHTML('beforeend', compHtml);
+            
+            // Simpan komponen ke state
+            state.components.push({
+                id: compId,
+                type: type,
+                content: compHtml
+            });
+            
+            // Tambahkan event listeners untuk toolbar
+            document.getElementById(compId).querySelector('.edit-btn').addEventListener('click', function() {
+                selectComponent(compId);
+            });
+            
+            document.getElementById(compId).querySelector('.delete-btn').addEventListener('click', function() {
+                document.getElementById(compId).remove();
+                state.components = state.components.filter(c => c.id !== compId);
+                state.currentComponent = null;
+                renderProperties();
+            });
+            
+            // Pilih komponen baru
+            selectComponent(compId);
+        }
+        
+        // Pilih komponen untuk edit
+        function selectComponent(compId) {
+            // Hapus seleksi sebelumnya
+            document.querySelectorAll('.canvas-component').forEach(comp => {
+                comp.classList.remove('selected');
+            });
+            
+            // Tambahkan seleksi ke komponen yang dipilih
+            const comp = document.getElementById(compId);
+            if (comp) {
+                comp.classList.add('selected');
+                state.currentComponent = state.components.find(c => c.id === compId);
+                renderProperties();
+            }
+        }
+        
+        // Render properti komponen yang dipilih
+        function renderProperties() {
+            const propsContainer = document.getElementById('component-properties');
+            
+            if (!state.currentComponent) {
+                propsContainer.innerHTML = '<p>Pilih komponen untuk mengedit properti</p>';
+                return;
+            }
+            
+            let propsHtml = '';
+            const compType = state.currentComponent.type;
+            
+            switch(compType) {
+                case 'header':
+                    propsHtml = `
+                        <div class="form-group">
+                            <label>Judul</label>
+                            <input type="text" class="form-control" id="header-title" value="${state.appConfig.name}">
+                        </div>
+                        <div class="form-group">
+                            <label>Deskripsi</label>
+                            <textarea class="form-control" id="header-description" rows="2">${state.appConfig.description}</textarea>
+                        </div>
+                    `;
+                    break;
+                case 'hero':
+                    propsHtml = `
+                        <div class="form-group">
+                            <label>Judul Hero</label>
+                            <input type="text" class="form-control" id="hero-title" value="Selamat Datang di Aplikasi Kami">
+                        </div>
+                        <div class="form-group">
+                            <label>Subjudul</label>
+                            <textarea class="form-control" id="hero-subtitle" rows="2">Platform blockchain untuk pengelolaan sampah yang berkelanjutan</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Teks Tombol</label>
+                            <input type="text" class="form-control" id="hero-button" value="Mulai Sekarang">
+                        </div>
+                    `;
+                    break;
+                default:
+                    propsHtml = `
+                        <div class="form-group">
+                            <label>Judul</label>
+                            <input type="text" class="form-control" id="comp-title" value="${compType} Component">
+                        </div>
+                        <div class="form-group">
+                            <label>Konten</label>
+                            <div class="wysiwyg-editor" id="comp-content" contenteditable="true">
+                                <p>This is a ${compType} component. Edit me!</p>
+                            </div>
+                        </div>
+                    `;
+            }
+            
+            propsContainer.innerHTML = propsHtml;
+            
+            // Tambahkan event listeners untuk WYSIWYG jika ada
+            if (document.getElementById('comp-content')) {
+                initWysiwyg('comp-content');
+            }
+        }
+        
+        // Inisialisasi WYSIWYG editor
+        function initWysiwyg(editorId) {
+            const editor = document.getElementById(editorId);
+            
+            // Toolbar editor
+            const toolbar = document.createElement('div');
+            toolbar.className = 'editor-toolbar';
+            
+            const buttons = [
+                {icon: 'bold', command: 'bold', title: 'Bold'},
+                {icon: 'italic', command: 'italic', title: 'Italic'},
+                {icon: 'underline', command: 'underline', title: 'Underline'},
+                {icon: 'list-ul', command: 'insertUnorderedList', title: 'Bullet List'},
+                {icon: 'list-ol', command: 'insertOrderedList', title: 'Numbered List'},
+                {icon: 'link', command: 'createLink', title: 'Insert Link'},
+            ];
+            
+            buttons.forEach(btn => {
+                const button = document.createElement('button');
+                button.className = 'editor-btn';
+                button.innerHTML = `<i class="fas fa-${btn.icon}"></i>`;
+                button.title = btn.title;
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.execCommand(btn.command, false, null);
+                    editor.focus();
+                });
+                toolbar.appendChild(button);
+            });
+            
+            editor.parentNode.insertBefore(toolbar, editor);
+        }
+        
+        // Update tema aplikasi
+        function updateTheme() {
+            const root = document.documentElement;
+            root.style.setProperty('--primary', state.appConfig.theme.primary);
+            root.style.setProperty('--primary-dark', shadeColor(state.appConfig.theme.primary, -20));
+            root.style.setProperty('--secondary', state.appConfig.theme.secondary);
+            
+            // Update preview warna
+            document.getElementById('primary-color-preview').style.background = state.appConfig.theme.primary;
+            document.getElementById('secondary-color-preview').style.background = state.appConfig.theme.secondary;
+        }
+        
+        // Fungsi untuk menggelapkan atau mencerahkan warna
+        function shadeColor(color, percent) {
+            let R = parseInt(color.substring(1,3),16);
+            let G = parseInt(color.substring(3,5),16);
+            let B = parseInt(color.substring(5,7),16);
+
+            R = parseInt(R * (100 + percent) / 100);
+            G = parseInt(G * (100 + percent) / 100);
+            B = parseInt(B * (100 + percent) / 100);
+
+            R = (R<255)?R:255;  
+            G = (G<255)?G:255;  
+            B = (B<255)?B:255;  
+
+            return `#${((1 << 24) + (R << 16) + (G << 8) + B).toString(16).slice(1)}`;
+        }
+        
+        // Generate JSON konfigurasi
+        function generateJSON() {
+            const config = {
+                app: state.appConfig,
+                components: state.components.map(comp => {
+                    return {
+                        type: comp.type,
+                        id: comp.id
+                        // Di aplikasi nyata, akan ada lebih banyak properti yang disimpan
+                    };
+                })
+            };
+            
+            document.getElementById('json-output').value = JSON.stringify(config, null, 2);
+        }
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi
+            initDragAndDrop();
+            updateTheme();
+            generateJSON();
+            
+            // Event untuk pengaturan aplikasi
+            document.getElementById('app-name').addEventListener('input', function() {
+                state.appConfig.name = this.value;
+                generateJSON();
+            });
+            
+            document.getElementById('app-description').addEventListener('input', function() {
+                state.appConfig.description = this.value;
+                generateJSON();
+            });
+            
+            document.getElementById('primary-color').addEventListener('input', function() {
+                state.appConfig.theme.primary = this.value;
+                updateTheme();
+                generateJSON();
+            });
+            
+            document.getElementById('secondary-color').addEventListener('input', function() {
+                state.appConfig.theme.secondary = this.value;
+                updateTheme();
+                generateJSON();
+            });
+            
+            // Event untuk preview device
+            document.querySelectorAll('.device-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const device = this.dataset.device;
+                    const canvas = document.querySelector('.canvas-container');
+                    
+                    if (device === 'mobile') {
+                        canvas.style.maxWidth = '400px';
+                        document.body.classList.add('mobile-preview');
+                    } else {
+                        canvas.style.maxWidth = '900px';
+                        document.body.classList.remove('mobile-preview');
+                    }
+                });
+            });
+            
+            // Toggle property panel di mobile
+            document.getElementById('toggle-properties').addEventListener('click', function() {
+                document.getElementById('property-panel').classList.toggle('open');
+            });
+            
+            // Simpan konfigurasi
+            document.getElementById('save-btn').addEventListener('click', function() {
+                alert('Konfigurasi berhasil disimpan!');
+                generateJSON();
+            });
+            
+            // Update dari JSON
+            document.getElementById('update-json').addEventListener('click', function() {
+                try {
+                    const newConfig = JSON.parse(document.getElementById('json-output').value);
+                    state.appConfig = newConfig.app;
+                    
+                    // Update form
+                    document.getElementById('app-name').value = state.appConfig.name;
+                    document.getElementById('app-description').value = state.appConfig.description;
+                    document.getElementById('primary-color').value = state.appConfig.theme.primary;
+                    document.getElementById('secondary-color').value = state.appConfig.theme.secondary;
+                    
+                    updateTheme();
+                    alert('Konfigurasi diperbarui dari JSON!');
+                } catch(e) {
+                    alert('Error parsing JSON: ' + e.message);
+                }
+            });
+            
+            // Export project
+            document.getElementById('export-btn').addEventListener('click', function() {
+                generateJSON();
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(document.getElementById('json-output').value);
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", "nyampah-app-config.json");
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                document.body.removeChild(downloadAnchor);
+            });
+            
+            // Clear canvas
+            document.getElementById('clear-btn').addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin menghapus semua komponen?')) {
+                    document.getElementById('canvas-drop-area').innerHTML = '<p style="text-align: center; color: #777;">Drag komponen ke sini untuk memulai</p>';
+                    
+                    state.components = [];
+                    state.currentComponent = null;
+                    renderProperties();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Living Journal NFT - Komunitas Nyampah Bersama</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.4/dist/web3.min.js"></script>
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --secondary: #27ae60;
+            --dark: #1e272e;
+            --light: #f5f6fa;
+            --accent: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .logo i {
+            font-size: 4rem;
+            color: var(--primary);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.9);
+            border-radius: 12px;
+            padding: 1.5rem;
+            min-width: 200px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: var(--dark);
+        }
+        
+        .nft-section {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+            position: relative;
+        }
+        
+        .section-title:after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: var(--accent);
+            margin: 0.5rem auto;
+            border-radius: 2px;
+        }
+        
+        .nft-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .nft-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .nft-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .nft-image {
+            height: 250px;
+            background: linear-gradient(45deg, #3498db, #9b59b6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nft-image i {
+            font-size: 6rem;
+            color: white;
+            opacity: 0.8;
+        }
+        
+        .nft-content {
+            padding: 1.5rem;
+        }
+        
+        .nft-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .nft-description {
+            color: #555;
+            margin-bottom: 1.5rem;
+            min-height: 80px;
+        }
+        
+        .nft-meta {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .meta-item:last-child {
+            border-bottom: none;
+        }
+        
+        .meta-label {
+            font-weight: 600;
+            color: #777;
+        }
+        
+        .meta-value {
+            color: var(--dark);
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            margin-top: 0.5rem;
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .impact-section {
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            color: white;
+            padding: 4rem 1rem;
+            text-align: center;
+        }
+        
+        .impact-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .impact-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .impact-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .impact-card i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+        
+        .impact-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .verification {
+            background: var(--light);
+            padding: 4rem 1rem;
+        }
+        
+        .verification-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 3rem;
+        }
+        
+        .verification-text {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .verification-badge {
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+        }
+        
+        .badge {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .badge i {
+            font-size: 5rem;
+            color: white;
+        }
+        
+        .community-section {
+            padding: 4rem 1rem;
+            background: #f8f9fa;
+        }
+        
+        .community-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .community-logos {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .partner-logo {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .partner-logo i {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: left;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .footer-section h3:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--primary);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid #444;
+            color: #888;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stat-card {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-recycle"></i>
+                </div>
+            </div>
+            <h1>Living Journal NFT</h1>
+            <p class="subtitle">Komunitas Nyampah Bersama - Setiap aktivitas adalah kontribusi untuk bumi yang lebih hijau dan tercatat abadi di blockchain</p>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-members">1,240</div>
+                    <div class="stat-label">Anggota Komunitas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-waste">56.8</div>
+                    <div class="stat-label">Ton Sampah Terkelola</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="co2-reduced">124.5</div>
+                    <div class="stat-label">Ton CO2 Berkurang</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="nft-editions">12</div>
+                    <div class="stat-label">Edisi NFT</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- NFT Collection Section -->
+    <section class="nft-section">
+        <h2 class="section-title">Koleksi NFT Edisi Kami</h2>
+        
+        <div class="nft-container">
+            <!-- NFT 1 -->
+            <div class="nft-card">
+                <div class="nft-image">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="nft-content">
+                    <h3 class="nft-title">Edisi Perintis</h3>
+                    <p class="nft-description">Edisi pertama komunitas, menandai dimulainya revolusi daur ulang berbasis blockchain.</p>
+                    
+                    <div class="nft-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Edisi</span>
+                            <span class="meta-value">#1/100</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Tanggal</span>
+                            <span class="meta-value">15 Jan 2024</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Dampak</span>
+                            <span class="meta-value">2.1 Ton CO2e</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn">Lihat Detail</button>
+                    <button class="btn btn-outline">Beli di OpenSea</button>
+                </div>
+            </div>
+            
+            <!-- NFT 2 -->
+            <div class="nft-card">
+                <div class="nft-image">
+                    <i class="fas fa-water"></i>
+                </div>
+                <div class="nft-content">
+                    <h3 class="nft-title">Revolusi Sungai</h3>
+                    <p class="nft-description">Pembersihan sungai Ciliwung yang melibatkan 500 relawan dan mengangkat 8 ton sampah.</p>
+                    
+                    <div class="nft-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Edisi</span>
+                            <span class="meta-value">#2/250</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Tanggal</span>
+                            <span class="meta-value">22 Mar 2024</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Dampak</span>
+                            <span class="meta-value">5.8 Ton CO2e</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn">Lihat Detail</button>
+                    <button class="btn btn-outline">Beli di OpenSea</button>
+                </div>
+            </div>
+            
+            <!-- NFT 3 -->
+            <div class="nft-card">
+                <div class="nft-image">
+                    <i class="fas fa-solar-panel"></i>
+                </div>
+                <div class="nft-content">
+                    <h3 class="nft-title">Eco Campus</h3>
+                    <p class="nft-description">Implementasi daur ulang di 10 kampus dengan sistem reward berbasis blockchain.</p>
+                    
+                    <div class="nft-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Edisi</span>
+                            <span class="meta-value">#3/500</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Tanggal</span>
+                            <span class="meta-value">5 Jun 2024</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Dampak</span>
+                            <span class="meta-value">12.4 Ton CO2e</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn">Lihat Detail</button>
+                    <button class="btn btn-outline">Beli di OpenSea</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Section -->
+    <section class="impact-section">
+        <div class="impact-content">
+            <h2 class="section-title">Dampak Nyata Kami</h2>
+            <p>Setiap NFT mewakili kontribusi nyata terhadap lingkungan dan komunitas</p>
+            
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <i class="fas fa-recycle"></i>
+                    <h3>Pengelolaan Sampah</h3>
+                    <p>56.8 ton sampah berhasil didaur ulang dan dikelola dengan baik</p>
+                </div>
+                
+                <div class="impact-card">
+                    <i class="fas fa-cloud"></i>
+                    <h3>Pengurangan Emisi</h3>
+                    <p>124.5 ton CO2 berhasil dikurangi melalui program kami</p>
+                </div>
+                
+                <div class="impact-card">
+                    <i class="fas fa-users"></i>
+                    <h3>Pemberdayaan</h3>
+                    <p>1,240 anggota komunitas aktif terlibat dalam program</p>
+                </div>
+                
+                <div class="impact-card">
+                    <i class="fas fa-tree"></i>
+                    <h3>Penghijauan</h3>
+                    <p>500+ pohon ditanam di area terdampak sampah</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Verification Section -->
+    <section class="verification">
+        <div class="verification-content">
+            <div class="verification-text">
+                <h2 class="section-title">Verifikasi & Transparansi</h2>
+                <p>Setiap aktivitas dan dampak lingkungan diverifikasi dan tercatat secara transparan:</p>
+                
+                <ul style="margin-top: 1rem; margin-left: 1.5rem;">
+                    <li>Data tercatat abadi di Polygon Blockchain</li>
+                    <li>Diverifikasi melalui standar Verra</li>
+                    <li>Terkoneksi dengan Zenodo untuk validasi ilmiah</li>
+                    <li>Metadata NFT terhubung dengan laporan dampak real-time</li>
+                </ul>
+                
+                <div style="margin-top: 2rem;">
+                    <a href="#" class="btn" style="width: auto; display: inline-block; margin-right: 10px;">
+                        <i class="fas fa-file-contract"></i> Kontrak Cerdas
+                    </a>
+                    <a href="#" class="btn btn-outline" style="width: auto; display: inline-block;">
+                        <i class="fas fa-chart-line"></i> Lihat Dashboard
+                    </a>
+                </div>
+            </div>
+            
+            <div class="verification-badge">
+                <div class="badge">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <p style="margin-top: 2rem; font-size: 1.1rem;">
+                    DOI: <a href="https://doi.org/10.5281/zenodo.XXXX" style="color: var(--primary);">10.5281/zenodo.XXXX</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Partners -->
+    <section class="community-section">
+        <div class="community-content">
+            <h2 class="section-title">Kolaborasi & Sinergi</h2>
+            <p>Bersama mitra strategis mewujudkan ekonomi sirkular berkelanjutan</p>
+            
+            <div class="community-logos">
+                <div class="partner-logo">
+                    <i class="fab fa-pagelines"></i>
+                </div>
+                <div class="partner-logo">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="partner-logo">
+                    <i class="fas fa-city"></i>
+                </div>
+                <div class="partner-logo">
+                    <i class="fab fa-envira"></i>
+                </div>
+                <div class="partner-logo">
+                    <i class="fas fa-hand-holding-water"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Tentang Kami</h3>
+                <p>Komunitas Nyampah Bersama adalah gerakan inovatif yang menggabungkan pengelolaan sampah, teknologi blockchain, dan ekonomi sirkular untuk menciptakan dampak berkelanjutan.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Link Cepat</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-arrow-right"></i> Koleksi NFT</a></li>
+                    <li><a href="#"><i class="fas fa-arrow-right"></i> Program Kami</a></li>
+                    <li><a href="#"><i class="fas fa-arrow-right"></i> Bergabung</a></li>
+                    <li><a href="#"><i class="fas fa-arrow-right"></i> Whitepaper</a></li>
+                    <li><a href="#"><i class="fas fa-arrow-right"></i> Dashboard Dampak</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Kontak</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-map-marker-alt"></i> Jakarta, Indonesia</li>
+                    <li><i class="fas fa-envelope"></i> info@nyampahbersama.id</li>
+                    <li><i class="fab fa-telegram"></i> t.me/nyampahbersama</li>
+                    <li><i class="fab fa-twitter"></i> @nyampahbersama</li>
+                    <li><i class="fab fa-discord"></i> Discord Komunitas</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2024 Komunitas Nyampah Bersama. Seluruh hak cipta dilindungi.</p>
+            <p>Smart Contract: 0x5FbDB2315678afecb367f032d93F642f64180aa3</p>
+        </div>
+    </footer>
+
+    <script>
+        // Blockchain Integration
+        async function loadBlockchainData() {
+            try {
+                // Inisialisasi Web3
+                if (window.ethereum) {
+                    window.web3 = new Web3(ethereum);
+                    await ethereum.enable();
+                } else if (window.web3) {
+                    window.web3 = new Web3(web3.currentProvider);
+                } else {
+                    console.log('Non-Ethereum browser detected. Consider installing MetaMask!');
+                    return;
+                }
+                
+                // Kontrak Pintar (Alamat Polygon Mainnet)
+                const contractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+                const contractABI = [...]; // ABI akan diisi setelah kontrak di-deploy
+                
+                const contract = new web3.eth.Contract(contractABI, contractAddress);
+                
+                // Mendapatkan data komunitas dari kontrak
+                const communityData = await contract.methods.getCommunityData().call();
+                
+                // Update UI dengan data dari blockchain
+                document.getElementById('total-members').innerText = communityData.memberCount.toLocaleString();
+                document.getElementById('total-waste').innerText = communityData.totalWaste.toFixed(1);
+                document.getElementById('co2-reduced').innerText = communityData.co2Reduced.toFixed(1);
+                document.getElementById('nft-editions').innerText = communityData.nftEditions;
+                
+            } catch (error) {
+                console.error('Error loading blockchain data:', error);
+            }
+        }
+        
+        // Load data saat halaman siap
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load data blockchain jika wallet terdeteksi
+            if (typeof window.ethereum !== 'undefined') {
+                loadBlockchainData();
+            }
+            
+            // Animasi statistik
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('mouseover', () => {
+                    card.style.transform = 'scale(1.05)';
+                });
+                card.addEventListener('mouseout', () => {
+                    card.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

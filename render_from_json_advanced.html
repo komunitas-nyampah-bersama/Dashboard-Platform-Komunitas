@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>🧬 JSON Renderer Interaktif</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: var(--bg, #f5f5f5);
+      color: var(--text, #222);
+      padding: 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: var(--card, #fff);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 10px;
+    }
+    .header { font-size: 20px; font-weight: bold; }
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .filter-bar button {
+      padding: 6px 12px;
+      border: none;
+      background: #18b875;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .dark-mode {
+      --bg: #1e1e1e;
+      --text: #f5f5f5;
+      --card: #2c2c2c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🌍 JSON Renderer Interaktif</h2>
+    <div class="filter-bar">
+      <button onclick="filterByRole('All')">Semua</button>
+      <button onclick="filterByRole('Header')">Header</button>
+      <button onclick="filterByRole('Navigation')">Navigasi</button>
+      <button onclick="filterByRole('Content')">Konten</button>
+      <button onclick="filterByRole('Footer')">Footer</button>
+      <button onclick="toggleDarkMode()">🌙 Dark Mode</button>
+    </div>
+    <div id="rendered-content"></div>
+  </div>
+
+  <script>
+    let allComponents = [];
+
+    function getJSONFileFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("file") || "json_template_render_map.json";
+    }
+
+    async function renderFromJSON() {
+      const file = getJSONFileFromURL();
+      const response = await fetch(file);
+      const data = await response.json();
+      allComponents = data.components || [];
+      renderComponents(allComponents);
+    }
+
+    function renderComponents(components) {
+      const container = document.getElementById('rendered-content');
+      container.innerHTML = "";
+      components.forEach(comp => {
+        const el = document.createElement(comp.tag || 'div');
+        if (comp.id) el.id = comp.id;
+        if (comp.class) el.className = Array.isArray(comp.class) ? comp.class.join(' ') : comp.class;
+        el.classList.add('card');
+        el.innerText = `[${comp.role || comp.type}] ${comp.content_preview || ''}`;
+        container.appendChild(el);
+      });
+    }
+
+    function filterByRole(role) {
+      if (role === 'All') {
+        renderComponents(allComponents);
+      } else {
+        const filtered = allComponents.filter(c => (c.role || '').toLowerCase() === role.toLowerCase());
+        renderComponents(filtered);
+      }
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    renderFromJSON();
+  </script>
+</body>
+</html>

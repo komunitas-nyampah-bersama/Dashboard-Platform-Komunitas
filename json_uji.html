@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2BCycle Framework - Uji Coba Terpadu</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #FFC107;
+            --background: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text-color);
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .test-panel {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 25px;
+        }
+        
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .test-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .test-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .config-editor, .app-preview {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            height: 400px;
+            overflow: auto;
+        }
+        
+        .config-editor textarea {
+            width: 100%;
+            height: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            resize: none;
+            font-family: monospace;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .app-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            border-radius: 6px 6px 0 0;
+            text-align: center;
+        }
+        
+        .app-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: white;
+            border-radius: 0 0 6px 6px;
+            overflow: auto;
+        }
+        
+        .recycle-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        input, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .test-result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            background-color: #e9f7fe;
+            color: #31708f;
+        }
+        
+        .result-pass {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        
+        .result-fail {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        
+        .log-output {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            height: 150px;
+            overflow: auto;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsif */
+        @media (max-width: 768px) {
+            .test-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .test-panel {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>2BCycle Framework - Uji Coba Terpadu</h1>
+        <p>Ubah konfigurasi dan lihat perubahan langsung di aplikasi</p>
+        
+        <!-- Panel 1: Uji Struktur HTML -->
+        <div class="test-panel">
+            <div class="test-header">
+                <h2 class="test-title">1. Uji Struktur HTML</h2>
+                <div class="test-controls">
+                    <button id="resetHtml">Reset</button>
+                    <button id="changeHtml">Ubah Struktur</button>
+                </div>
+            </div>
+            <div class="test-content">
+                <div class="config-editor">
+                    <textarea id="htmlConfig" readonly>{
+  "app_name": "EcoRecycle Palembang",
+  "app_description": "Aplikasi daur ulang komunitas",
+  "form_fields": [
+    {
+      "type": "number",
+      "id": "weight",
+      "label": "Berat (kg)"
+    },
+    {
+      "type": "select",
+      "id": "material",
+      "options": ["Plastik", "Kertas", "Logam"]
+    }
+  ],
+  "submit_button": "Laporkan Daur Ulang"
+}</textarea>
+                </div>
+                <div class="app-preview">
+                    <div class="app-container">
+                        <div class="app-header" id="appHeader">
+                            <h2 id="appName">EcoRecycle Palembang</h2>
+                            <p id="appDescription">Aplikasi daur ulang komunitas</p>
+                        </div>
+                        <div class="app-content" id="appContent">
+                            <!-- Konten aplikasi akan di-render di sini -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="test-result" id="htmlResult">
+                Status: Belum diuji
+            </div>
+            <div class="log-output" id="htmlLog"></div>
+        </div>
+        
+        <!-- Panel 2: Uji Tampilan CSS -->
+        <div class="test-panel">
+            <div class="test-header">
+                <h2 class="test-title">2. Uji Tampilan CSS</h2>
+                <div class="test-controls">
+                    <button id="resetCss">Reset</button>
+                    <button id="changeTheme">Ubah Tema</button>
+                    <button id="toggleResponsive">Mode Responsif</button>
+                </div>
+            </div>
+            <div class="test-content">
+                <div class="config-editor">
+                    <textarea id="cssConfig" readonly>{
+  "theme": {
+    "primary_color": "#4CAF50",
+    "secondary_color": "#FFC107",
+    "background": "#f5f5f5",
+    "card_bg": "#ffffff",
+    "text_color": "#333333"
+  },
+  "responsive_breakpoint": "768px"
+}</textarea>
+                </div>
+                <div class="app-preview">
+                    <div class="app-container">
+                        <div class="app-header">
+                            <h2>Pratinjau Tampilan</h2>
+                        </div>
+                        <div class="app-content">
+                            <div class="recycle-form">
+                                <input type="number" placeholder="Berat (kg)">
+                                <select>
+                                    <option>Plastik</option>
+                                    <option>Kertas</option>
+                                </select>
+                                <button>Kirim Data</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="test-result" id="cssResult">
+                Status: Belum diuji
+            </div>
+            <div class="log-output" id="cssLog"></div>
+        </div>
+        
+        <!-- Panel 3: Uji Logika JavaScript -->
+        <div class="test-panel">
+            <div class="test-header">
+                <h2 class="test-title">3. Uji Logika JavaScript</h2>
+                <div class="test-controls">
+                    <button id="resetLogic">Reset</button>
+                    <button id="changeLogic">Ubah Logika</button>
+                    <button id="runTest">Tes Fungsi</button>
+                </div>
+            </div>
+            <div class="test-content">
+                <div class="config-editor">
+                    <textarea id="logicConfig" readonly>{
+  "function_name": "submitRecycle",
+  "parameters": ["weight", "material"],
+  "expected_result": {
+    "success": true,
+    "message": "Berhasil dicatat!"
+  }
+}</textarea>
+                </div>
+                <div class="app-preview">
+                    <div class="app-container">
+                        <div class="app-header">
+                            <h2>Simulasi Logika Aplikasi</h2>
+                        </div>
+                        <div class="app-content">
+                            <div class="recycle-form">
+                                <input type="number" id="testWeight" placeholder="Berat (kg)" value="5">
+                                <select id="testMaterial">
+                                    <option value="plastic">Plastik</option>
+                                    <option value="paper">Kertas</option>
+                                </select>
+                                <button onclick="testSubmit()">Tes Submit</button>
+                                <div id="logicResult"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="test-result" id="jsResult">
+                Status: Belum diuji
+            </div>
+            <div class="log-output" id="jsLog"></div>
+        </div>
+    </div>
+
+    <script>
+        // Inisialisasi data uji coba
+        const initialHtmlConfig = {
+            app_name: "EcoRecycle Palembang",
+            app_description: "Aplikasi daur ulang komunitas",
+            form_fields: [
+                { type: "number", id: "weight", label: "Berat (kg)" },
+                { type: "select", id: "material", options: ["Plastik", "Kertas", "Logam"] }
+            ],
+            submit_button: "Laporkan Daur Ulang"
+        };
+        
+        const initialCssConfig = {
+            theme: {
+                primary_color: "#4CAF50",
+                secondary_color: "#FFC107",
+                background: "#f5f5f5",
+                card_bg: "#ffffff",
+                text_color: "#333333"
+            },
+            responsive_breakpoint: "768px"
+        };
+        
+        const initialLogicConfig = {
+            function_name: "submitRecycle",
+            parameters: ["weight", "material"],
+            expected_result: {
+                success: true,
+                message: "Berhasil dicatat!"
+            }
+        };
+        
+        // Fungsi untuk merender aplikasi berdasarkan konfigurasi
+        function renderApp() {
+            const config = JSON.parse(htmlConfig.value);
+            const appContent = document.getElementById('appContent');
+            
+            // Render header
+            document.getElementById('appName').textContent = config.app_name;
+            document.getElementById('appDescription').textContent = config.app_description;
+            
+            // Render form
+            let formHTML = '<div class="recycle-form">';
+            config.form_fields.forEach(field => {
+                if (field.type === 'number' || field.type === 'text') {
+                    formHTML += `
+                        <label>${field.label || field.id}</label>
+                        <input type="${field.type}" id="${field.id}" placeholder="${field.placeholder || ''}">
+                    `;
+                } else if (field.type === 'select') {
+                    formHTML += `
+                        <label>${field.label || field.id}</label>
+                        <select id="${field.id}">
+                            ${field.options.map(opt => `<option value="${opt.toLowerCase()}">${opt}</option>`).join('')}
+                        </select>
+                    `;
+                }
+            });
+            
+            formHTML += `
+                <button id="submitBtn">${config.submit_button}</button>
+            </div>`;
+            
+            appContent.innerHTML = formHTML;
+            
+            // Update log
+            document.getElementById('htmlLog').textContent = 
+                `[${new Date().toLocaleTimeString()}] Struktur HTML dirender ulang`;
+                
+            // Update hasil uji
+            document.getElementById('htmlResult').textContent = 
+                "Status: Struktur HTML berhasil diubah";
+            document.getElementById('htmlResult').className = "test-result result-pass";
+        }
+        
+        // Fungsi untuk mengubah tema CSS
+        function updateTheme() {
+            const config = JSON.parse(cssConfig.value);
+            const theme = config.theme;
+            
+            document.documentElement.style.setProperty('--primary-color', theme.primary_color);
+            document.documentElement.style.setProperty('--secondary-color', theme.secondary_color);
+            document.documentElement.style.setProperty('--background', theme.background);
+            document.documentElement.style.setProperty('--card-bg', theme.card_bg);
+            document.documentElement.style.setProperty('--text-color', theme.text_color);
+            
+            // Update log
+            document.getElementById('cssLog').textContent = 
+                `[${new Date().toLocaleTimeString()}] Tema diubah: ${JSON.stringify(theme)}`;
+                
+            // Update hasil uji
+            document.getElementById('cssResult').textContent = 
+                "Status: Tema tampilan berhasil diubah";
+            document.getElementById('cssResult').className = "test-result result-pass";
+        }
+        
+        // Fungsi untuk menguji logika aplikasi
+        function testSubmit() {
+            const weight = document.getElementById('testWeight').value;
+            const material = document.getElementById('testMaterial').value;
+            
+            // Simulasi panggilan smart contract
+            setTimeout(() => {
+                const resultArea = document.getElementById('logicResult');
+                resultArea.innerHTML = `
+                    <div class="success">
+                        <h3>Berhasil dicatat!</h3>
+                        <p>${weight} kg ${material} telah terdaftar</p>
+                    </div>
+                `;
+                
+                // Update log
+                document.getElementById('jsLog').textContent = 
+                    `[${new Date().toLocaleTimeString()}] Fungsi dijalankan: submitRecycle(${weight}, ${material})`;
+                
+                // Verifikasi hasil
+                const config = JSON.parse(logicConfig.value);
+                const testPassed = weight > 0 && material;
+                
+                document.getElementById('jsResult').textContent = 
+                    `Status: ${testPassed ? "BERHASIL" : "GAGAL"} - ${testPassed ? 
+                    config.expected_result.message : "Data tidak valid"}`;
+                    
+                document.getElementById('jsResult').className = testPassed ? 
+                    "test-result result-pass" : "test-result result-fail";
+            }, 1000);
+        }
+        
+        // Fungsi untuk mengubah konfigurasi HTML
+        function changeHtmlConfig() {
+            const newConfig = {
+                app_name: "GreenRecycle Jakarta",
+                app_description: "Program daur ulang metropolitan",
+                form_fields: [
+                    { type: "text", id: "name", label: "Nama Pelapor" },
+                    { type: "number", id: "weight", label: "Massa Limbah (kg)" },
+                    { type: "select", id: "category", options: ["Organik", "Anorganik", "B3"] }
+                ],
+                submit_button: "Kirim Laporan"
+            };
+            
+            htmlConfig.value = JSON.stringify(newConfig, null, 2);
+            renderApp();
+        }
+        
+        // Fungsi untuk mengubah tema
+        function changeTheme() {
+            const newConfig = {
+                theme: {
+                    primary_color: "#2196F3",
+                    secondary_color: "#FF9800",
+                    background: "#e3f2fd",
+                    card_bg: "#ffffff",
+                    text_color: "#0d47a1"
+                },
+                responsive_breakpoint: "768px"
+            };
+            
+            cssConfig.value = JSON.stringify(newConfig, null, 2);
+            updateTheme();
+        }
+        
+        // Fungsi untuk mengubah logika
+        function changeLogic() {
+            const newConfig = {
+                function_name: "processRecycle",
+                parameters: ["name", "weight", "category"],
+                expected_result: {
+                    success: true,
+                    message: "Data berhasil diproses!"
+                }
+            };
+            
+            logicConfig.value = JSON.stringify(newConfig, null, 2);
+            
+            // Update log
+            document.getElementById('jsLog').textContent = 
+                `[${new Date().toLocaleTimeString()}] Konfigurasi logika diubah`;
+                
+            document.getElementById('jsResult').textContent = 
+                "Status: Konfigurasi logika diubah - jalankan tes untuk verifikasi";
+            document.getElementById('jsResult').className = "test-result";
+        }
+        
+        // Fungsi toggle mode responsif
+        function toggleResponsive() {
+            const preview = document.querySelector('.app-preview');
+            preview.classList.toggle('responsive-preview');
+            
+            // Update log
+            const isResponsive = preview.classList.contains('responsive-preview');
+            document.getElementById('cssLog').textContent = 
+                `[${new Date().toLocaleTimeString()}] Mode responsif: ${isResponsive ? "AKTIF" : "NONAKTIF"}`;
+        }
+        
+        // Inisialisasi setelah DOM dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            // Dapatkan elemen
+            window.htmlConfig = document.getElementById('htmlConfig');
+            window.cssConfig = document.getElementById('cssConfig');
+            window.logicConfig = document.getElementById('logicConfig');
+            
+            // Set nilai awal
+            htmlConfig.value = JSON.stringify(initialHtmlConfig, null, 2);
+            cssConfig.value = JSON.stringify(initialCssConfig, null, 2);
+            logicConfig.value = JSON.stringify(initialLogicConfig, null, 2);
+            
+            // Render aplikasi awal
+            renderApp();
+            updateTheme();
+            
+            // Setup event listeners
+            document.getElementById('changeHtml').addEventListener('click', changeHtmlConfig);
+            document.getElementById('changeTheme').addEventListener('click', changeTheme);
+            document.getElementById('changeLogic').addEventListener('click', changeLogic);
+            document.getElementById('toggleResponsive').addEventListener('click', toggleResponsive);
+            document.getElementById('runTest').addEventListener('click', () => {
+                document.getElementById('jsResult').textContent = "Status: Menjalankan tes...";
+                testSubmit();
+            });
+            
+            // Reset functions
+            document.getElementById('resetHtml').addEventListener('click', () => {
+                htmlConfig.value = JSON.stringify(initialHtmlConfig, null, 2);
+                renderApp();
+            });
+            
+            document.getElementById('resetCss').addEventListener('click', () => {
+                cssConfig.value = JSON.stringify(initialCssConfig, null, 2);
+                updateTheme();
+            });
+            
+            document.getElementById('resetLogic').addEventListener('click', () => {
+                logicConfig.value = JSON.stringify(initialLogicConfig, null, 2);
+                document.getElementById('jsResult').textContent = "Status: Konfigurasi logika direset";
+                document.getElementById('jsResult').className = "test-result";
+            });
+        });
+    </script>
+</body>
+</html>

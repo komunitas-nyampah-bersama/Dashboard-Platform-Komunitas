@@ -1,0 +1,322 @@
+{
+  "access": {
+    "embargo": {
+      "active": false,
+      "reason": null
+    },
+    "files": "public",
+    "record": "public",
+    "status": "open"
+  },
+  "created": "2025-08-01T02:44:27.534997+00:00",
+  "custom_fields": {},
+  "deletion_status": {
+    "is_deleted": false,
+    "status": "P"
+  },
+  "files": {
+    "count": 2,
+    "enabled": true,
+    "entries": {
+      "profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf": {
+        "access": {
+          "hidden": false
+        },
+        "checksum": "md5:e4686e23252e3d51f95ae8743f604cf2",
+        "ext": "pdf",
+        "id": "6ed91463-6d25-4cbe-983b-48ad49feb5d0",
+        "key": "profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf",
+        "links": {
+          "content": "https://zenodo.org/api/records/16663697/files/profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf/content",
+          "iiif_api": "https://zenodo.org/api/iiif/record:16663697:profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf/full/full/0/default.png",
+          "iiif_base": "https://zenodo.org/api/iiif/record:16663697:profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf",
+          "iiif_canvas": "https://zenodo.org/api/iiif/record:16663697/canvas/profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf",
+          "iiif_info": "https://zenodo.org/api/iiif/record:16663697:profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf/info.json",
+          "self": "https://zenodo.org/api/records/16663697/files/profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf"
+        },
+        "metadata": {
+          "height": 1191,
+          "width": 842
+        },
+        "mimetype": "application/pdf",
+        "size": 223370,
+        "storage_class": "L"
+      },
+      "representasi_komunitas.json": {
+        "access": {
+          "hidden": false
+        },
+        "checksum": "md5:597c112dbb99d918498ac1e647243a5d",
+        "ext": "json",
+        "id": "26fc3030-ed19-43e3-b906-f9e20418ac0d",
+        "key": "representasi_komunitas.json",
+        "links": {
+          "content": "https://zenodo.org/api/records/16663697/files/representasi_komunitas.json/content",
+          "self": "https://zenodo.org/api/records/16663697/files/representasi_komunitas.json"
+        },
+        "metadata": {},
+        "mimetype": "application/json",
+        "size": 8723,
+        "storage_class": "L"
+      }
+    },
+    "order": [],
+    "total_bytes": 232093
+  },
+  "id": "16663697",
+  "is_draft": false,
+  "is_published": true,
+  "links": {
+    "access": "https://zenodo.org/api/records/16663697/access",
+    "access_grants": "https://zenodo.org/api/records/16663697/access/grants",
+    "access_links": "https://zenodo.org/api/records/16663697/access/links",
+    "access_request": "https://zenodo.org/api/records/16663697/access/request",
+    "access_users": "https://zenodo.org/api/records/16663697/access/users",
+    "archive": "https://zenodo.org/api/records/16663697/files-archive",
+    "archive_media": "https://zenodo.org/api/records/16663697/media-files-archive",
+    "communities": "https://zenodo.org/api/records/16663697/communities",
+    "communities-suggestions": "https://zenodo.org/api/records/16663697/communities-suggestions",
+    "doi": "https://doi.org/10.5281/zenodo.16663697",
+    "draft": "https://zenodo.org/api/records/16663697/draft",
+    "files": "https://zenodo.org/api/records/16663697/files",
+    "latest": "https://zenodo.org/api/records/16663697/versions/latest",
+    "latest_html": "https://zenodo.org/records/16663697/latest",
+    "media_files": "https://zenodo.org/api/records/16663697/media-files",
+    "parent": "https://zenodo.org/api/records/16663696",
+    "parent_doi": "https://doi.org/10.5281/zenodo.16663696",
+    "parent_doi_html": "https://zenodo.org/doi/10.5281/zenodo.16663696",
+    "parent_html": "https://zenodo.org/records/16663696",
+    "preview_html": "https://zenodo.org/records/16663697?preview=1",
+    "requests": "https://zenodo.org/api/records/16663697/requests",
+    "reserve_doi": "https://zenodo.org/api/records/16663697/draft/pids/doi",
+    "self": "https://zenodo.org/api/records/16663697",
+    "self_doi": "https://doi.org/10.5281/zenodo.16663697",
+    "self_doi_html": "https://zenodo.org/doi/10.5281/zenodo.16663697",
+    "self_html": "https://zenodo.org/records/16663697",
+    "self_iiif_manifest": "https://zenodo.org/api/iiif/record:16663697/manifest",
+    "self_iiif_sequence": "https://zenodo.org/api/iiif/record:16663697/sequence/default",
+    "thumbnails": {
+      "10": "https://zenodo.org/api/iiif/record:16663697:profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf/full/%5E10,/0/default.jpg",
+      "100": "https://zenodo.org/api/iiif/record:16663697:profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf/full/%5E100,/0/default.jpg",
+      "1200": "https://zenodo.org/api/iiif/record:16663697:profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf/full/%5E1200,/0/default.jpg",
+      "250": "https://zenodo.org/api/iiif/record:16663697:profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf/full/%5E250,/0/default.jpg",
+      "50": "https://zenodo.org/api/iiif/record:16663697:profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf/full/%5E50,/0/default.jpg",
+      "750": "https://zenodo.org/api/iiif/record:16663697:profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf/full/%5E750,/0/default.jpg"
+    },
+    "versions": "https://zenodo.org/api/records/16663697/versions"
+  },
+  "media_files": {
+    "count": 1,
+    "enabled": true,
+    "entries": {
+      "profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf.ptif": {
+        "access": {
+          "hidden": true
+        },
+        "ext": "ptif",
+        "id": "a07da26a-c672-482f-ae8e-1951ea617389",
+        "key": "profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf.ptif",
+        "links": {
+          "content": "https://zenodo.org/api/records/16663697/files/profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf.ptif/content",
+          "self": "https://zenodo.org/api/records/16663697/files/profil_komunitas_standar_internasional_untuk_Nyampah_Bersama.pdf.ptif"
+        },
+        "metadata": null,
+        "mimetype": "application/octet-stream",
+        "processor": {
+          "source_file_id": "6ed91463-6d25-4cbe-983b-48ad49feb5d0",
+          "status": "finished",
+          "type": "image-tiles"
+        },
+        "size": 0,
+        "storage_class": "L"
+      }
+    },
+    "order": [],
+    "total_bytes": 0
+  },
+  "metadata": {
+    "copyright": "Komunitas Nyampah Bersama",
+    "creators": [
+      {
+        "affiliations": [
+          {
+            "name": "Komunitas Nyampah Bersama"
+          }
+        ],
+        "person_or_org": {
+          "identifiers": [
+            {
+              "identifier": "0009-0003-5705-8107",
+              "scheme": "orcid"
+            }
+          ],
+          "name": "Komunitas Nyampah Bersama",
+          "type": "organizational"
+        },
+        "role": {
+          "id": "contactperson",
+          "title": {
+            "de": "Kontaktperson",
+            "en": "Contact person"
+          }
+        }
+      }
+    ],
+    "description": "<p>Community Name: Nyampah Bersama</p>\n<p>Field of Activity: Waste Management, Environmental Education, Social Technology and People&rsquo;s Economy</p>\n<p>Hereby certifies that the Nyampah Bersama community is a civil society movement established in 2023, focusing on:</p>\n<ul>\n<li>Environmental education and digitalization of waste management,</li>\n<li>Development of people&rsquo;s incentive technologies (such as NyampahCoin, NFT Proof of Clean Act),</li>\n<li>Research collaboration and participation in international sustainable waste management systems,</li>\n<li>Creating a social system based on real action and Web3 technology.</li>\n</ul>\n<p>Nyampah Bersama is not just a name, but a symbol of transformation rooted in the lived experiences of everyday people. Born from the collective awareness of environmental degradation, economic imbalance, and the untapped potential of grassroots action, this community was established to offer a new way of thinking. It aims to bridge the gap between environmental concern and technological innovation.</p>\n<p>Our movement is designed around the principles of inclusion, sustainability, and technological empowerment. We believe that every individual, regardless of their background, has the right to participate in building a cleaner and more equitable world. Through NyampahCoin, we offer tokenized rewards for sustainable behavior. Through NFT Proof of Clean Act (PoCA), we recognize and immortalize acts of environmental care and contribution.</p>\n<p>We see waste not as the end, but as a beginning &mdash; a source of data, energy, economic opportunity, and collective trust. We are developing a comprehensive ecosystem that includes educational modules, digital dashboards, proof-of-action systems, DAO governance, and smart contract verification. This system is not only meant to be scalable but also replicable across different communities globally.</p>\n<p>Nyampah Bersama collaborates with schools, academic researchers, blockchain developers, NGOs, and government entities to ensure the alignment of social missions with technological feasibility. Our digital platform leverages open-source tools, AI assistants, and decentralized identities to establish transparency and traceability. We work to enable local waste actors &mdash; including families, informal workers, and small businesses &mdash; to join the global circular economy with minimal barriers.</p>\n<p>We believe that sustainability must be rewarding, and that environmental action must be visible and verifiable. That is why our focus on tokenized verification (via Web3 and IPFS systems) is central to our mission. We have launched initiatives such as:</p>\n<ul>\n<li>Akademi Nyampah (a grassroots education system),</li>\n<li>2BCycle (BurnCycle and BlockCycle protocol),</li>\n<li>and the Digital Waste Passport,</li>\n</ul>\n<p>&mdash;all of which are designed to create long-term impact while remaining accessible and inclusive.</p>\n<p>Our organization is non-profit and fully community-driven. We are open to research collaborations, international grants, and multilateral partnerships aimed at developing cleaner, more just societies. The Nyampah Bersama ecosystem is built by the people, for the people &mdash; and powered by the belief that transformation begins with small, consistent actions.</p>\n<p>This certificate is issued as an official declaration of our commitment and operational presence, in support of our application as a registered operator within the IMSOC/TRACES system of the European Commission. It also serves to provide administrative clarity for future collaborations involving sustainability, digital trust, environmental verification, and cross-border cooperation.</p>\n<p>We invite institutions, funders, academic partners, and fellow visionaries to engage with us in building a future where waste is no longer a problem, but a solution &mdash; a key that opens doors to empowerment, equality, and ecological balance.</p>\n<p>Palembang, 10 July 2025</p>\n<p>Sincerely,</p>\n<p>[uID EU Login: n00jcciv]</p>\n<p>Muhamad Oky Muhisin</p>\n<p>Founder of Nyampah Bersama.</p>",
+    "publication_date": "2025-08-01",
+    "publisher": "Zenodo",
+    "resource_type": {
+      "id": "dataset",
+      "title": {
+        "de": "Datensatz",
+        "en": "Dataset"
+      }
+    },
+    "rights": [
+      {
+        "description": {
+          "en": "The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited."
+        },
+        "icon": "cc-by-icon",
+        "id": "cc-by-4.0",
+        "props": {
+          "scheme": "spdx",
+          "url": "https://creativecommons.org/licenses/by/4.0/legalcode"
+        },
+        "title": {
+          "en": "Creative Commons Attribution 4.0 International"
+        }
+      }
+    ],
+    "title": "Profil Internasional Komunitas Nyampah Bersama"
+  },
+  "parent": {
+    "access": {
+      "grants": [],
+      "links": [],
+      "owned_by": {
+        "user": "1347142"
+      },
+      "settings": {
+        "accept_conditions_text": null,
+        "allow_guest_requests": false,
+        "allow_user_requests": false,
+        "secret_link_expiration": 0
+      }
+    },
+    "communities": {
+      "default": "04f01f0a-8ba6-4183-b307-5133452147a0",
+      "entries": [
+        {
+          "access": {
+            "member_policy": "open",
+            "members_visibility": "public",
+            "record_submission_policy": "open",
+            "review_policy": "members",
+            "visibility": "public"
+          },
+          "children": {
+            "allow": false
+          },
+          "created": "2025-07-19T10:37:02.400085+00:00",
+          "custom_fields": {},
+          "deletion_status": {
+            "is_deleted": false,
+            "status": "P"
+          },
+          "id": "04f01f0a-8ba6-4183-b307-5133452147a0",
+          "links": {},
+          "metadata": {
+            "curation_policy": "<p><strong>Kebijakan Kurasi Komunitas Nyampah Bersama<br><br>Komunitas Nyampah Bersama menerima unggahan karya ilmiah, laporan, whitepaper, data penelitian, presentasi, dan publikasi digital yang relevan dengan:<br>&bull; Pengelolaan sampah dan lingkungan berkelanjutan,<br>&bull; Teknologi sosial dan insentif digital berbasis Web3 (seperti token, NFT, DAO),<br>&bull; Edukasi lingkungan, ekonomi sirkular, dan peran masyarakat akar rumput,<br>&bull; Inovasi AI, blockchain, dan sistem kepercayaan digital dalam pemberdayaan komunitas,<br>&bull; Kajian multidisiplin tentang keadilan ekologi, partisipasi publik, dan pembangunan berkelanjutan. <br><br>Semua kontribusi akan dikurasi berdasarkan:<br>&bull; Relevansi terhadap misi komunitas (ekologi, edukasi, teknologi, keadilan sosial),<br>&bull; Keterbukaan data dan transparansi,<br>&bull; Potensi dampak sosial dan ilmiah terhadap masyarakat. <br><br><span>Kami terbuka terhadap karya dari akademisi, praktisi, pelaku lapangan, serta komunitas lokal &mdash; selama selaras dengan semangat transformasi lingkungan dan teknologi kerakyatan.</span></strong></p>",
+            "description": "Erasmus+ Organisation ID: E10404020\n\nMuhlisin, Muhamad Oky (ORCID: [0009-0003-5705-8107]\nPendiri & Manajer Komunitas\n\nLegal Address: Jl. Plaju lr Manggis kel Silaberanti 30151 Palembang, Indonesia\nNPWP: 397576190016000\nKontak: +62 831-7782-8139",
+            "organizations": [
+              {
+                "name": "komunitas lingkungan"
+              },
+              {
+                "name": "nyampah bersama"
+              },
+              {
+                "name": "research collective"
+              },
+              {
+                "name": "muhamad oky muhlisin"
+              },
+              {
+                "name": "blockcycle"
+              },
+              {
+                "name": "sirkular ekonomi"
+              },
+              {
+                "name": "desentralized economics micro"
+              },
+              {
+                "name": "carbon rakyat"
+              },
+              {
+                "name": "Teknologi desentralisasi"
+              }
+            ],
+            "page": "<p><strong>Komunitas&nbsp; Nyampah Bersama</strong></p>\n<p><strong>Nyampah Bersama komunitas akar rumput yang lahir dari keresahan terhadap krisis lingkungan, ketimpangan ekonomi, dan peluang besar yang terabaikan dalam tumpukan sampah. Kami bergerak dari jalanan hingga jaringan, dari pemulung hingga blockchain &mdash; membangun jembatan antara aksi nyata dan teknologi masa depan.</strong></p>\n<p>Alamat: Jl. Talang Keramat, 30151 Palembang, Sumatera Selatan</p>\n<p>Nomor Telepon: <a>+62 831-7782-8139</a></p>\n<p>NPWP: <a href=\"tel:397576190016000\">397576190016000</a></p>\n<p>https://ipfs.io/ipfs/bafkreifhit57ao36xh5ftnryybc775vcihdp2ywuw32lklouarqgxgdiwq</p>\n<p>ORCID: <a href=\"http://orcid.org/0009-0003-5705-8107\">http://orcid.org/0009-0003-5705-8107</a></p>\n<p>Peran: Pendiri &amp; Manajer Komunitas</p>\n<p>Nama Komunitas: Nyampah Bersama</p>\n<p>Bidang Kegiatan: Pengelolaan Sampah, Pendidikan Lingkungan, Teknologi Sosial dan Ekonomi Kerakyatan</p>\n<p>Dengan ini menyatakan bahwa komunitas Nyampah Bersama adalah gerakan masyarakat sipil yang didirikan pada tahun 2023, yang berfokus pada:</p>\n<p><strong>&bull; Edukasi lingkungan dan digitalisasi pengelolaan sampah,<br>&bull; Pengembangan teknologi insentif berbasis token &amp; NFT,<br>&bull; Partisipasi riset terbuka dan pengembangan sistem verifikasi aksi lingkungan (Proof of Clean Act),<br>&bull; serta Ekosistem sosial berbasis Web3, DAO, dan smart contract.</strong></p>\n<p>Nyampah Bersama bukan hanya sebuah nama, tetapi simbol transformasi yang berakar pada pengalaman hidup masyarakat sehari-hari. Lahir dari kesadaran kolektif akan degradasi lingkungan, ketidakseimbangan ekonomi, dan potensi aksi akar rumput yang belum dimanfaatkan, komunitas ini didirikan untuk menawarkan cara berpikir baru. Ini bertujuan untuk menjembatani kesenjangan antara kepedulian lingkungan dan inovasi teknologi.</p>\n<p>Gerakan kami dirancang berdasarkan prinsip-prinsip inklusi, keberlanjutan, dan pemberdayaan teknologi. Kami percaya bahwa setiap individu, terlepas dari latar belakang mereka, memiliki hak untuk berpartisipasi dalam membangun dunia yang lebih bersih dan adil. Melalui NyampahCoin, kami menawarkan hadiah token untuk perilaku berkelanjutan. Melalui NFT Proof of Clean Act (PoCA), kami mengakui dan mengabadikan tindakan kepedulian dan kontribusi lingkungan.</p>\n<p>Kami melihat pemborosan bukan sebagai akhir, tetapi sebagai awal - sumber data, energi, peluang ekonomi, dan kepercayaan kolektif. Kami sedang mengembangkan ekosistem komprehensif yang mencakup modul pendidikan, dasbor digital, sistem proof-of-action, tata kelola DAO, dan verifikasi kontrak pintar. Sistem ini tidak hanya dimaksudkan untuk dapat diskalakan tetapi juga dapat direplikasi di berbagai komunitas secara global.</p>\n<p>Nyampah Bersama berkolaborasi dengan sekolah, peneliti akademis, pengembang blockchain, LSM, dan entitas pemerintah untuk memastikan keselarasan misi sosial dengan kelayakan teknologi. Platform digital kami memanfaatkan alat sumber terbuka, asisten AI, dan identitas terdesentralisasi untuk membangun transparansi dan ketertelusuran. Kami bekerja untuk memungkinkan pelaku sampah lokal &mdash; termasuk keluarga, pekerja informal, dan usaha kecil &mdash; untuk bergabung dengan ekonomi sirkular global dengan hambatan minimal.</p>\n<p>Kami percaya bahwa keberlanjutan harus bermanfaat, dan bahwa tindakan lingkungan harus terlihat dan dapat diverifikasi. Itulah sebabnya fokus kami pada verifikasi tokenisasi (melalui sistem Web3 dan IPFS) adalah inti dari misi kami. Kami telah meluncurkan inisiatif seperti:</p>\n<p><strong>&bull; Akademi Nyampah,<br>&bull; 2BCycle Framework (BlockCycle &amp; BurnCycle),<br>&bull; Paspor Digital Sampah,<br>&bull; dan berbagai eksperimen berbasis AI, IPFS, dan blockchain,kami</strong></p>\n<p>&mdash;yang semuanya dirancang untuk menciptakan dampak jangka panjang sambil tetap dapat diakses dan inklusif.</p>\n<p>Organisasi kami nirlaba dan sepenuhnya digerakkan oleh komunitas. Kami terbuka untuk kolaborasi penelitian, hibah internasional, dan kemitraan multilateral yang bertujuan untuk mengembangkan masyarakat yang lebih bersih dan lebih adil. Ekosistem Nyampah Bersama dibangun oleh orang-orang, untuk orang-orang &mdash; dan didukung oleh keyakinan bahwa transformasi dimulai dengan tindakan kecil dan konsisten.</p>\n<p>Sertifikat ini dikeluarkan sebagai pernyataan resmi komitmen dan kehadiran operasional kami, untuk mendukung aplikasi kami sebagai operator terdaftar dalam sistem IMSOC/TRACES Komisi Eropa. Ini juga berfungsi untuk memberikan kejelasan administratif untuk kolaborasi masa depan yang melibatkan keberlanjutan, kepercayaan digital, verifikasi lingkungan, dan kerja sama lintas batas.</p>\n<p>Kami mengundang institusi, penyandang dana, mitra akademis, dan sesama visioner untuk terlibat bersama kami dalam membangun masa depan di mana limbah bukan lagi masalah, tetapi solusi &mdash; kunci yang membuka pintu menuju pemberdayaan, kesetaraan, dan keseimbangan ekologis.</p>\n<p>Palembang, 10 Juli 2025</p>\n<p>Dengan Hormat</p>\n<p>[Login UE uID: n00jcciv]</p>\n<p>Muhamad Oky Muhisin</p>\n<p>Pendiri Nyampah Bersama</p>\n<p>&nbsp;</p>",
+            "title": "Komunitas Nyampah Bersama",
+            "type": {
+              "id": "organization"
+            },
+            "website": "https://komunitas-nyampah-bersama.github.io/.github/"
+          },
+          "revision_id": 17,
+          "slug": "nyampahbersama",
+          "updated": "2025-08-01T16:53:07.398094+00:00"
+        }
+      ],
+      "ids": [
+        "04f01f0a-8ba6-4183-b307-5133452147a0"
+      ]
+    },
+    "id": "16663696",
+    "pids": {
+      "doi": {
+        "client": "datacite",
+        "identifier": "10.5281/zenodo.16663696",
+        "provider": "datacite"
+      }
+    }
+  },
+  "pids": {
+    "doi": {
+      "client": "datacite",
+      "identifier": "10.5281/zenodo.16663697",
+      "provider": "datacite"
+    },
+    "oai": {
+      "identifier": "oai:zenodo.org:16663697",
+      "provider": "oai"
+    }
+  },
+  "revision_id": 4,
+  "stats": {
+    "all_versions": {
+      "data_volume": 5172402.0,
+      "downloads": 27,
+      "unique_downloads": 16,
+      "unique_views": 55,
+      "views": 59
+    },
+    "this_version": {
+      "data_volume": 5172402.0,
+      "downloads": 27,
+      "unique_downloads": 16,
+      "unique_views": 55,
+      "views": 59
+    }
+  },
+  "status": "published",
+  "swh": {},
+  "updated": "2025-08-01T02:44:27.779437+00:00",
+  "versions": {
+    "index": 1,
+    "is_latest": true,
+    "is_latest_draft": true
+  }
+}

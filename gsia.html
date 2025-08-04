@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Komunitas Akar Rumput - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --secondary: #3498db;
+            --dark: #2c3e50;
+            --darker: #1a2530;
+            --light: #ecf0f1;
+            --error: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --orcid: #a6ce39;
+            --zenodo: #1d7abf;
+            --sidebar-width: 280px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(to bottom, var(--darker), var(--dark));
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding: 20px 0;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .logo-container {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .nav-links {
+            list-style: none;
+            padding: 0 15px;
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .nav-link i {
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* Stats Card */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        /* Academic Verification */
+        .academic-verification {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(166, 206, 57, 0.1);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .orcid-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(166, 206, 57, 0.15);
+            border: 1px solid rgba(166, 206, 57, 0.3);
+            border-radius: 20px;
+            padding: 8px 15px;
+        }
+        
+        .orcid-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--orcid);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        /* Publication Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .file-upload {
+            position: relative;
+            margin-top: 10px;
+        }
+        
+        .file-upload-label {
+            display: block;
+            padding: 12px;
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload-label:hover {
+            border-color: var(--secondary);
+            background: rgba(52, 152, 219, 0.05);
+        }
+        
+        .file-upload-label i {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .file-input {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0;
+        }
+        
+        .file-name {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        /* Reputation System */
+        .reputation-card {
+            text-align: center;
+            padding: 25px;
+        }
+        
+        .rep-score {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 20px 0;
+        }
+        
+        .rep-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        
+        .rep-metrics {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 25px;
+        }
+        
+        .metric {
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        /* Incentive System */
+        .incentive-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 25px;
+        }
+        
+        .token-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #8e44ad, #3498db);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .token-info {
+            flex: 1;
+        }
+        
+        .token-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #8e44ad;
+        }
+        
+        .token-name {
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            gap: 8px;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(46, 204, 113, 0.3);
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        /* Toast Overrides */
+        .toastify {
+            border-radius: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .toastify-success {
+            background: linear-gradient(90deg, var(--success), var(--primary));
+        }
+        
+        .toastify-error {
+            background: linear-gradient(90deg, var(--error), #c0392b);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                overflow: hidden;
+            }
+            
+            .logo-text, .nav-text {
+                display: none;
+            }
+            
+            .logo {
+                justify-content: center;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .user-menu {
+                align-self: flex-end;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 0;
+                padding: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .rep-metrics {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate {
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="logo-container">
+            <a href="#" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="logo-text">Akar Rumput</div>
+            </a>
+        </div>
+        
+        <ul class="nav-links">
+            <li class="nav-item">
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-home"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-recycle"></i>
+                    <span class="nav-text">Aksi Lingkungan</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-book"></i>
+                    <span class="nav-text">Penelitian</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="nav-text">Statistik</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-text">Komunitas</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fab fa-ethereum"></i>
+                    <span class="nav-text">Blockchain</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span class="nav-text">Pengaturan</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="header-title">Dashboard Anggota</h1>
+            <div class="user-menu">
+                <div class="user-avatar">U</div>
+                <button class="btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+        
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Stats Card -->
+            <div class="card animate">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-chart-bar"></i> Statistik Kontribusi</h2>
+                </div>
+                <div class="card-body">
+                    <div class="stats-grid">
+                        <div class="stat-card animate delay-1">
+                            <div class="stat-number">1,250</div>
+                            <div class="stat-label">Total XP</div>
+                        </div>
+                        <div class="stat-card animate delay-2">
+                            <div class="stat-number">350</div>
+                            <div class="stat-label">2B Tokens</div>
+                        </div>
+                        <div class="stat-card animate delay-3">
+                            <div class="stat-number">#48</div>
+                            <div class="stat-label">Peringkat</div>
+                        </div>
+                        <div class="stat-card animate delay-4">
+                            <div class="stat-number">27</div>
+                            <div class="stat-label">Aksi Lingkungan</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-container" style="margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Level 3</span>
+                            <span>XP: 1,250/2,000</span>
+                        </div>
+                        <div style="height: 10px; background: #f1f2f6; border-radius: 10px; overflow: hidden;">
+                            <div style="height: 100%; width: 62.5%; background: linear-gradient(90deg, var(--primary), var(--secondary));"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Academic Verification -->
+            <div class="card animate">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-graduation-cap"></i> Verifikasi Akademik</h2>
+                </div>
+                <div class="card-body">
+                    <div class="academic-verification">
+                        <div class="orcid-badge">
+                            <div class="orcid-icon">iD</div>
+                            <span>Terhubung dengan ORCID</span>
+                        </div>
+                        <button class="btn">Kelola</button>
+                    </div>
+                    
+                    <div>
+                        <p><strong>ID ORCID:</strong> 0000-0002-1825-0097</p>
+                        <p><strong>Afiliasi:</strong> Universitas Indonesia</p>
+                        <p><strong>Publikasi:</strong> 5 paper</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Publication System -->
+            <div class="card animate">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fab fa-zenodo" style="color: var(--zenodo);"></i> Publikasi Penelitian</h2>
+                </div>
+                <div class="card-body">
+                    <form id="publicationForm">
+                        <div class="form-group">
+                            <label class="form-label">Judul Penelitian</label>
+                            <input type="text" class="form-control" id="researchTitle" placeholder="Judul penelitian Anda">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Abstrak</label>
+                            <textarea class="form-control" id="researchAbstract" placeholder="Deskripsi singkat penelitian"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Dataset Penelitian</label>
+                            <div class="file-upload">
+                                <label class="file-upload-label">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Klik untuk mengunggah dataset</span>
+                                    <input type="file" class="file-input" id="datasetFile">
+                                </label>
+                                <div class="file-name" id="fileName">Belum ada file terpilih</div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block" id="publishToZenodoBtn">
+                            <i class="fab fa-zenodo"></i> Publikasikan ke Zenodo
+                        </button>
+                    </form>
+                    
+                    <div id="doiOutput" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; text-align: center; display: none;">
+                        <p><strong>DOI:</strong> <span id="doiValue">10.5281/zenodo.1234567</span></p>
+                        <p style="margin-top: 10px;">Publikasi berhasil! Data penelitian Anda sekarang tersedia di Zenodo.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reputation System -->
+            <div class="card animate">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-medal"></i> Reputasi Akademik</h2>
+                </div>
+                <div class="card-body">
+                    <div class="reputation-card">
+                        <div class="rep-badge">Peneliti Level 3</div>
+                        <div class="rep-score">82</div>
+                        
+                        <div class="rep-metrics">
+                            <div class="metric">
+                                <div class="metric-value">5</div>
+                                <div class="metric-label">Publikasi</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">124</div>
+                                <div class="metric-label">Sitasi</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">3</div>
+                                <div class="metric-label">Proyek</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Incentive System -->
+            <div class="card animate">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-award"></i> Insentif Penelitian</h2>
+                </div>
+                <div class="card-body">
+                    <div class="incentive-card">
+                        <div class="token-icon">
+                            <i class="fab fa-ethereum"></i>
+                        </div>
+                        <div class="token-info">
+                            <div class="token-amount">350 2B</div>
+                            <div class="token-name">Token Penelitian</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <p><strong>Token yang dapat diklaim:</strong> 120 2B</p>
+                        <p style="margin: 15px 0;">Setiap publikasi penelitian akan memberikan 50 token 2B yang dapat diklaim.</p>
+                        
+                        <button class="btn btn-primary btn-block" id="claimTokensBtn">
+                            <i class="fas fa-coins"></i> Klaim Token Penelitian
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Community Leaderboard -->
+            <div class="card animate">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-trophy"></i> Peringkat Komunitas</h2>
+                </div>
+                <div class="card-body">
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="padding: 12px; text-align: left;">#</th>
+                                    <th style="padding: 12px; text-align: left;">Anggota</th>
+                                    <th style="padding: 12px; text-align: left;">XP</th>
+                                    <th style="padding: 12px; text-align: left;">Token</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 12px; font-weight: bold; color: var(--primary);">1</td>
+                                    <td style="padding: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <div style="width: 30px; height: 30px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">A</div>
+                                            <div>Ani</div>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 12px;">8,450</td>
+                                    <td style="padding: 12px;">2,350</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 12px; font-weight: bold; color: var(--primary);">2</td>
+                                    <td style="padding: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <div style="width: 30px; height: 30px; background: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">B</div>
+                                            <div>Budi</div>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 12px;">7,890</td>
+                                    <td style="padding: 12px;">2,100</td>
+                                </tr>
+                                <tr style="background: rgba(46, 204, 113, 0.05);">
+                                    <td style="padding: 12px; font-weight: bold; color: var(--primary);">48</td>
+                                    <td style="padding: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <div style="width: 30px; height: 30px; background: var(--dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">U</div>
+                                            <div>Anda</div>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 12px;">1,250</td>
+                                    <td style="padding: 12px;">350</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        // Konfigurasi
+        const SUPABASE_EDGE_FN = 'https://weueopblwiliyjqaaqvb.supabase.co/functions/v1/zenodo-research-integration';
+        
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tangani unggah file
+            document.getElementById('datasetFile').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    document.getElementById('fileName').textContent = e.target.files[0].name;
+                } else {
+                    document.getElementById('fileName').textContent = 'Belum ada file terpilih';
+                }
+            });
+            
+            // Publikasi ke Zenodo
+            document.getElementById('publicationForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const title = document.getElementById('researchTitle').value;
+                const abstract = document.getElementById('researchAbstract').value;
+                const fileInput = document.getElementById('datasetFile');
+                
+                // Validasi input
+                if (!title || !abstract || fileInput.files.length === 0) {
+                    showToast('Harap isi semua bidang dan unggah dataset', 'error');
+                    return;
+                }
+                
+                const file = fileInput.files[0];
+                const fileName = file.name;
+                
+                // Tampilkan indikator loading
+                const publishBtn = document.getElementById('publishToZenodoBtn');
+                const originalBtnText = publishBtn.innerHTML;
+                publishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+                publishBtn.disabled = true;
+                
+                try {
+                    // Membaca file sebagai base64
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    
+                    reader.onload = async function() {
+                        const base64Data = reader.result.split(',')[1];
+                        
+                        // Kirim ke edge function
+                        const response = await fetch(SUPABASE_EDGE_FN, {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ 
+                                action: 'publish_to_zenodo',
+                                title: title,
+                                description: abstract,
+                                fileName: fileName,
+                                fileData: base64Data,
+                                orcid: "0000-0002-1825-0097" // Dalam implementasi nyata, ambil dari localStorage
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.status === 'success') {
+                            // Tampilkan DOI
+                            document.getElementById('doiValue').textContent = result.doi;
+                            document.getElementById('doiOutput').style.display = 'block';
+                            
+                            // Catat kontribusi penelitian
+                            await recordResearchContribution(result.doi);
+                            
+                            showToast('Publikasi berhasil! Data penelitian Anda sekarang tersedia di Zenodo', 'success');
+                            
+                            // Reset form
+                            document.getElementById('publicationForm').reset();
+                            document.getElementById('fileName').textContent = 'Belum ada file terpilih';
+                        } else {
+                            showToast(result.message || 'Gagal mempublikasikan penelitian', 'error');
+                        }
+                    };
+                    
+                    reader.onerror = function() {
+                        showToast('Gagal membaca file', 'error');
+                        publishBtn.innerHTML = originalBtnText;
+                        publishBtn.disabled = false;
+                    };
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('Terjadi kesalahan saat memproses permintaan', 'error');
+                    publishBtn.innerHTML = originalBtnText;
+                    publishBtn.disabled = false;
+                }
+            });
+            
+            // Klaim token
+            document.getElementById('claimTokensBtn').addEventListener('click', async function() {
+                const claimBtn = this;
+                const originalBtnText = claimBtn.innerHTML;
+                
+                claimBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+                claimBtn.disabled = true;
+                
+                try {
+                    // Simulasi klaim token
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    showToast('Token berhasil diklaim! 120 2B telah ditambahkan ke wallet Anda', 'success');
+                    
+                    // Dalam implementasi nyata:
+                    // await fetch(SUPABASE_EDGE_FN, {
+                    //     method: 'POST',
+                    //     headers: {'Content-Type': 'application/json'},
+                    //     body: JSON.stringify({
+                    //         action: 'claim_research_tokens',
+                    //         wallet: "0x7Af07c98e1B47FD...36162",
+                    //         orcid: "0000-0002-1825-0097"
+                    //     })
+                    // });
+                    
+                } catch (error) {
+                    showToast('Gagal mengklaim token', 'error');
+                } finally {
+                    claimBtn.innerHTML = originalBtnText;
+                    claimBtn.disabled = false;
+                }
+            });
+        });
+        
+        // Fungsi untuk mencatat kontribusi penelitian
+        async function recordResearchContribution(doi) {
+            try {
+                // Dalam implementasi nyata, kirim ke backend
+                // await fetch(SUPABASE_EDGE_FN, {
+                //     method: 'POST',
+                //     headers: {'Content-Type': 'application/json'},
+                //     body: JSON.stringify({
+                //         action: 'record_research',
+                //         orcid: localStorage.getItem('orcid_id'),
+                //         doi: doi
+                //     })
+                // });
+                
+                console.log(`Kontribusi penelitian dengan DOI ${doi} telah dicatat`);
+            } catch (error) {
+                console.error('Gagal mencatat kontribusi penelitian:', error);
+            }
+        }
+        
+        // Fungsi untuk menampilkan notifikasi
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 5000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: type === 'success' ? 
+                    "linear-gradient(to right, #00b09b, #96c93d)" : 
+                    "linear-gradient(to right, #ff416c, #ff4b2b)",
+            }).showToast();
+        }
+    </script>
+</body>
+</html>

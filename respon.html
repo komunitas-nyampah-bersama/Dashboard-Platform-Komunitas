@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contoh Responsive</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #f4f4f4;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      flex: 1 1 300px;
+      max-width: 400px;
+      background: white;
+      margin: 10px;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+
+    .card h2 {
+      font-size: 1.5rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 25px;
+      border-radius: 8px;
+      background: #2ecc71;
+      color: white;
+      text-decoration: none;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .card h2 {
+        font-size: 1.3rem;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 15px;
+      }
+
+      .btn {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="card">
+      <h2>Judul Kartu</h2>
+      <p>Ini adalah konten dari kartu yang responsif. Coba resize layarnya yaa 🥰</p>
+      <a href="#" class="btn">Tombol Aksi</a>
+    </div>
+  </div>
+
+</body>
+</html>

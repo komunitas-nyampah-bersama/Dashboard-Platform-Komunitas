@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoCycle - Bank Sampah Digital & Tokenisasi Karbon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --secondary: #4caf50;
+            --accent: #ff9800;
+            --dark: #1b5e20;
+            --light: #e8f5e9;
+            --carbon: #3a5199;
+            --gold: #FFD700;
+            --verra: #1a2a6c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--light) 0%, #c8e6c9 100%);
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+        
+        .logo i {
+            font-size: 2.2rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-links a.active {
+            background: white;
+            color: var(--primary);
+        }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 60px 0 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 Q50,20 100,0 L100,100 Q50,80 0,100 Z" fill="rgba(255,255,255,0.3)"/></svg>');
+            background-size: cover;
+            z-index: -1;
+        }
+        
+        .hero h2 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: #2c3e50;
+        }
+        
+        .hero-badges {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            background: white;
+            border: 1px solid rgba(0,0,0,0.1);
+            padding: 12px 25px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            font-weight: 500;
+        }
+        
+        .badge.verra {
+            border-color: var(--verra);
+            background: rgba(26, 42, 108, 0.1);
+            color: var(--verra);
+        }
+        
+        .badge.gold {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.1);
+            color: #b8860b;
+        }
+        
+        .badge.web3 {
+            border-color: var(--accent);
+            background: rgba(255, 152, 0, 0.1);
+            color: #e65100;
+        }
+        
+        /* Dashboard Section */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            padding: 25px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .card h3 i {
+            background: var(--light);
+            color: var(--primary);
+            border-radius: 50%;
+            padding: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 5px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+        
+        .carbon-badge {
+            background: linear-gradient(135deg, var(--carbon) 0%, #4a707a 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .carbon-score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .carbon-equivalent {
+            font-style: italic;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        /* Map Section */
+        .map-section {
+            margin: 50px 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            padding: 20px 25px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .map-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .filter-btn.active {
+            background: white;
+            color: var(--primary);
+        }
+        
+        #map {
+            height: 450px;
+            width: 100%;
+            border-radius: 0 0 15px 15px;
+        }
+        
+        /* Partners Section */
+        .partners {
+            margin: 50px 0;
+        }
+        
+        .partners-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .partner-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+        
+        .partner-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        
+        .partner-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        .partner-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .partner-type {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        /* Certification Section */
+        .certification {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 50px 0;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .cert-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .cert-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .cert-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .cert-card ul {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+        
+        .cert-card li {
+            margin-bottom: 10px;
+            padding-left: 5px;
+        }
+        
+        .cert-card li:before {
+            content: "✓";
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 50px 0 20px;
+            margin-top: 50px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
+        }
+        
+        .footer-col h4 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        
+        .footer-col p {
+            color: #cbd5e1;
+            margin-bottom: 15px;
+        }
+        
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            color: var(--accent);
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            background: var(--accent);
+            color: var(--dark);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 40px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 40px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                gap: 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h2 {
+                font-size: 2.2rem;
+            }
+            
+            .cert-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .btn:hover {
+            background: #e65100;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0,0,0,0.3);
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .leaf {
+            position: absolute;
+            font-size: 1.5rem;
+            color: var(--secondary);
+            animation: float 8s infinite linear;
+            z-index: -1;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-recycle"></i>
+                <h1>EcoCycle</h1>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="active"><i class="fas fa-home"></i> Beranda</a>
+                <a href="#"><i class="fas fa-map-marker-alt"></i> Bank Sampah</a>
+                <a href="#"><i class="fas fa-coins"></i> Token Karbon</a>
+                <a href="#"><i class="fas fa-handshake"></i> Mitra</a>
+                <a href="#"><i class="fas fa-certificate"></i> Sertifikasi</a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Bank Sampah Digital & Tokenisasi Karbon</h2>
+            <p>Transformasi pengelolaan sampah menjadi aset bernilai dengan teknologi blockchain dan sertifikasi internasional</p>
+            
+            <div class="hero-badges">
+                <div class="badge verra">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Standar Verra Terverifikasi</span>
+                </div>
+                <div class="badge gold">
+                    <i class="fas fa-medal"></i>
+                    <span>Gold Standard Certified</span>
+                </div>
+                <div class="badge web3">
+                    <i class="fas fa-link"></i>
+                    <span>Teknologi Blockchain</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Animated leaves -->
+        <div class="leaf" style="top: 10%; left: 5%;"><i class="fas fa-leaf"></i></div>
+        <div class="leaf" style="top: 20%; left: 90%;"><i class="fas fa-seedling"></i></div>
+        <div class="leaf" style="top: 40%; left: 15%;"><i class="fas fa-leaf"></i></div>
+        <div class="leaf" style="top: 60%; left: 85%;"><i class="fas fa-seedling"></i></div>
+        <div class="leaf" style="top: 80%; left: 10%;"><i class="fas fa-leaf"></i></div>
+    </section>
+    
+    <!-- Dashboard Section -->
+    <div class="container">
+        <div class="dashboard">
+            <div class="card">
+                <h3><i class="fas fa-wallet"></i> Dompet Digital</h3>
+                <p>Kelola saldo dari hasil setor sampah dan token karbon</p>
+                
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value">Rp 285.000</div>
+                        <div class="stat-label">Saldo Dompet</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">1.250</div>
+                        <div class="stat-label">EcoCoin</div>
+                    </div>
+                </div>
+                
+                <a href="#" class="btn"><i class="fas fa-exchange-alt"></i> Tukar Saldo</a>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-leaf"></i> Kontribusi Karbon</h3>
+                <p>Kurangi emisi karbon dengan pengelolaan sampah</p>
+                
+                <div class="carbon-badge">
+                    <h4>Pengurangan Emisi</h4>
+                    <div class="carbon-score">1.2 ton CO2e</div>
+                    <p class="carbon-equivalent">Setara dengan menanam 20 pohon selama 10 tahun</p>
+                </div>
+                
+                <a href="#" class="btn"><i class="fas fa-certificate"></i> Dapatkan Sertifikat</a>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-trophy"></i> Poin & Reward</h3>
+                <p>Dapatkan insentif untuk setiap aktivitas pengelolaan sampah</p>
+                
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value">350</div>
+                        <div class="stat-label">Poin Reward</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">NFT Sampah</div>
+                    </div>
+                </div>
+                
+                <div class="progress">
+                    <p><strong>Level Nasabah:</strong> Hijau Perak (85%)</p>
+                    <div style="height: 10px; background: #e0e0e0; border-radius: 5px; margin: 10px 0;">
+                        <div style="height: 100%; width: 85%; background: var(--secondary); border-radius: 5px;"></div>
+                    </div>
+                </div>
+                
+                <a href="#" class="btn"><i class="fas fa-gift"></i> Klaim Reward</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Map Section -->
+    <div class="container">
+        <div class="map-section">
+            <div class="section-header">
+                <h3 class="section-title"><i class="fas fa-map-marker-alt"></i> Bank Sampah Terdekat</h3>
+                <div class="map-controls">
+                    <button class="filter-btn active">Semua</button>
+                    <button class="filter-btn">Terdekat</button>
+                    <button class="filter-btn">Bersertifikat</button>
+                </div>
+            </div>
+            <div id="map"></div>
+        </div>
+    </div>
+    
+    <!-- Partners Section -->
+    <div class="container partners">
+        <h2 class="section-title"><i class="fas fa-handshake"></i> Mitra Kolaborasi</h2>
+        <p>Bersinergi dengan berbagai perusahaan dan instansi dalam pengelolaan sampah</p>
+        
+        <div class="partners-grid">
+            <div class="partner-card">
+                <div class="partner-logo">
+                    <i class="fas fa-industry"></i>
+                </div>
+                <div class="partner-name">PT Hijau Lestari</div>
+                <div class="partner-type">Pengelola Limbah</div>
+            </div>
+            
+            <div class="partner-card">
+                <div class="partner-logo">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="partner-name">Kementerian LHK</div>
+                <div class="partner-type">Pemerintah</div>
+            </div>
+            
+            <div class="partner-card">
+                <div class="partner-logo">
+                    <i class="fas fa-store"></i>
+                </div>
+                <div class="partner-name">RetailChain</div>
+                <div class="partner-type">Perusahaan Retail</div>
+            </div>
+            
+            <div class="partner-card">
+                <div class="partner-logo">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="partner-name">Universitas Ekologi</div>
+                <div class="partner-type">Pendidikan</div>
+            </div>
+            
+            <div class="partner-card">
+                <div class="partner-logo">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div class="partner-name">EcoFoundation</div>
+                <div class="partner-type">Lingkungan</div>
+            </div>
+            
+            <div class="partner-card">
+                <div class="partner-logo">
+                    <i class="fas fa-recycle"></i>
+                </div>
+                <div class="partner-name">Daur Ulang Nusantara</div>
+                <div class="partner-type">Daur Ulang</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Certification Section -->
+    <div class="container">
+        <div class="certification">
+            <h2 style="text-align: center; margin-bottom: 30px;"><i class="fas fa-certificate"></i> Sertifikasi Internasional</h2>
+            
+            <div class="cert-grid">
+                <div class="cert-card">
+                    <h3><i class="fas fa-shield-alt"></i> Sertifikasi Verra</h3>
+                    <p>Standar global untuk proyek pengurangan emisi karbon yang diverifikasi</p>
+                    <ul>
+                        <li>Metodologi pengukuran yang ketat</li>
+                        <li>Verifikasi pihak ketiga</li>
+                        <li>Transparansi penuh</li>
+                        <li>Diakui secara internasional</li>
+                        <li>Pemantauan berkelanjutan</li>
+                    </ul>
+                    <a href="#" class="btn"><i class="fas fa-info-circle"></i> Pelajari Lebih Lanjut</a>
+                </div>
+                
+                <div class="cert-card">
+                    <h3><i class="fas fa-medal"></i> Gold Standard</h3>
+                    <p>Sertifikasi premium untuk proyek yang memberikan manfaat berkelanjutan</p>
+                    <ul>
+                        <li>Fokus pada pembangunan berkelanjutan</li>
+                        <li>Manfaat sosial dan lingkungan</li>
+                        <li>Kepatuhan tinggi terhadap standar</li>
+                        <li>Diakui oleh PBB</li>
+                        <li>Mendukung SDGs</li>
+                    </ul>
+                    <a href="#" class="btn"><i class="fas fa-info-circle"></i> Pelajari Lebih Lanjut</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>EcoCycle</h4>
+                    <p>Platform bank sampah digital terintegrasi dengan tokenisasi karbon berbasis blockchain dan sertifikasi internasional.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Navigasi</h4>
+                    <div class="footer-links">
+                        <a href="#"><i class="fas fa-chevron-right"></i> Bank Sampah</a>
+                        <a href="#"><i class="fas fa-chevron-right"></i> Token Karbon</a>
+                        <a href="#"><i class="fas fa-chevron-right"></i> Mitra Kolaborasi</a>
+                        <a href="#"><i class="fas fa-chevron-right"></i> Sertifikasi</a>
+                        <a href="#"><i class="fas fa-chevron-right"></i> Tentang Kami</a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Kontak</h4>
+                    <div class="footer-links">
+                        <a href="#"><i class="fas fa-envelope"></i> info@ecocycle.id</a>
+                        <a href="#"><i class="fas fa-phone"></i> (021) 1234-5678</a>
+                        <a href="#"><i class="fas fa-map-marker-alt"></i> Jakarta, Indonesia</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 EcoCycle - Bank Sampah Digital & Tokenisasi Karbon. Hak Cipta Dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize the map
+        const map = L.map('map').setView([-6.2088, 106.8456], 12);
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Add markers for waste banks
+        const wasteBanks = [
+            {
+                name: "Bank Sampah Hijau Lestari",
+                position: [-6.2088, 106.8456],
+                certified: true,
+                address: "Jl. Sudirman No. 123, Jakarta"
+            },
+            {
+                name: "Bank Sampah Eco Mandiri",
+                position: [-6.1988, 106.8356],
+                certified: false,
+                address: "Jl. Thamrin No. 45, Jakarta"
+            },
+            {
+                name: "Bank Sampah Bersih Nusantara",
+                position: [-6.2188, 106.8556],
+                certified: true,
+                address: "Jl. Gatot Subroto No. 78, Jakarta"
+            },
+            {
+                name: "Bank Sampah Daur Ulang",
+                position: [-6.2288, 106.8656],
+                certified: true,
+                address: "Jl. Rasuna Said No. 34, Jakarta"
+            },
+            {
+                name: "Bank Sampah Sejahtera",
+                position: [-6.2388, 106.8756],
+                certified: false,
+                address: "Jl. Kuningan No. 56, Jakarta"
+            }
+        ];
+        
+        wasteBanks.forEach(bank => {
+            const marker = L.marker(bank.position).addTo(map);
+            const certifiedIcon = bank.certified ? '<i class="fas fa-certificate" style="color: gold;"></i> ' : '';
+            
+            marker.bindPopup(`
+                <b>${bank.name}</b><br>
+                ${certifiedIcon}${bank.certified ? 'Bersertifikat' : ''}<br>
+                <i class="fas fa-map-marker-alt"></i> ${bank.address}<br>
+                <button class="btn" style="margin-top: 10px; width: 100%;">
+                    <i class="fas fa-route"></i> Rute
+                </button>
+            `);
+        });
+        
+        // Filter buttons functionality
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Animated leaves
+        for (let i = 0; i < 10; i++) {
+            const leaf = document.createElement('div');
+            leaf.className = 'leaf';
+            leaf.innerHTML = `<i class="fas ${i % 2 === 0 ? 'fa-leaf' : 'fa-seedling'}"></i>`;
+            
+            // Random position
+            leaf.style.left = `${Math.random() * 100}%`;
+            leaf.style.animationDelay = `${Math.random() * 5}s`;
+            leaf.style.fontSize = `${Math.random() * 1 + 1}rem`;
+            
+            document.body.appendChild(leaf);
+        }
+        
+        // Simulate carbon reduction increase
+        function simulateCarbonReduction() {
+            const carbonScore = document.querySelector('.carbon-score');
+            let carbonValue = 1.2;
+            
+            setInterval(() => {
+                carbonValue += 0.01;
+                carbonScore.textContent = carbonValue.toFixed(1) + ' ton CO2e';
+            }, 5000);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            simulateCarbonReduction();
+        });
+    </script>
+</body>
+</html>

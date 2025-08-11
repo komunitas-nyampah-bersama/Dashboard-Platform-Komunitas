@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dasbor WhatsApp API</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        .dashboard {
+            display: flex;
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #f0f0f0;
+            padding: 10px;
+        }
+        .main-content {
+            flex: 1;
+            padding: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], textarea {
+            width: 300px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+        }
+        #respons {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="#kirimPesan">Kirim Pesan</a></li>
+                <li><a href="#kelolaPelanggan">Kelola Pelanggan</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div id="kirimPesan">
+                <h1>Kirim Pesan WhatsApp</h1>
+                <form id="whatsappForm">
+                    <label for="nomorTelepon">Nomor Telepon:</label><br>
+                    <input type="text" id="nomorTelepon" name="nomorTelepon" placeholder="6281234567890"><br><br>
+                    <label for="pesan">Pesan:</label><br>
+                    <textarea id="pesan" name="pesan" placeholder="Halo, apa kabar?"></textarea><br><br>
+                    <button type="submit">Kirim Pesan</button>
+                </form>
+                <div id="respons"></div>
+            </div>
+            <div id="kelolaPelanggan">
+                <h1>Kelola Pelanggan</h1>
+                <form id="pelangganForm">
+                    <label for="namaPelanggan">Nama:</label><br>
+                    <input type="text" id="namaPelanggan" name="namaPelanggan"><br><br>
+                    <label for="emailPelanggan">Email:</label><br>
+                    <input type="email" id="emailPelanggan" name="emailPelanggan"><br><br>
+                    <button type="button" id="tambahPelanggan">Tambah Pelanggan</button>
+                </form>
+                <ul id="daftarPelanggan"></ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Konfigurasi EmailJS
+        emailjs.init("YOUR_EMAILJS_USER_ID");
+
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            // YOUR_FIREBASE_CONFIG
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Kirim Pesan WhatsApp
+        document.getElementById('whatsappForm').addEventListener('submit', function(event) {
+            // ... kode kirim pesan WhatsApp ...
+        });
+
+        // Kelola Pelanggan
+        document.getElementById('tambahPelanggan').addEventListener('click', function() {
+            // ... kode tambah pelanggan ke Firebase ...
+        });
+
+        // Ambil Data Pelanggan
+        database.ref('pelanggan').on('value', function(snapshot) {
+            // ... kode ambil data pelanggan dari Firebase ...
+        });
+    </script>
+</body>
+</html>

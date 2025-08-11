@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Message Hub — Nyampah Bersama</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#0b1220; --panel:#0f172a; --muted:#94a3b8; --line:#1f2937; --brand:#16a34a; --brand2:#22c55e; --text:#e5e7eb; }
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#081021,#0b1220 30%);color:var(--text);font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial}
+header{padding:28px 16px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#052e1a;text-align:center}
+header h1{margin:0;font-size:28px;font-weight:800;letter-spacing:.3px}
+header p{margin:8px 0 0}
+.container{max-width:1180px;margin: -24px auto 80px;padding:0 16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 30px rgba(2,6,23,.4);padding:18px;margin-top:18px}
+.row{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.col-8{grid-column:span 8} .col-4{grid-column:span 4} .col-6{grid-column:span 6} .col-12{grid-column:span 12}
+@media(max-width:900px){.col-8,.col-4,.col-6{grid-column:span 12}}
+label{font-size:13px;color:var(--muted)}
+input[type="text"], textarea, select{width:100%;background:#0b1220;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px 12px;font-size:14px}
+textarea{min-height:120px;resize:vertical}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);border:none;color:#052e1a;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+.btn:hover{filter:brightness(1.05)}
+.btn.secondary{background:#0b1220;color:var(--text);border:1px solid var(--line)}
+.btn.ghost{background:transparent;border:1px dashed var(--line);color:var(--muted)}
+.badge{display:inline-block;padding:6px 10px;background:#052e1a;border:1px solid #14532d;color:#a7f3d0;border-radius:999px;font-size:12px;margin-right:8px;margin-top:6px}
+.table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+.table th,.table td{border-bottom:1px solid var(--line);padding:10px;vertical-align:top}
+.table th{text-align:left;color:#a7f3d0}
+.kpi{display:flex;gap:12px;flex-wrap:wrap}
+.kpi .card{background:#0b1220;border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:160px}
+.kpi .card .big{font-size:22px;font-weight:800}
+.footer{text-align:center;color:var(--muted);padding:28px 10px;margin-top:30px}
+small.hint{color:var(--muted)}
+.switch{display:inline-flex;align-items:center;gap:8px}
+.switch input{accent-color:#16a34a}
+.searchbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+table .actions button{margin-right:6px}
+code{background:#0b1220;border:1px solid var(--line);padding:2px 6px;border-radius:6px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Customer Message Hub</h1>
+  <p>Kelola nomor, tulis template, dan kirim pesan massal (via WhatsApp Web / wa.me). Gak usah ribet tapi harus tuntas 😎</p>
+</header>
+
+<main class="container">
+  <!-- Composer -->
+  <section class="panel">
+    <div class="row">
+      <div class="col-8">
+        <label>Template Pesan (pakai variabel: <code>{'}}name{{'}</code>, <code>{'}}phone{{'}</code>, dan field meta lain)</label>
+        <textarea id="template">Halo {'}}name{{'}, ini dari Nyampah Bersama. Info terbaru: ...</textarea>
+        <div style="margin-top:8px" class="switch">
+          <input type="checkbox" id="encode"> <label for="encode">URL-encode pesan (disarankan)</label>
+        </div>
+      </div>
+      <div class="col-4">
+        <label>Mode Kirim</label>
+        <select id="mode">
+          <option value="waweb">WhatsApp Web</option>
+          <option value="wa.me">wa.me (mobile)</option>
+          <option value="api">API 360dialog (butuh token)</option>
+          <option value="sms">SMS (fallback)</option>
+        </select>
+        <div class="switch" style="margin-top:8px">
+          <input type="checkbox" id="normalize62" checked> <label for="normalize62">Normalisasi ke format internasional 62</label>
+        </div>
+        <div class="switch" style="margin-top:6px">
+          <input type="checkbox" id="removePlus" checked> <label for="removePlus">Hapus tanda + pada nomor</label>
+        </div>
+        <div style="margin-top:16px">
+          <button class="btn" id="previewBtn">Preview 1 Pesan</button>
+          <button class="btn secondary" id="generateBtn">Generate Link untuk Terpilih</button>
+        </div>
+        <div style="margin-top:10px">
+          <small class="hint">Catatan: Pembukaan chat dilakukan per tab/browser. Untuk kirim otomatis via API, siapkan token 360dialog.</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Data -->
+  <section class="panel">
+    <div class="row">
+      <div class="col-8">
+        <div class="searchbar">
+          <input type="text" id="search" placeholder="Cari nama / nomor / meta...">
+          <label class="switch"><input type="checkbox" id="onlySelected"> Hanya yang dipilih</label>
+          <button class="btn ghost" id="exportBtn">Export CSV personal</button>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="kpi">
+          <div class="card"><div class="big" id="kpiTotal">0</div><div>Total kontak</div></div>
+          <div class="card"><div class="big" id="kpiSelected">0</div><div>Terpilih</div></div>
+        </div>
+      </div>
+      <div class="col-12">
+        <input type="file" id="fileInput" accept=".csv,.xlsx" style="margin-top:10px">
+        <small class="hint">Kamu bisa upload CSV/XLSX. Kolom minimal: nama & nomor. Variabel lainnya ikut sebagai meta.</small>
+        <table class="table" id="tbl">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="checkAll"></th>
+              <th>Nama</th>
+              <th>Nomor</th>
+              <th>Meta</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Output -->
+  <section class="panel">
+    <h3>Link Hasil Generate</h3>
+    <div id="links"></div>
+  </section>
+
+  <div class="footer">© Nyampah Bersama — Customer Message Hub</div>
+</main>
+
+<script>
+const PRELOADED = [];
+
+let rows = PRELOADED.slice();
+rows.forEach((r,i)=>r._id = i+1);
+let filtered = rows.slice();
+let selected = new Set();
+
+function normalizePhone(raw) {
+  let digits = (''+raw).replace(/[^0-9+]/g,'');
+  if (document.getElementById('removePlus').checked) digits = digits.replace(/^\+/, '');
+  // if starts with 0 -> 62
+  if (document.getElementById('normalize62').checked) {
+    if (/^0/.test(digits)) digits = '62' + digits.slice(1);
+    if (/^08/.test(raw)) digits = '62' + raw.replace(/[^0-9]/g,'').slice(1);
+    if (/^\+62/.test(raw)) digits = raw.replace(/[^0-9]/g,'').replace(/^62/, '62');
+  }
+  return digits;
+}
+
+function renderTable() {
+  const tb = document.querySelector('#tbl tbody');
+  tb.innerHTML='';
+  document.getElementById('kpiTotal').textContent = filtered.length;
+  document.getElementById('kpiSelected').textContent = selected.size;
+  for (const r of filtered) {
+    const tr = document.createElement('tr');
+    const metaText = r.meta ? Object.entries(r.meta).filter(([k,v])=>v && v!=='nan').map(([k,v])=> k+': '+v).join('; ') : '';
+    tr.innerHTML = `
+      <td><input type="checkbox" data-id="${r._id}" ${selected.has(r._id)?'checked':''}></td>
+      <td>${r.name||''}</td>
+      <td>${r.phone||''}</td>
+      <td style="color:#a3e635">${metaText}</td>
+      <td class="actions">
+        <button class="btn secondary" data-action="preview" data-id="${r._id}">Preview</button>
+        <button class="btn" data-action="open" data-id="${r._id}">Open</button>
+      </td>
+    `;
+    tb.appendChild(tr);
+  }
+}
+
+function applySearch() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const only = document.getElementById('onlySelected').checked;
+  filtered = rows.filter(r=> {
+    if (only && !selected.has(r._id)) return false;
+    const blob = (r.name+' '+r.phone+' '+JSON.stringify(r.meta||{})).toLowerCase();
+    return blob.includes(q);
+  });
+  renderTable();
+}
+
+function personalize(tpl, row) {
+  let out = tpl.replace(/\{\s*name\s*}/gi, row.name||'')
+               .replace(/\{\s*phone\s*}/gi, row.phone||'');
+  if (row.meta) {
+    for (const k in row.meta) {
+      const re = new RegExp('\\{\\s*'+k+'\\s*}','gi');
+      out = out.replace(re, row.meta[k]||'');
+    }
+  }
+  return out;
+}
+
+function buildLink(row) {
+  const tpl = document.getElementById('template').value;
+  const msg = personalize(tpl, row);
+  const enc = document.getElementById('encode').checked ? encodeURIComponent(msg) : msg;
+  const phone = normalizePhone(row.phone);
+  const mode = document.getElementById('mode').value;
+  if (mode==='waweb') return `https://web.whatsapp.com/send?phone=${phone}&text=${enc}`;
+  if (mode==='wa.me') return `https://wa.me/${phone}?text=${enc}`;
+  if (mode==='sms') return `sms:${phone}?body=${enc}`;
+  if (mode==='api') return `# API mode: Siapkan fetch ke endpoint 360dialog /messages`;
+  return '#';
+}
+
+function openLink(url, delay=400) {
+  setTimeout(()=>window.open(url, '_blank'), delay);
+}
+
+document.getElementById('fileInput').addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (ext==='csv') {
+    const text = await file.text();
+    // Simple CSV parse
+    const lines = text.split(/\r?\n/).filter(Boolean);
+    const headers = lines.shift().split(',').map(s=>s.trim().toLowerCase().replace(/\s+/g,'_'));
+    const getCol = (names)=> headers.find(h=>names.includes(h));
+    const phoneKey = getCol(['phone','no_hp','nomor','nomor_hp','hp','telepon','wa','whatsapp','no_wa','nomor_wa','phone_number']) || headers[0];
+    const nameKey = getCol(['nama','name','full_name','nama_lengkap','customer','user']) || headers[1] || headers[0];
+    const arr = [];
+    for (const line of lines) {
+      const cells = line.split(',').map(s=>s.trim());
+      const obj = {};
+      headers.forEach((h,i)=> obj[h] = cells[i]||'');
+      arr.push({
+        name: obj[nameKey]||'',
+        phone: obj[phoneKey]||'',
+        meta: Object.fromEntries(Object.entries(obj).filter(([k])=>k!==nameKey && k!==phoneKey))
+      });
+    }
+    rows = arr;
+    rows.forEach((r,i)=>r._id=i+1);
+    selected = new Set();
+    applySearch();
+  } else if (ext==='xlsx') {
+    alert('Untuk file .xlsx, konversi dulu ke CSV lalu upload. (Versi tanpa library eksternal).');
+  } else {
+    alert('Format tidak didukung. Upload CSV ya syg.');
+  }
+});
+
+document.getElementById('checkAll').addEventListener('change', (e)=>{
+  if (e.target.checked) filtered.forEach(r=>selected.add(r._id)); else filtered.forEach(r=>selected.delete(r._id));
+  document.getElementById('kpiSelected').textContent = selected.size;
+  renderTable();
+});
+
+document.getElementById('tbl').addEventListener('change', (e)=>{
+  if (e.target.type==='checkbox' && e.target.dataset.id) {
+    const id = Number(e.target.dataset.id);
+    if (e.target.checked) selected.add(id); else selected.delete(id);
+    document.getElementById('kpiSelected').textContent = selected.size;
+  }
+});
+
+document.getElementById('tbl').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  const id = Number(btn.dataset.id);
+  const row = rows.find(r=>r._id===id);
+  if (!row) return;
+  if (btn.dataset.action==='preview') {
+    const url = buildLink(row);
+    window.open(url, '_blank');
+  }
+  if (btn.dataset.action==='open') {
+    const url = buildLink(row);
+    window.open(url, '_blank');
+  }
+});
+
+document.getElementById('search').addEventListener('input', applySearch);
+document.getElementById('onlySelected').addEventListener('change', applySearch);
+
+document.getElementById('previewBtn').addEventListener('click', ()=>{
+  if (!rows.length) return alert('Belum ada data kontak.');
+  const url = buildLink(rows[0]);
+  window.open(url, '_blank');
+});
+
+document.getElementById('generateBtn').addEventListener('click', ()=>{
+  const container = document.getElementById('links');
+  container.innerHTML='';
+  const ids = Array.from(selected);
+  if (!ids.length) return alert('Pilih dulu beberapa kontak ya syg.');
+  let i=0;
+  for (const id of ids) {
+    const r = rows.find(x=>x._id===id);
+    const url = buildLink(r);
+    const a = document.createElement('a');
+    a.href = url; a.target="_blank"; a.textContent = (r.name||'') + ' — ' + normalizePhone(r.phone);
+    const div = document.createElement('div'); div.appendChild(a);
+    container.appendChild(div);
+    openLink(url, 400*i); // buka bertahap
+    i++;
+  }
+});
+
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const ids = document.getElementById('onlySelected').checked ? Array.from(selected) : filtered.map(r=>r._id);
+  const arr = rows.filter(r=>ids.includes(r._id));
+  const tpl = document.getElementById('template').value;
+  const lines = ['name,phone,personalized_message,link'];
+  for (const r of arr) {
+    const msg = personalize(tpl,r).replace(/"/g,'""');
+    const link = buildLink(r).replace(/"/g,'""');
+    lines.push(`"${r.name}","${normalizePhone(r.phone)}","${msg}","${link}"`);
+  }
+  const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='personalized_messages.csv'; a.click();
+  URL.revokeObjectURL(url);
+});
+
+// Init
+applySearch();
+</script>
+</body>
+</html>

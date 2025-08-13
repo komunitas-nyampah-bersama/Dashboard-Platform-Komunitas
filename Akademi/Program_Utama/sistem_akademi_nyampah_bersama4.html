@@ -6,6 +6,8 @@
     <title>Nyampah Akademi - Sistem Pendidikan Lingkungan Berstandar Global</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@3.6.2/dist/fetch.umd.min.js"></script>
     <style>
         /* Existing styles... */
             :root {
@@ -29,6 +31,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
@@ -70,13 +73,64 @@
         .logo img {
             height: 50px;
         }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #2ecc71;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+        }
         
         .logo h1 {
             font-family: 'Poppins', sans-serif;
             font-weight: 700;
             font-size: 1.8rem;
         }
+
+        /* Auth Container Styles */
+        .auth-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 40px 0;
+        }
         
+        .auth-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #2ecc71, #3498db);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .auth-subtitle {
+            color: #bdc3c7;
+            font-size: 1.1rem;
+        }
+
         nav ul {
             display: flex;
             list-style: none;
@@ -122,6 +176,32 @@
             font-size: 1.2rem;
             margin-bottom: 30px;
         }
+
+         /* Form Styles */
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
         
         .btn {
             display: inline-block;
@@ -136,11 +216,61 @@
             cursor: pointer;
             font-size: 1.1rem;
         }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(90deg, #2ecc71, #3498db);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
         
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .submit-btn.loading {
+            position: relative;
+            pointer-events: none;
+        }
+        
+        .submit-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin: -10px 0 0 -10px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .btn:hover {
             background: var(--secondary-dark);
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
         .btn-eu {
@@ -151,7 +281,57 @@
         .btn-eu:hover {
             background: #003376;
         }
+
+         /* Divider Styles */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+        }
         
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .divider-text {
+            padding: 0 15px;
+            color: #bdc3c7;
+            font-size: 0.9rem;
+        }
+
+        
+        /* Message Styles */
+        .message {
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.95rem;
+            display: none;
+        }
+        
+        .error-message {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            color: #ff9e9e;
+        }
+        
+        .success-message {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: #a1ffd0;
+        }
+
+        .screen {
+            display: none; /* Hidden by default */
+            padding: 20px 0;
+            text-align: center;
+        }
+        .screen.active {
+            display: block; /* Show active screen */
+            
         .section {
             padding: 80px 0;
         }
@@ -721,11 +901,84 @@
                 font-size: 0.9rem;
             }
         }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .auth-card {
+                padding: 30px 20px;
+            }
+            
+            .auth-title {
+                font-size: 1.8rem;
+            }
+        }
+
+            
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate {
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+        }
+        /* Tambahkan di CSS untuk mobile */
+@media (max-width: 480px) {
+  .auth-card {
+      border-radius: 0;
+      height: 100vh;
+      max-width: 100%;
+  }
+}
+        
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
     </style>
 </head>
 <body>
     <header>
         <div class="container header-content">
+            <div id="startScreen" class="screen active">
+                 <a href="http://ipfs.io/ipfs/QmfR65e5Y2fgDWduwMhSX1GrT3gYweXT9dsb6Qonh5VMNi/0.jpg" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="logo-text">
+                    Komunitas Nyampah Bersama
+                </div>
+            </a>
+        </div>
+
+             <!-- Main Content -->
+    <main class="auth-container">
+        <div class="auth-card animate">
+            <div class="auth-header">
+                <h1 class="auth-title animate">Selamat Datang</h1>
+                <p class="auth-subtitle animate delay-1">
+                    Masuk untuk mengakses dashboard anggota dan kontribusi lingkungan
+                </p>
+            </div>
+            
+            <form id="magicLinkForm">
+                <div class="form-group">
+                   <input 
+    type="email" 
+    id="emailInput" 
+    class="input-field animate delay-1" 
+    placeholder="Masukkan email Anda" 
+    required
+    autofocus <!-- [TAMBAHKAN DI SINI] -->
+>
+                </div>
+            
+            <div class="button-group">
+                <button class="btn" onclick="showScreen('mainsection')">Buat ID Internasional Anda</button>
+            </div>
+        </div>
+
+            <div id="mainsection" class"screen">
             <div class="logo">
                 <i class="fas fa-recycle fa-2x"></i>
                 <h1>Nyampah Akademi</h1>

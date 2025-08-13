@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero Waste Schools Initiative 2030 | Erasmus+</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2ecc71;
+            --primary-dark: #27ae60;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --eu-blue: #003399;
+            --eu-gold: #FFCC00;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%);
+            color: var(--light);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        header {
+            background: rgba(44, 62, 80, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.2rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 50px;
+            filter: drop-shadow(0 0 5px rgba(46, 204, 113, 0.5));
+        }
+
+        .logo h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 650px;
+            z-index: 2;
+            padding-top: 80px;
+        }
+
+        .hero h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero h2 span {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 550px;
+            opacity: 0.9;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            border: 2px solid var(--primary);
+            box-shadow: 0 10px 20px rgba(46, 204, 113, 0.3);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background: transparent;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(46, 204, 113, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            margin-left: 15px;
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-eu {
+            background: var(--eu-blue);
+            border-color: var(--eu-blue);
+            box-shadow: 0 10px 20px rgba(0, 51, 153, 0.3);
+        }
+
+        .btn-eu:hover {
+            background: transparent;
+            color: var(--eu-blue);
+        }
+
+        .hero-visual {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 45%;
+            max-width: 700px;
+            z-index: 1;
+        }
+
+        .earth-container {
+            position: relative;
+            width: 100%;
+            padding-top: 100%;
+        }
+
+        .earth {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #3498db, #1a5276);
+            box-shadow: 
+                inset 0 0 50px #fff,
+                inset 20px 0 80px #2980b9,
+                inset -20px 0 80px #8e44ad,
+                inset 20px 0 300px #2980b9,
+                inset -20px 0 300px #8e44ad,
+                0 0 50px #fff,
+                -10px 0 80px #2980b9,
+                10px 0 80px #8e44ad;
+            animation: rotate 40s linear infinite;
+        }
+
+        .earth::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Blue_Marble_2002.png/1200px-Blue_Marble_2002.png');
+            background-size: cover;
+            opacity: 0.4;
+            animation: rotate 30s linear infinite;
+        }
+
+        .floating-icons {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .icon {
+            position: absolute;
+            font-size: 2.5rem;
+            color: var(--primary);
+            filter: drop-shadow(0 0 8px rgba(46, 204, 113, 0.7));
+            animation: float 8s infinite ease-in-out;
+        }
+
+        .icon:nth-child(1) { top: 10%; left: 15%; animation-delay: 0s; }
+        .icon:nth-child(2) { top: 60%; left: 25%; animation-delay: -2s; }
+        .icon:nth-child(3) { top: 30%; left: 75%; animation-delay: -4s; }
+        .icon:nth-child(4) { top: 80%; left: 65%; animation-delay: -6s; }
+        .icon:nth-child(5) { top: 20%; left: 45%; animation-delay: -1s; }
+
+        .programs {
+            padding: 8rem 5%;
+            background: #1a2a3a;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .section-title p {
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .program-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        .card {
+            background: rgba(44, 62, 80, 0.7);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 3px var(--primary);
+        }
+
+        .card-header {
+            padding: 2rem 2rem 1rem;
+            background: rgba(39, 174, 96, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-header h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 1rem 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list li i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 5rem auto;
+            max-width: 1200px;
+        }
+
+        .stat-card {
+            background: rgba(44, 62, 80, 0.7);
+            padding: 2.5rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-number {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            line-height: 1;
+        }
+
+        .stat-text {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .cta-section {
+            padding: 6rem 5%;
+            text-align: center;
+            background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%);
+            position: relative;
+        }
+
+        .cta-section h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-section p {
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .partners-section {
+            padding: 5rem 5%;
+            background: #1a2a3a;
+            text-align: center;
+        }
+
+        .partners-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .partner-logo {
+            height: 80px;
+            filter: grayscale(100%);
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .partner-logo:hover {
+            filter: grayscale(0);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        footer {
+            background: rgba(26, 37, 47, 0.95);
+            padding: 4rem 5% 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-column h4 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .footer-column p, .footer-column a {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.8rem;
+            display: block;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-column a:hover {
+            color: var(--primary);
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .eu-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 51, 153, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--eu-blue);
+            margin-top: 20px;
+        }
+
+        .eu-logo {
+            width: 30px;
+            height: 30px;
+            background: var(--eu-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--eu-gold);
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Animations */
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* Particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(46, 204, 113, 0.5);
+            border-radius: 50%;
+            animation: float 8s infinite linear;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .hero h2 {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding-top: 100px;
+            }
+
+            .hero-content {
+                max-width: 100%;
+                margin-bottom: 3rem;
+            }
+
+            .hero p {
+                margin: 0 auto 2rem;
+            }
+
+            .hero-visual {
+                position: relative;
+                width: 80%;
+                right: auto;
+                top: auto;
+                transform: none;
+                margin: 0 auto;
+            }
+
+            .earth-container {
+                padding-top: 80%;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h2 {
+                font-size: 2.8rem;
+            }
+
+            .btn {
+                display: block;
+                margin: 1rem auto;
+                width: 80%;
+            }
+
+            .btn-secondary {
+                margin-left: 0;
+            }
+
+            .program-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--primary);
+            font-size: 0.9rem;
+            opacity: 0.8;
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-indicator i {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles Background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Header -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-leaf fa-2x" style="color: #2ecc71;"></i>
+                <h1>ZERO WASTE SCHOOLS INITIATIVE 2030</h1>
+            </div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#program">Programs</a>
+                <a href="#impact">Impact</a>
+                <a href="#partners">Partners</a>
+                <a href="#join">Apply</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h2>TOWARDS A CLEANER <span>AND GREENER EUROPE</span></h2>
+            <p>An Erasmus+ funded initiative to create an environmentally conscious generation through zero-waste schools. Together, let's build a sustainable future for Europe!</p>
+            <div class="hero-buttons">
+                <a href="#join" class="btn btn-eu">Apply for Funding</a>
+                <a href="#program" class="btn btn-secondary">Explore Programs</a>
+            </div>
+            <div class="eu-badge">
+                <div class="eu-logo">EU</div>
+                <span>Funded by the European Union</span>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="earth-container">
+                <div class="earth"></div>
+                <div class="floating-icons">
+                    <div class="icon"><i class="fas fa-recycle"></i></div>
+                    <div class="icon"><i class="fas fa-seedling"></i></div>
+                    <div class="icon"><i class="fas fa-tree"></i></div>
+                    <div class="icon"><i class="fas fa-solar-panel"></i></div>
+                    <div class="icon"><i class="fas fa-wind"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i>
+            <span>Scroll to explore</span>
+        </div>
+    </section>
+
+    <!-- Program Section -->
+    <section class="programs" id="program">
+        <div class="section-title">
+            <h3>CORE INITIATIVES</h3>
+            <p>Three pillars to achieve the vision of a Clean Europe 2030 through education and practical action</p>
+        </div>
+
+        <div class="program-cards">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="card-header">
+                    <h4>FUTURE PIONEER EDUCATORS</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Training 1000 Pioneer Teachers</li>
+                        <li><i class="fas fa-check-circle"></i> 1000 Waste Management Innovations</li>
+                        <li><i class="fas fa-check-circle"></i> 1000 Daily Actions</li>
+                        <li><i class="fas fa-check-circle"></i> Erasmus+ Mobility Programs</li>
+                        <li><i class="fas fa-check-circle"></i> EU Certification & Accreditation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card">
+                <div class="card-header">
+                    <h4>SUSTAINABILITY SCHOLARSHIPS</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> 1000 Erasmus+ Scholarships</li>
+                        <li><i class="fas fa-check-circle"></i> Student Exchange Programs</li>
+                        <li><i class="fas fa-check-circle"></i> 1000 Young Environmental Leaders</li>
+                        <li><i class="fas fa-check-circle"></i> International Green Internships</li>
+                        <li><i class="fas fa-check-circle"></i> EU Youth Empowerment Grants</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card">
+                <div class="card-header">
+                    <h4>EUROPEAN COLLABORATION</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Erasmus+ Strategic Partnerships</li>
+                        <li><i class="fas fa-check-circle"></i> EU-Wide School Network</li>
+                        <li><i class="fas fa-check-circle"></i> Cross-border Knowledge Exchange</li>
+                        <li><i class="fas fa-check-circle"></i> European Green School Certification</li>
+                        <li><i class="fas fa-check-circle"></i> EU Policy Development</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats" id="impact">
+            <div class="stat-card">
+                <div class="stat-number" id="counter1">0</div>
+                <div class="stat-text">Participating Schools</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="counter2">0</div>
+                <div class="stat-text">Tons of Waste Managed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="counter3">0</div>
+                <div class="stat-text">Grants Distributed (€)</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners Section -->
+    <section class="partners-section" id="partners">
+        <div class="section-title">
+            <h3>OUR STRATEGIC PARTNERS</h3>
+            <p>Collaborating with leading organizations across Europe for sustainable impact</p>
+        </div>
+        <div class="partners-grid">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/320px-Flag_of_Europe.svg.png" alt="European Union" class="partner-logo">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/Flag_of_Japan.svg/320px-Flag_of_Japan.svg.png" alt="Japan International Cooperation Agency" class="partner-logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/UNESCO_logo.svg/320px-UNESCO_logo.svg.png" alt="UNESCO" class="partner-logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/World_Wide_Fund_for_Nature_logo.svg/320px-World_Wide_Fund_for_Nature_logo.svg.png" alt="WWF" class="partner-logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Greenpeace_logo.svg/320px-Greenpeace_logo.svg.png" alt="Greenpeace" class="partner-logo">
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="join">
+        <h3>READY TO BE PART OF THE CHANGE?</h3>
+        <p>Join hundreds of schools across Europe that have started their journey toward zero waste and sustainability. Together we can create a greener future!</p>
+        <div class="cta-buttons">
+            <a href="#" class="btn btn-eu">Apply for Erasmus+ Funding</a>
+            <a href="#" class="btn">School Registration</a>
+            <a href="#" class="btn btn-secondary">Partnership Inquiry</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>ABOUT THE INITIATIVE</h4>
+                <p>The Zero Waste Schools Initiative 2030 is an Erasmus+ funded program to create sustainable, waste-free educational ecosystems across Europe.</p>
+                <p>Implemented in collaboration with the European Commission and national governments.</p>
+                <div class="eu-badge">
+                    <div class="eu-logo">EU</div>
+                    <span>Erasmus+ Project 2023-2027</span>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h4>QUICK LINKS</h4>
+                <a href="#home">Home</a>
+                <a href="#program">Programs</a>
+                <a href="#impact">Impact</a>
+                <a href="#join">Apply</a>
+                <a href="#">Funding Guidelines</a>
+                <a href="#">Erasmus+ Portal</a>
+            </div>
+            <div class="footer-column">
+                <h4>CONTACT US</h4>
+                <a href="#"><i class="fas fa-map-marker-alt"></i> Brussels, Belgium</a>
+                <a href="mailto:info@zerowasteschools.eu"><i class="fas fa-envelope"></i> info@zerowasteschools.eu</a>
+                <a href="tel:+3221234567"><i class="fas fa-phone"></i> +32 2 123 4567</a>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2023 Zero Waste Schools Initiative 2030. Co-funded by the Erasmus+ Programme of the European Union.</p>
+            <p>Disclaimer: The European Commission's support for this initiative does not constitute an endorsement of the contents, which reflect the views only of the authors.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Create particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 100;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size
+                const size = Math.random() * 5 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                
+                // Random animation
+                const duration = Math.random() * 15 + 10;
+                const delay = Math.random() * 5;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                // Random color
+                const colors = ['#2ecc71', '#3498db', '#9b59b6', '#1abc9c'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.background = color;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Counter animation
+        function animateCounter(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                element.textContent = value.toLocaleString();
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            
+            // Initialize counters when they come into view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateCounter(document.getElementById('counter1'), 0, 870, 2000);
+                        animateCounter(document.getElementById('counter2'), 0, 1250, 2000);
+                        animateCounter(document.getElementById('counter3'), 0, 4200, 2000);
+                        observer.disconnect();
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            observer.observe(document.querySelector('.stats'));
+            
+            // Smooth scrolling for navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        window.scrollTo({
+                            top: target.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

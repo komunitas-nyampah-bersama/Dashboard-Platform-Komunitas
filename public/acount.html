@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartWallet - Wallet Cerdas dengan Account Abstraction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <script src="https://unpkg.com/@biconomy/account@latest/dist/index.umd.js"></script>
+    <script src="https://unpkg.com/@biconomy/common@latest/dist/index.umd.js"></script>
+    <script src="https://unpkg.com/@thirdweb-dev/sdk@latest/dist/thirdweb-dev-sdk.evm.min.js"></script>
+   <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0 0 80px 0;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #004aad 0%, #002d6e 100%);
+            color: white;
+            padding: 20px 16px 10px;
+            position: relative;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 8px;
+            color: #ffd700;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .user-actions i {
+            font-size: 20px;
+        }
+        
+        .balance-section {
+            text-align: center;
+            padding: 15px 0;
+        }
+        
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .balance-amount {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 10px;
+        }
+        
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 0;
+            border-radius: 12px;
+            width: 22%;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+        }
+        
+        .action-btn i {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .action-btn span {
+            font-size: 12px;
+        }
+        
+        /* Main Content Styles */
+        .content {
+            padding: 20px 16px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .promo-banner {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .promo-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .promo-title i {
+            margin-right: 10px;
+        }
+        
+        .promo-desc {
+            font-size: 14px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        
+        .promo-btn {
+            background: white;
+            color: #ff6b6b;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .promo-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .promo-btn i {
+            margin-left: 5px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .feature-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px 5px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .feature-item:hover {
+            background: #e9ecef;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: #eef7ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            color: #004aad;
+            font-size: 18px;
+        }
+        
+        .feature-name {
+            font-size: 12px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .see-all {
+            color: #004aad;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Activity Section */
+        .activity-section {
+            margin-top: 20px;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .activity-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: #eef7ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: #004aad;
+            font-size: 18px;
+        }
+        
+        .activity-details {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        
+        .activity-desc {
+            font-size: 13px;
+            color: #6c757d;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: #adb5bd;
+        }
+        
+        /* Security Section */
+        .security-section {
+            background: #eef7ff;
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid #d0ebff;
+        }
+        
+        .security-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .security-icon {
+            width: 30px;
+            height: 30px;
+            background: #d0ebff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: #004aad;
+            font-size: 14px;
+        }
+        
+        .security-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .security-content {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #495057;
+        }
+        
+        .security-btn {
+            background: #004aad;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .security-btn:hover {
+            background: #003a8c;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+            border-top: 1px solid #e9ecef;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 20%;
+        }
+        
+        .nav-item.active {
+            color: #004aad;
+        }
+        
+        .nav-item:hover {
+            color: #004aad;
+            transform: translateY(-3px);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        /* Account Abstraction Badge */
+        .aa-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .aa-badge i {
+            margin-right: 5px;
+        }
+        
+        /* Animation for balance */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .balance-amount {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            .header {
+                border-radius: 0 0 20px 20px;
+            }
+        }
+
+         /* Tambahan untuk loading state */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+            font-size: 24px;
+            flex-direction: column;
+        }
+        
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #004aad;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ced4da;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .input-field:focus {
+            border-color: #004aad;
+            box-shadow: 0 0 0 3px rgba(0, 74, 173, 0.1);
+            outline: none;
+        }
+        
+        .action-button {
+            background: linear-gradient(135deg, #004aad 0%, #002d6e 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0, 74, 173, 0.3);
+        }
+        
+        .tx-status {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #004aad;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .tx-success {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .tx-error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .tx-hash {
+            font-size: 14px;
+            word-break: break-all;
+            margin-top: 10px;
+            color: #004aad;
+        }
+        
+        .wallet-address {
+            font-size: 12px;
+            color: #6c757d;
+            text-align: center;
+            margin-top: 10px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div>Menginisialisasi wallet...</div>
+    </div>
+    <div class="container">
+        <!-- Account Abstraction Badge -->
+        <div class="aa-badge">
+            <i class="fas fa-brain"></i> Smart Account
+        </div>
+        
+        <!-- Header Section -->
+        <div class="header">
+            <div class="top-bar">
+                <div class="logo">
+                    <i class="fas fa-wallet"></i>
+                    SmartWallet
+                </div>
+                <div class="user-actions">
+                    <i class="fas fa-bell"></i>
+                    <i class="fas fa-qrcode" id="showQR"></i>
+                    <i class="fas fa-cog" id="showSettings"></i>
+                </div>
+            </div>
+            
+            <div class="balance-section">
+                <div class="balance-label">Saldo Tersedia</div>
+                <div class="balance-amount" id="balanceAmount">Rp 0</div>
+                
+                <div class="action-buttons">
+                    <div class="action-btn" id="topUpBtn">
+                        <i class="fas fa-wallet"></i>
+                        <span>Isi Saldo</span>
+                    </div>
+                    <div class="action-btn" id="requestBtn">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <span>Minta</span>
+                    </div>
+                    <div class="action-btn" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Kirim</span>
+                    </div>
+                    <div class="action-btn">
+                        <i class="fas fa-comment-alt"></i>
+                        <span>Pesan</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Promo Banner -->
+            <div class="promo-banner">
+                <div class="promo-title">
+                    <i class="fas fa-gift"></i>
+                    SmartFest
+                </div>
+                <div class="promo-desc">
+                    Klaim hadiah spesial dan menangkan ratusan juta rupiah!
+                </div>
+                <button class="promo-btn">
+                    Klaim Sekarang <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+            
+            <!-- Features Grid -->
+            <div class="section-title">
+                <span>Fitur SmartWallet</span>
+                <span class="see-all">Lihat Semua</span>
+            </div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="feature-name">Smart Deals</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="feature-name">Smart Games</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fab fa-apple"></i>
+                    </div>
+                    <div class="feature-name">Apple Zone</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="feature-name">Hemat 80%</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <div class="feature-name">A+ Rewards</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="feature-name">Listrik</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="feature-name">Cicilan</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </div>
+                    <div class="feature-name">Lainnya</div>
+                </div>
+            </div>
+            
+            <!-- Activity Section -->
+            <div class="section-title">
+                <span>Aktivitas Terkini</span>
+            </div>
+            <div class="activity-section">
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="activity-details">
+                        <div class="activity-title">rdmahayana</div>
+                        <div class="activity-desc">Klaim hadiah di Smart Deals</div>
+                    </div>
+                    <div class="activity-time">Baru saja</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-birthday-cake"></i>
+                    </div>
+                    <div class="activity-details">
+                        <div class="activity-title">gianvenido</div>
+                        <div class="activity-desc">Ultah - Kirim Hadiah</div>
+                    </div>
+                    <div class="activity-time">1 jam lalu</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <div class="activity-details">
+                        <div class="activity-title">SmartWallet</div>
+                        <div class="activity-desc">Berbagi kabar spesial</div>
+                    </div>
+                    <div class="activity-time">13/08</div>
+                </div>
+            </div>
+            
+            <!-- Security Section -->
+            <div class="security-section">
+                <div class="security-header">
+                    <div class="security-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="security-title">Keamanan Smart Account</div>
+                </div>
+                <div class="security-content">
+                    <p>2 aktivitas terlindungi oleh smart contract!</p>
+                    <p>Ada transaksi mencurigakan? Laporkan segera.</p>
+                </div>
+                <button class="security-btn">
+                    <i class="fas fa-shield-alt"></i> Cek Keamanan
+                </button>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <div class="nav-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <span>Beranda</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <span>Aktivitas</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <span>PAY</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <span>Dompet</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>Saya</span>
+            </div>
+        </div>
+    </div>
+
+     <!-- Modal untuk Kirim Dana -->
+    <div class="modal" id="sendModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Kirim Dana</div>
+                <button class="close-btn" id="closeSendModal">&times;</button>
+            </div>
+            <div class="input-group">
+                <label class="input-label">Alamat Penerima</label>
+                <input type="text" class="input-field" id="recipientAddress" placeholder="0x...">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Jumlah (ETH)</label>
+                <input type="number" class="input-field" id="sendAmount" placeholder="0.00" step="0.001">
+            </div>
+            <button class="action-button" id="confirmSend">Kirim Sekarang</button>
+            <div class="tx-status" id="sendStatus"></div>
+        </div>
+    </div>
+    
+    <!-- Modal untuk Isi Saldo -->
+    <div class="modal" id="topUpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Isi Saldo</div>
+                <button class="close-btn" id="closeTopUpModal">&times;</button>
+            </div>
+            <div class="input-group">
+                <label class="input-label">Jumlah (ETH)</label>
+                <input type="number" class="input-field" id="topUpAmount" placeholder="0.00" step="0.001">
+            </div>
+            <button class="action-button" id="confirmTopUp">Isi Saldo</button>
+            <div class="tx-status" id="topUpStatus"></div>
+        </div>
+    </div>
+    
+    <!-- Modal untuk Info Wallet -->
+    <div class="modal" id="walletInfoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Info Smart Wallet</div>
+                <button class="close-btn" id="closeWalletInfo">&times;</button>
+            </div>
+            <div class="tx-status">
+                <div class="wallet-address" id="walletAddress"></div>
+                <div class="wallet-address" id="smartAccountAddress"></div>
+                <div class="wallet-address" id="balanceInfo"></div>
+                <div class="wallet-address" id="tokenBalance"></div>
+                <button class="action-button" style="margin-top: 20px;" id="disconnectWallet">Disconnect Wallet</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Konfigurasi Supabase
+        const SUPABASE_URL = 'https://weueopblwiliyjqaaqvb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldWVvcGJsd2lsaXlqcWFhcXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NzExNzUsImV4cCI6MjA2NzA0NzE3NX0.O_hQFoLpRoRqa7je2PwavqiGrc4f9PP_UKd7iG9K8Xg';
+                
+        // Inisialisasi Supabase client
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // State aplikasi
+        let userAddress = null;
+        let smartAccountAddress = null;
+        let session = null;
+        
+        // Elemen UI
+        const balanceAmountEl = document.getElementById('balanceAmount');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        
+        // Fungsi untuk menampilkan/menyembunyikan loading
+        function showLoading(message) {
+            if (message) loadingOverlay.querySelector('div:last-child').textContent = message;
+            loadingOverlay.style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            loadingOverlay.style.display = 'none';
+        }
+        
+        // Inisialisasi wallet dengan Metamask
+        async function initWallet() {
+            showLoading('Menginisialisasi wallet...');
+            
+            try {
+                // Periksa apakah Metamask terinstall
+                if (!window.ethereum) {
+                    throw new Error('Silakan install Metamask untuk menggunakan wallet ini!');
+                }
+                
+                // Minta koneksi ke wallet
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAddress = accounts[0];
+                
+                // Dapatkan session token dari Supabase
+                const { data, error } = await supabase.functions.invoke('create-session', {
+                    body: { userAddress }
+                });
+                
+                if (error) throw error;
+                
+                session = data.session;
+                smartAccountAddress = data.smartAccountAddress;
+                
+                // Perbarui UI
+                updateBalances();
+                
+                console.log('Smart Account Address:', smartAccountAddress);
+                console.log('User Address:', userAddress);
+                
+                hideLoading();
+                showNotification('Wallet Connected', `Smart wallet berhasil diinisialisasi!`);
+                
+            } catch (error) {
+                console.error('Error initializing wallet:', error);
+                hideLoading();
+                showNotification('Wallet Error', `Gagal menginisialisasi wallet: ${error.message}`);
+            }
+        }
+        
+        // Perbarui saldo wallet melalui Supabase
+        async function updateBalances() {
+            showLoading('Memperbarui saldo...');
+            
+            try {
+                // Panggil fungsi Supabase untuk mendapatkan saldo
+                const { data, error } = await supabase.functions.invoke('get-balances', {
+                    headers: {
+                        'Authorization': `Bearer ${session.token}`
+                    }
+                });
+                
+                if (error) throw error;
+                
+                const { ethBalance, tokenBalance } = data;
+                
+                // Konversi ke Rupiah (contoh kurs)
+                const ethToIDR = 24000000; // 1 ETH = 24,000,000 IDR
+                const balanceInIDR = (parseFloat(ethBalance) * ethToIDR).toLocaleString('id-ID');
+                
+                balanceAmountEl.textContent = `Rp ${balanceInIDR}`;
+                
+                console.log(`ETH Balance: ${ethBalance}`);
+                console.log(`Token Balance: ${tokenBalance} NYMPH`);
+                
+                hideLoading();
+                
+            } catch (error) {
+                console.error('Error updating balances:', error);
+                hideLoading();
+                showNotification('Error', `Gagal memperbarui saldo: ${error.message}`);
+            }
+        }
+        
+        // Kirim transaksi melalui Supabase
+        async function sendTransaction(recipient, amount) {
+            showLoading('Mengirim transaksi...');
+            
+            try {
+                // Validasi input
+                if (!recipient || !recipient.startsWith('0x') || recipient.length !== 42) {
+                    throw new Error('Alamat penerima tidak valid');
+                }
+                
+                if (isNaN(amount) || amount <= 0) {
+                    throw new Error('Jumlah tidak valid');
+                }
+                
+                // Panggil fungsi Supabase untuk mengirim transaksi
+                const { data, error } = await supabase.functions.invoke('send-transaction', {
+                    body: { 
+                        recipient, 
+                        amount: amount.toString(),
+                        userAddress
+                    },
+                    headers: {
+                        'Authorization': `Bearer ${session.token}`
+                    }
+                });
+                
+                if (error) throw error;
+                
+                // Perbarui saldo
+                await updateBalances();
+                
+                // Tampilkan notifikasi
+                showNotification('Transfer Berhasil', `Berhasil mengirim ${amount} ETH ke ${recipient.substring(0, 8)}...`);
+                
+                return data.txHash;
+                
+            } catch (error) {
+                console.error('Transaction failed:', error);
+                showNotification('Error', `Gagal mengirim transaksi: ${error.message}`);
+                return null;
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Isi saldo melalui Supabase
+        async function topUpWallet(amount) {
+            showLoading('Mengisi saldo...');
+            
+            try {
+                // Validasi input
+                if (isNaN(amount) || amount <= 0) {
+                    throw new Error('Jumlah tidak valid');
+                }
+                
+                // Panggil fungsi Supabase untuk mint token
+                const { data, error } = await supabase.functions.invoke('mint-tokens', {
+                    body: { 
+                        amount: amount.toString(),
+                        userAddress
+                    },
+                    headers: {
+                        'Authorization': `Bearer ${session.token}`
+                    }
+                });
+                
+                if (error) throw error;
+                
+                // Perbarui saldo
+                await updateBalances();
+                
+                // Tampilkan notifikasi
+                showNotification('Isi Saldo Berhasil', `Berhasil menambahkan ${amount} NYMPH ke wallet`);
+                
+                return data.txHash;
+                
+            } catch (error) {
+                console.error('Top-up failed:', error);
+                showNotification('Error', `Gagal mengisi saldo: ${error.message}`);
+                return null;
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', initWallet);
+        
+        // ... (event listeners lainnya tetap sama)
+        
+        
+        // Animasi untuk fitur
+        document.querySelectorAll('.feature-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const featureName = this.querySelector('.feature-name').textContent;
+                alert(`Membuka fitur: ${featureName}`);
+            });
+        });
+        
+        // Animasi saldo
+        setInterval(() => {
+            const balance = document.querySelector('.balance-amount');
+            balance.style.animation = 'none';
+            setTimeout(() => {
+                balance.style.animation = 'pulse 2s infinite';
+            }, 10);
+        }, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin • Bulk Address Generator</title>
+<style>
+  body{font-family:system-ui,Segoe UI,Roboto;background:#0b0f15;color:#e6ebf5;margin:0}
+  .wrap{max-width:760px;margin:32px auto;padding:16px}
+  .card{background:#111827;border:1px solid #1f2937;border-radius:16px;padding:20px}
+  h1{margin:0 0 8px;font-size:22px} .muted{color:#9aa4b2}
+  label{display:block;font-size:12px;color:#cbd5e1;margin:10px 0 6px}
+  input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #253046;background:#0b1220;color:#e6ebf5}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .row{margin-top:12px}
+  button{background:#7c91ff;border:0;border-radius:10px;padding:12px 16px;color:#fff;font-weight:600;cursor:pointer}
+  .ghost{background:transparent;border:1px solid #2b364a;color:#cbd5e1}
+  pre{background:#0b1220;border:1px solid #253046;padding:12px;border-radius:10px;white-space:pre-wrap}
+  .ok{color:#9af0b7} .err{color:#ffb4b4}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Bulk Address Generator</h1>
+    <div class="muted">Generate alamat smart account (counterfactual) massal. Gratis, belum deploy.</div>
+    <div class="grid">
+      <div>
+        <label>Jumlah (1–10.000)</label>
+        <input id="count" type="number" min="1" max="10000" value="100">
+      </div>
+      <div>
+        <label>Shard / Wilayah</label>
+        <input id="shard" placeholder="mis. kecamatan-a">
+      </div>
+      <div>
+        <label>Salt Prefix (opsional)</label>
+        <input id="prefix" placeholder="opsi pembeda salt">
+      </div>
+      <div>
+        <label>Batch ID (opsional)</label>
+        <input id="batch" placeholder="auto kalau kosong">
+      </div>
+    </div>
+    <div class="row">
+      <label>Catatan (opsional)</label>
+      <textarea id="note" rows="2" placeholder="mis. pregen untuk event 17an"></textarea>
+    </div>
+    <div class="row">
+      <label><input id="dry" type="checkbox"> Dry run (preview 3 alamat, tidak menyimpan)</label>
+    </div>
+    <div class="row">
+      <label>Admin Token</label>
+      <input id="token" placeholder="X-Admin-Token">
+    </div>
+    <div class="row">
+      <button id="go">Generate</button>
+      <button class="ghost" id="reset">Reset</button>
+    </div>
+    <div class="row">
+      <pre id="out" class="muted">Belum ada output.</pre>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  const OUT = document.getElementById('out');
+  const GO  = document.getElementById('go');
+  const RS  = document.getElementById('reset');
+
+  const PROJECT_ID = "YOUR_SUPABASE_PROJECT_ID";
+  const URL = `https://${PROJECT_ID}.supabase.co/functions/v1/admin-bulk-address`;
+
+  function log(o, ok=true){
+    OUT.textContent = (ok?"✅ ":"❌ ") + (typeof o === "string" ? o : JSON.stringify(o,null,2));
+    OUT.className = ok ? "ok" : "err";
+  }
+
+  GO.onclick = async () => {
+    const body = {
+      count:  Number(document.getElementById('count').value || 100),
+      shard:  document.getElementById('shard').value || "default",
+      salt_prefix: document.getElementById('prefix').value || undefined,
+      batch_id: document.getElementById('batch').value || undefined,
+      note: document.getElementById('note').value || undefined,
+      dry_run: document.getElementById('dry').checked
+    };
+    const token = document.getElementById('token').value.trim();
+    if(!token){ log("Admin token kosong.", false); return; }
+
+    GO.disabled = true; GO.textContent = "Processing...";
+    try{
+      const r = await fetch(URL, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json", "X-Admin-Token": token },
+        body: JSON.stringify(body)
+      });
+      const j = await r.json().catch(()=>({}));
+      if(!r.ok) throw new Error(j.error || r.statusText);
+      log(j, true);
+      if (j.batch_id) {
+        OUT.textContent += `\n\nTip: cek batch di SQL: select * from wallets where batch_id='${j.batch_id}' limit 5;`;
+      }
+    }catch(e){ log(e.message || e, false); }
+    finally{ GO.disabled=false; GO.textContent="Generate"; }
+  };
+
+  RS.onclick = ()=> location.reload();
+})();
+</script>
+</body>
+</html>

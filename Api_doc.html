@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Daftar NyampahCoin • Dapat Alamat Dompet</title>
+  <style>
+    :root { --bg:#0b0f15; --card:#121826; --text:#e6ebf5; --muted:#9ca3af; --brand:#7c91ff; --ok:#22c55e; --err:#ef4444; }
+    *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#0b0f15,#0b0f15 60%,#0e1522);
+      color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+    .wrap{max-width:680px;margin:32px auto;padding:16px}
+    .card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:20px 18px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+    h1{font-size:22px;margin:0 0 6px} p.lead{margin:2px 0 16px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px} .grid-1{grid-template-columns:1fr}
+    label{font-size:13px;color:#cbd5e1;display:block;margin:6px 0}
+    input{width:100%;padding:12px 12px;border-radius:10px;border:1px solid #253046;background:#0b1220;color:var(--text);
+      outline:none} input:focus{border-color:#3b82f6}
+    .row{margin:10px 0}
+    .btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);border:0;padding:12px 16px;border-radius:12px;
+      color:white;font-weight:600;cursor:pointer} .btn:disabled{opacity:.55;cursor:not-allowed}
+    .btn-ghost{background:transparent;border:1px solid #2b364a;color:#cbd5e1}
+    .note{font-size:12px;color:#9aa4b2}
+    .status{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:14px;display:none}
+    .ok{background:#112617;color:#9af0b7;border:1px solid #1e3a2a}
+    .err{background:#2a1212;color:#feb2b2;border:1px solid #3f1d1d}
+    .result{margin-top:16px;display:none}
+    .addr{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#0b1220;border:1px solid #253046;
+      padding:10px;border-radius:10px;word-break:break-all}
+    .row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .qr{width:168px;height:168px;background:#0b1220;border:1px dashed #334155;border-radius:12px;display:flex;align-items:center;justify-content:center}
+    .flex{display:flex;gap:16px;flex-wrap:wrap}
+    .muted{color:var(--muted);font-size:13px}
+    .footer{margin-top:18px;color:#93a3b8;font-size:12px}
+  </style>
+  <!-- QRCode lib (ringan) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Daftar NyampahCoin</h1>
+      <p class="lead">Isi data singkat, dapat <b>alamat dompet</b> (smart account) seketika. Gratis—aktif saat transaksi pertama.</p>
+
+      <form id="form" autocomplete="on" novalidate>
+        <div class="grid">
+          <div class="row">
+            <label>Nama</label>
+            <input id="name" name="name" required placeholder="Nama lengkap" />
+          </div>
+          <div class="row">
+            <label>Nomor WA</label>
+            <input id="phone" name="phone" inputmode="tel" placeholder="+62..." />
+          </div>
+          <div class="row">
+            <label>Email</label>
+            <input id="email" name="email" type="email" placeholder="nama@email.com" />
+          </div>
+          <div class="row">
+            <label>Kode Referral (opsional)</label>
+            <input id="ref" name="ref" placeholder="KODE-REF" />
+          </div>
+        </div>
+        <div class="row">
+          <button class="btn" id="submitBtn" type="submit">Daftarkan & Buat Alamat</button>
+          <button class="btn btn-ghost" id="resetBtn" type="button">Reset</button>
+        </div>
+        <div id="status" class="status"></div>
+      </form>
+
+      <div id="result" class="result">
+        <div class="flex">
+          <div>
+            <div id="qrcode" class="qr"></div>
+          </div>
+          <div style="flex:1;min-width:240px">
+            <div class="muted">Alamat dompet kamu</div>
+            <div id="addr" class="addr">-</div>
+            <div class="row-actions">
+              <button class="btn btn-ghost" id="copyBtn">Copy</button>
+              <a id="basescan" class="btn btn-ghost" target="_blank" rel="noopener">Lihat di BaseScan</a>
+              <a id="zerion" class="btn btn-ghost" target="_blank" rel="noopener">Buka di Zerion</a>
+            </div>
+            <p class="note">Catatan: ini <i>counterfactual smart account</i> — aktif otomatis saat transaksi pertama (disponsor gas).</p>
+          </div>
+        </div>
+        <div class="footer">Terima kasih sudah daftar. Ayo pelan-pelan tapi pasti—gak usah ribet tapi harus tuntas. 💚</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const FORM = document.getElementById('form');
+  const BTN  = document.getElementById('submitBtn');
+  const RESET= document.getElementById('resetBtn');
+  const STAT = document.getElementById('status');
+  const RES  = document.getElementById('result');
+  const ADDR = document.getElementById('addr');
+  const QRCT = document.getElementById('qrcode');
+  const COPY = document.getElementById('copyBtn');
+  const BASE = document.getElementById('basescan');
+  const ZERI = document.getElementById('zerion');
+
+  // === KONFIGURASI ===
+  const PROJECT_ID = "YOUR_SUPABASE_PROJECT_ID"; // mis. abcdxyztuv
+  const EDGE_URL   = `https://${PROJECT_ID}.supabase.co/functions/v1/register-user`;
+  // Kalau fungsi kamu memerlukan Authorization: pakai ANON KEY (BUKAN service role!)
+  const ANON_KEY   = "YOUR_ANON_KEY"; // atau kosongkan bila endpoint publik
+  const USE_AUTH   = !!ANON_KEY;
+
+  function show(msg, ok=true){
+    STAT.style.display = 'block';
+    STAT.className = 'status ' + (ok ? 'ok' : 'err');
+    STAT.textContent = msg;
+  }
+  function hideStatus(){ STAT.style.display='none'; }
+  function uuid4(){ return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)); }
+
+  async function submit(e){
+    e.preventDefault();
+    hideStatus(); RES.style.display='none'; QRCT.innerHTML=''; ADDR.textContent='-';
+
+    const name  = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const ref   = document.getElementById('ref').value.trim();
+
+    if(!name || (!phone && !email)){
+      show("Nama + salah satu dari WA/Email wajib diisi.", false); return;
+    }
+
+    BTN.disabled = true; BTN.textContent = "Memproses...";
+    const idem = uuid4();
+
+    try{
+      const headers = { "Content-Type":"application/json", "Idempotency-Key": idem };
+      if (USE_AUTH) headers["Authorization"] = `Bearer ${ANON_KEY}`;
+
+      const r = await fetch(EDGE_URL, {
+        method:"POST",
+        headers,
+        body: JSON.stringify({ name, phone, email, ref_code: ref })
+      });
+      const j = await r.json().catch(()=>({}));
+      if(!r.ok || !j || !j.address){
+        throw new Error(j?.message || j?.error || "Gagal membuat alamat. Coba lagi.");
+      }
+
+      const address = j.address;
+      ADDR.textContent = address;
+      // QR
+      new QRCode(QRCT, { text: address, width: 168, height: 168 });
+
+      // Links
+      BASE.href = `https://basescan.org/address/${address}`;
+      ZERI.href = `https://app.zerion.io/${address}/overview`;
+
+      RES.style.display = 'block';
+      show("Alamat berhasil dibuat. Simpan dan lanjutkan verifikasi ya ✨", true);
+    }catch(err){
+      console.error(err);
+      show(String(err.message || err), false);
+    }finally{
+      BTN.disabled = false; BTN.textContent = "Daftarkan & Buat Alamat";
+    }
+  }
+
+  COPY.addEventListener('click', async (e)=>{
+    e.preventDefault();
+    const t = ADDR.textContent.trim();
+    if(!t || t==='-') return;
+    await navigator.clipboard.writeText(t);
+    show("Alamat disalin ke clipboard ✅", true);
+  });
+
+  RESET.addEventListener('click', ()=>{
+    FORM.reset(); hideStatus(); RES.style.display='none'; QRCT.innerHTML=''; ADDR.textContent='-';
+  });
+
+  FORM.addEventListener('submit', submit);
+})();
+</script>
+</body>
+</html>

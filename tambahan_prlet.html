@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil & Dompet Terintegrasi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    <style>
+        /* Semua gaya CSS sebelumnya dipertahankan */
+        /* Untuk menghemat ruang, saya tidak menampilkan semua CSS lagi */
+        /* Anda dapat menggunakan CSS dari implementasi sebelumnya */
+        
+        /* Tambahan untuk indikator loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            background: #2ecc71;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            transform: translateX(120%);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            background: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification Area -->
+    <div class="notification" id="global-notification"></div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <span>Memuat data...</span>
+    </div>
+    
+    <!-- Container Utama -->
+    <div class="container">
+        <header>
+            <div class="profile-header">
+                <div class="photo-container">
+                    <img id="profile-photo" src="https://randomuser.me/api/portraits/men/41.jpg" alt="Foto Profil" class="profile-photo">
+                </div>
+                <h1 class="profile-title" id="profile-name">Muhamad Oky Muhlisin</h1>
+                <p class="subtitle" id="profile-title">Independent Researcher — Teknologi dan Inovasi</p>
+                <div class="eu-id">
+                    <i class="fas fa-user-shield"></i> EU Login ID: <span id="eu-id">n00jcciv</span>
+                </div>
+                <p class="subtitle" id="submission-channels">Submitted via: Zenodo · EU OpenAIRE · HAL · OSF</p>
+                
+                <div class="navigation">
+                    <button class="nav-btn active" data-target="profil">
+                        <i class="fas fa-user"></i> Profil
+                    </button>
+                    <button class="nav-btn" data-target="dashboard">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </button>
+                    <button class="nav-btn" data-target="dompet">
+                        <i class="fas fa-wallet"></i> Dompet
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Profil Section -->
+        <section id="profil" class="content-section active">
+            <!-- Konten profil tetap sama -->
+            <!-- ... -->
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section">
+            <!-- Konten dashboard tetap sama -->
+            <!-- ... -->
+        </section>
+        
+        <!-- Dompet Section -->
+        <section id="dompet" class="content-section">
+            <!-- Konten dompet tetap sama -->
+            <!-- ... -->
+        </section>
+        
+        <footer>
+            <p>© 2025 Komunitas Nyampah Bersama | Inovasi untuk Masa Depan Berkelanjutan</p>
+            <p>Profil Terintegrasi v3.0 | Powered by Web3 Technology</p>
+        </footer>
+    </div>
+
+    <script>
+        // ===================== KONFIGURASI APLIKASI =====================
+        const CONFIG = {
+            BACKEND_URL: "https://api.anda.com", // Ganti dengan URL backend Anda
+            CONTRACT_ADDRESS: "0x...", // Alamat kontrak pintar
+            IPFS_GATEWAY: "https://ipfs.io/ipfs/",
+            DEFAULT_PROFILE: {
+                name: "Muhamad Oky Muhlisin",
+                title: "Independent Researcher — Teknologi dan Inovasi",
+                euId: "n00jcciv",
+                submissionChannels: "Zenodo · EU OpenAIRE · HAL · OSF",
+                focusAreas: [
+                    "Proof of Attention Value",
+                    "Ekonomi Perilaku dan Kepercayaan",
+                    "Teknologi Blockchain Sosial",
+                    "Desentralisasi Sistem Sosial Digital",
+                    "Model Peer-to-Peer Trust & Reward Framework",
+                    "Sistem Tokenisasi Aksi dan Memori KolektiF"
+                ],
+                publications: [
+                    {
+                        title: "Implementasi Proof of Attention Value dalam Ekosistem Digital Sosial",
+                        details: "Muhlisin, M.O. (2024). Jurnal Teknologi dan Inovasi, 12(3), 45-62."
+                    },
+                    {
+                        title: "Model Ekonomi Perilaku untuk Sistem Desentralisasi: Studi Kasus Nyampah Bersama",
+                        details: "Muhlisin, M.O. (2023). Dalam Prosiding Konferensi Nasional Teknologi Blockchain, Jakarta, Indonesia."
+                    },
+                    {
+                        title: "Trust Mechanism in Decentralized Social Applications",
+                        details: "Muhlisin, M.O. & Pratama, A. (2023). International Journal of Blockchain Innovation, 5(2), 78-95."
+                    }
+                ],
+                competencies: [
+                    "Sistem Desentralisasi & Blockchain",
+                    "Pengembangan Framework Aplikasi Sosial",
+                    "Analisis Ekonomi Perilaku Digital",
+                    "Tokenisasi Sistem Sosial",
+                    "Desain Mekanisme Insentif"
+                ],
+                contacts: [
+                    { label: "LinkedIn", value: "https://www.linkedin.com/in/oky-muhlisin/" },
+                    { label: "ResearchGate", value: "https://www.researchgate.net/profile/Muhamad-Oky-Muhlisin" },
+                    { label: "GitHub", value: "https://github.com/okymuhlisin" }
+                ],
+                links: [
+                    { title: "Linktree", url: "https://linktr.ee/MuhamadOkyMuhlisin" },
+                    { title: "GitHub: komunitas-nyampah-bersama", url: "https://github.com/enterprises/komunitas-nyampah-bersama" },
+                    { title: "Zenodo: nyampahbersama community", url: "https://zenodo.org/communities/nyampahbersama" },
+                    { title: "OSF Preprints", url: "https://osf.io/preprints/search?q=Muhamad%20Oky%20Muhlisin" }
+                ]
+            }
+        };
+
+        // ===================== STATE APLIKASI =====================
+        let appState = {
+            userProfile: null,
+            walletBalance: 0,
+            transactions: [],
+            web3: null,
+            contract: null,
+            currentAccount: null
+        };
+
+        // ===================== INISIALISASI APLIKASI =====================
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Tampilkan loading
+            showLoading();
+            
+            try {
+                // Inisialisasi Web3
+                await initWeb3();
+                
+                // Muat data profil
+                await loadProfileData();
+                
+                // Muat data dompet
+                await loadWalletData();
+                
+                // Inisialisasi event listeners
+                initEventListeners();
+                
+                // Perbarui UI
+                updateUI();
+            } catch (error) {
+                showNotification(`Error: ${error.message}`, true);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // ===================== FUNGSI UTAMA =====================
+
+        // Inisialisasi Web3 dan kontrak pintar
+        async function initWeb3() {
+            if (window.ethereum) {
+                try {
+                    // Minta akses ke akun
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    appState.currentAccount = accounts[0];
+                    
+                    // Inisialisasi Web3
+                    appState.web3 = new Web3(window.ethereum);
+                    
+                    // Inisialisasi kontrak pintar
+                    const contractABI = await fetchContractABI();
+                    appState.contract = new appState.web3.eth.Contract(
+                        contractABI, 
+                        CONFIG.CONTRACT_ADDRESS
+                    );
+                    
+                    showNotification("Dompet blockchain terhubung!");
+                } catch (error) {
+                    throw new Error("Gagal menghubungkan ke dompet blockchain");
+                }
+            } else {
+                throw new Error("Instal ekstensi dompet blockchain (seperti MetaMask) terlebih dahulu");
+            }
+        }
+
+        // Muat data profil dari backend
+        async function loadProfileData() {
+            try {
+                const response = await axios.get(`${CONFIG.BACKEND_URL}/profile`);
+                appState.userProfile = response.data;
+                showNotification("Profil berhasil dimuat");
+            } catch (error) {
+                // Gunakan data default jika backend tidak tersedia
+                appState.userProfile = CONFIG.DEFAULT_PROFILE;
+                showNotification("Menggunakan profil default", false);
+            }
+        }
+
+        // Muat data dompet dari blockchain
+        async function loadWalletData() {
+            if (!appState.web3) return;
+            
+            try {
+                // Dapatkan saldo ETH
+                const balance = await appState.web3.eth.getBalance(appState.currentAccount);
+                appState.walletBalance = appState.web3.utils.fromWei(balance, 'ether');
+                
+                // Dapatkan transaksi (contoh)
+                appState.transactions = [
+                    { description: "Transfer ke Siti Rahayu", date: "15 Jul 2023", amount: "Rp 350.000", status: "Berhasil" },
+                    { description: "Top Up via Bank BCA", date: "14 Jul 2023", amount: "Rp 1.500.000", status: "Berhasil" },
+                    { description: "Pembayaran Toko Buku", date: "12 Jul 2023", amount: "Rp 125.000", status: "Berhasil" },
+                    { description: "Transfer ke Budi Santoso", date: "10 Jul 2023", amount: "Rp 500.000", status: "Pending" }
+                ];
+                
+                showNotification("Data dompet berhasil dimuat");
+            } catch (error) {
+                throw new Error("Gagal memuat data dompet");
+            }
+        }
+
+        // Inisialisasi event listeners
+        function initEventListeners() {
+            // Navigasi
+            document.querySelectorAll('.nav-btn').forEach(button => {
+                button.addEventListener('click', handleNavigation);
+            });
+            
+            // Kalkulator karbon
+            document.getElementById('hitung-karbon-btn').addEventListener('click', hitungKarbon);
+            document.getElementById('generate-certificate-btn').addEventListener('click', generateCertificate);
+            
+            // Dompet
+            document.getElementById('transfer-btn').addEventListener('click', handleTransfer);
+            document.getElementById('topup-btn').addEventListener('click', handleTopUp);
+            
+            // Edit profil
+            document.querySelectorAll('.edit-toggle').forEach(button => {
+                button.addEventListener('click', enableEditMode);
+            });
+            
+            // Embed web
+            document.getElementById('load-embed-btn').addEventListener('click', loadEmbed);
+            
+            // Surat
+            document.getElementById('generate-letter-btn').addEventListener('click', generateLetterPDF);
+        }
+
+        // Perbarui UI dengan data terbaru
+        function updateUI() {
+            if (!appState.userProfile) return;
+            
+            // Perbarui profil
+            document.getElementById('profile-name').textContent = appState.userProfile.name;
+            document.getElementById('profile-title').textContent = appState.userProfile.title;
+            document.getElementById('eu-id').textContent = appState.userProfile.euId;
+            document.getElementById('submission-channels').textContent = appState.userProfile.submissionChannels;
+            
+            // Perbarui dompet
+            document.querySelector('.balance-amount').textContent = `Rp ${appState.walletBalance.toLocaleString()}`;
+            
+            // Perbarui transaksi
+            const tbody = document.querySelector('.transaction-table tbody');
+            tbody.innerHTML = '';
+            
+            appState.transactions.forEach(tx => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${tx.description}</td>
+                    <td>${tx.date}</td>
+                    <td>${tx.amount}</td>
+                    <td><span style="color: ${tx.status === 'Berhasil' ? '#27ae60' : '#f39c12'};">${tx.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ===================== FUNGSI MODUL PROFIL =====================
+
+        // Aktifkan mode edit
+        function enableEditMode(event) {
+            const card = event.target.closest('.info-card');
+            alert('Fitur edit diaktifkan untuk bagian ini');
+            // Implementasi edit akan dilakukan di sini
+        }
+
+        // ===================== FUNGSI MODUL DASHBOARD =====================
+
+        // Hitung jejak karbon
+        function hitungKarbon() {
+            const listrik = parseFloat(document.getElementById('listrik').value) || 0;
+            const transportasi = parseFloat(document.getElementById('transportasi').value) || 0;
+            const jenisBahanBakar = document.getElementById('jenisBahanBakar').value;
+            const penerbangan = parseFloat(document.getElementById('penerbangan').value) || 0;
+            
+            // Faktor emisi
+            const faktorListrik = 0.85;
+            const faktorBensin = 2.32;
+            const faktorDiesel = 2.68;
+            const faktorPenerbangan = 90;
+            
+            let total = 0;
+            total += listrik * faktorListrik;
+            
+            if (jenisBahanBakar === 'bensin') {
+                total += transportasi * faktorBensin;
+            } else if (jenisBahanBakar === 'diesel') {
+                total += transportasi * faktorDiesel;
+            }
+            
+            total += penerbangan * faktorPenerbangan;
+            
+            document.getElementById('hasilKarbon').innerHTML = 
+                `Jejak Karbon Anda: <strong>${total.toFixed(2)} kg CO2e/bulan</strong>`;
+        }
+
+        // Generate sertifikat karbon
+        async function generateCertificate() {
+            const carbonResult = document.getElementById('hasilKarbon').textContent;
+            const carbonValue = carbonResult.match(/\d+\.\d+/)[0];
+            
+            // Simpan ke blockchain (contoh)
+            try {
+                showLoading("Mencetak sertifikat NFT...");
+                const tx = await appState.contract.methods.mintCarbonCertificate(
+                    appState.currentAccount,
+                    carbonValue
+                ).send({ from: appState.currentAccount });
+                
+                showNotification("Sertifikat NFT berhasil dicetak!");
+            } catch (error) {
+                showNotification("Gagal mencetak sertifikat: " + error.message, true);
+            } finally {
+                hideLoading();
+            }
+            
+            // Tampilkan sertifikat di UI
+            const certificate = document.createElement('div');
+            certificate.className = 'certificate';
+            certificate.innerHTML = `
+                <div class="certificate-title">SERTIFIKAT JEJAK KARBON</div>
+                <div class="certificate-subtitle">Diberikan Kepada:</div>
+                <div class="certificate-content">
+                    <p>Atas nama: <strong>${appState.userProfile.name}</strong></p>
+                    <p>Dengan jejak karbon bulanan sebesar: <strong>${carbonValue} kg CO2e</strong></p>
+                    <p>Ditetapkan pada: <strong>${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</strong></p>
+                </div>
+                <div class="certificate-signature">
+                    <div class="signature-block">
+                        <div class="signature-line"></div>
+                        <div>Koordinator Riset</div>
+                        <div>Komunitas Nyampah Bersama</div>
+                    </div>
+                    <div class="signature-block">
+                        <div class="signature-line"></div>
+                        <div>Direktur Eksekutif</div>
+                        <div>Komunitas Nyampah Bersama</div>
+                    </div>
+                </div>
+            `;
+            
+            const dashboard = document.getElementById('dashboard');
+            dashboard.appendChild(certificate);
+            
+            // Scroll ke sertifikat
+            certificate.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Generate PDF surat
+        function generateLetterPDF() {
+            alert('Fitur ini akan membuat PDF dari surat yang telah dibuat.');
+            // Implementasi pembuatan PDF akan dilakukan di sini
+        }
+
+        // Load embed website
+        function loadEmbed() {
+            const url = document.getElementById('embed-url').value;
+            if (url) {
+                const iframe = document.querySelector('.embed-viewer');
+                iframe.src = url;
+            }
+        }
+
+        // ===================== FUNGSI MODUL DOMPET =====================
+
+        // Handle transfer
+        async function handleTransfer() {
+            const recipient = prompt("Masukkan alamat penerima:");
+            const amount = prompt("Masukkan jumlah:");
+            
+            if (!recipient || !amount) return;
+            
+            try {
+                showLoading("Memproses transfer...");
+                
+                // Kirim transaksi
+                await appState.web3.eth.sendTransaction({
+                    from: appState.currentAccount,
+                    to: recipient,
+                    value: appState.web3.utils.toWei(amount, 'ether')
+                });
+                
+                // Perbarui saldo
+                await loadWalletData();
+                updateUI();
+                
+                showNotification("Transfer berhasil!");
+            } catch (error) {
+                showNotification("Transfer gagal: " + error.message, true);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Handle top up
+        async function handleTopUp() {
+            const amount = prompt("Masukkan jumlah top up:");
+            
+            if (!amount) return;
+            
+            try {
+                showLoading("Memproses top up...");
+                
+                // Simulasikan top up (dalam implementasi nyata, ini akan melalui payment gateway)
+                appState.walletBalance += parseFloat(amount);
+                
+                // Perbarui UI
+                updateUI();
+                
+                showNotification("Top up berhasil!");
+            } catch (error) {
+                showNotification("Top up gagal: " + error.message, true);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ===================== FUNGSI UTILITAS =====================
+
+        // Tampilkan notifikasi
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('global-notification');
+            notification.textContent = message;
+            notification.className = `notification ${isError ? 'error' : ''} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        // Tampilkan loading overlay
+        function showLoading(message = "Memuat data...") {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.querySelector('span').textContent = message;
+            overlay.style.display = 'flex';
+        }
+
+        // Sembunyikan loading overlay
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        // Handle navigasi
+        function handleNavigation() {
+            // Remove active class from all buttons and sections
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Show corresponding section
+            const target = this.getAttribute('data-target');
+            document.getElementById(target).classList.add('active');
+        }
+
+        // Fetch contract ABI (contoh)
+        async function fetchContractABI() {
+            // Dalam implementasi nyata, ini akan mengambil ABI dari backend
+            return [
+                {
+                    "inputs": [
+                        {"internalType": "address", "name": "_stakingTokenAddress", "type": "address"}
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "constructor"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {"indexed": true, "internalType": "address", "name": "to", "type": "address"},
+                        {"indexed": true, "internalType": "uint256", "name": "tokenId", "type": "uint256"},
+                        {"indexed": false, "internalType": "string", "name": "uri", "type": "string"}
+                    ],
+                    "name": "Minted",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {"indexed": true, "internalType": "address", "name": "user", "type": "address"},
+                        {"indexed": true, "internalType": "uint256", "name": "tokenId", "type": "uint256"},
+                        {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"}
+                    ],
+                    "name": "StakingDeposit",
+                    "type": "event"
+                },
+                {
+                    "inputs": [
+                        {"internalType": "address", "name": "_to", "type": "address"},
+                        {"internalType": "string", "name": "_uri", "type": "string"}
+                    ],
+                    "name": "mintSoulboundNFT",
+                    "outputs": [
+                        {"internalType": "uint256", "name": "", "type": "uint256"}
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {"internalType": "uint256", "name": "amount", "type": "uint256"},
+                        {"internalType": "string", "name": "tokenURI_", "type": "string"}
+                    ],
+                    "name": "stakingDeposit",
+                    "outputs": [
+                        {"internalType": "uint256", "name": "", "type": "uint256"}
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }
+            ];
+        }
+
+        // Perbarui tanggal di surat
+        function updateDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const formattedDate = now.toLocaleDateString('id-ID', options);
+            document.getElementById('current-date').textContent = `Palembang, ${formattedDate}`;
+        }
+
+        // Inisialisasi tanggal
+        updateDate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1193 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Excel Formula Automator — Mini App</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --card: #121a2a;
+    --muted: #9bb0d1;
+    --accent: #7ee787;
+    --danger: #ff6b6b;
+    --text: #e6edf3;
+    --border: #23304a;
+    --highlight: #1e3a8a;
+  }
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    line-height: 1.5;
+  }
+  
+  h1, h2, h3 {
+    margin: 8px 0 6px;
+  }
+  
+  .wrap {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+  
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 1px 12px rgba(0,0,0,.25);
+  }
+  
+  .row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .col {
+    flex: 1 1 280px;
+    min-width: 0;
+  }
+  
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  
+  input[type=file], select, button, input[type=text], input[type=number] {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #2a3a59;
+    background: #0f1726;
+    color: var(--text);
+    box-sizing: border-box;
+  }
+  
+  button {
+    background: #1f2a44;
+    border-color: #33446a;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  button:hover {
+    opacity: 0.9;
+  }
+  
+  button.primary {
+    background: #1a3b2b;
+    border-color: #2a5c40;
+    color: #d6ffe6;
+  }
+  
+  button.warn {
+    background: #3c1a1a;
+    border-color: #6a3333;
+    color: #ffd6d6;
+  }
+  
+  button.highlight {
+    background: var(--highlight);
+    border-color: #3b82f6;
+  }
+  
+  .grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  
+  .grid th, .grid td {
+    border: 1px solid var(--border);
+    padding: 6px 8px;
+    white-space: nowrap;
+  }
+  
+  .grid th {
+    background: #16233b;
+    color: #cfe2f3;
+    position: sticky;
+    top: 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .grid th:hover {
+    background: #1d2e4d;
+  }
+  
+  .grid th.sorted {
+    background: var(--highlight);
+  }
+  
+  .grid tr:hover td {
+    background: rgba(30, 58, 138, 0.2);
+  }
+  
+  .formula-card {
+    background: rgba(30, 58, 138, 0.1);
+    border-left: 3px solid #3b82f6;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 0 4px 4px 0;
+  }
+  
+  .formula-title {
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #3b82f6;
+  }
+  
+  .formula-desc {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  
+  .tab-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .tab {
+    padding: 8px 16px;
+    background: #1f2a44;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  
+  .tab.active {
+    background: var(--highlight);
+  }
+  
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    border: 1px solid #2a3a59;
+    color: var(--muted);
+  }
+  
+  .ok {
+    color: var(--accent);
+  }
+  
+  .err {
+    color: var(--danger);
+  }
+  
+  .tip {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  
+  .footer {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  
+  .small {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  
+  .sep {
+    height: 1px;
+    background: #22304b;
+    margin: 12px 0;
+  }
+  
+  .title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .badge {
+    background: #12243a;
+    border: 1px solid #254a75;
+    color: #9fd1ff;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+  }
+  
+  .preview-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .preview-controls > div {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .column-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  
+  .column-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    background: var(--card);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    cursor: grab;
+  }
+  
+  .column-option:hover {
+    background: #1a2438;
+  }
+  
+  .column-option.dragging {
+    opacity: 0.5;
+  }
+  
+  .theme-selector {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 100;
+  }
+  
+  .theme-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+  
+  .theme-btn.active {
+    border-color: var(--text);
+  }
+  
+  .formula-params {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 12px 0;
+  }
+  
+  .param-group {
+    background: rgba(30, 58, 138, 0.1);
+    padding: 10px;
+    border-radius: 8px;
+  }
+  
+  @media (max-width: 768px) {
+    .col {
+      flex: 1 1 100%;
+    }
+    
+    .title {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .theme-selector {
+      bottom: 10px;
+      right: 10px;
+    }
+    
+    .formula-params {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">
+    <h1>Excel Formula Automator <span class="small">— Mini App</span></h1>
+    <span class="badge">Client‑side • No server</span>
+  </div>
+  
+  <div class="card">
+    <h2>1) Unggah Data</h2>
+    <div class="row">
+      <div class="col">
+        <label>File Utama (.xlsx / .csv)</label>
+        <input type="file" id="fileMain" accept=".xlsx,.xls,.csv">
+      </div>
+      <div class="col">
+        <label>File Referensi (.xlsx / .csv) - Opsional</label>
+        <input type="file" id="fileRef" accept=".xlsx,.xls,.csv">
+      </div>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h2>2) Pilih Formula</h2>
+    <div class="tab-container">
+      <div class="tab active" data-tab="lookup">Lookup</div>
+      <div class="tab" data-tab="text">Text</div>
+      <div class="tab" data-tab="math">Math</div>
+      <div class="tab" data-tab="date">Date</div>
+      <div class="tab" data-tab="logic">Logic</div>
+      <div class="tab" data-tab="custom">Custom</div>
+    </div>
+    
+    <div id="tabLookup" class="tab-content active">
+      <div class="formula-card" data-formula="vlookup">
+        <div class="formula-title">VLOOKUP</div>
+        <div class="formula-desc">Mencari nilai di kolom pertama tabel dan mengembalikan nilai dari kolom yang ditentukan</div>
+      </div>
+      
+      <div class="formula-card" data-formula="hlookup">
+        <div class="formula-title">HLOOKUP</div>
+        <div class="formula-desc">Mencari nilai di baris pertama tabel dan mengembalikan nilai dari baris yang ditentukan</div>
+      </div>
+      
+      <div class="formula-card" data-formula="xlookup">
+        <div class="formula-title">XLOOKUP</div>
+        <div class="formula-desc">Versi lebih fleksibel dari VLOOKUP/HLOOKUP dengan kemampuan pencarian dua arah</div>
+      </div>
+      
+      <div class="formula-card" data-formula="indexmatch">
+        <div class="formula-title">INDEX+MATCH</div>
+        <div class="formula-desc">Kombinasi powerful untuk lookup fleksibel dengan kriteria apa pun</div>
+      </div>
+    </div>
+    
+    <div id="tabText" class="tab-content" style="display:none">
+      <div class="formula-card" data-formula="concat">
+        <div class="formula-title">CONCAT / &</div>
+        <div class="formula-desc">Menggabungkan teks dari beberapa sel</div>
+      </div>
+      
+      <div class="formula-card" data-formula="left">
+        <div class="formula-title">LEFT</div>
+        <div class="formula-desc">Mengambil sejumlah karakter dari kiri teks</div>
+      </div>
+      
+      <div class="formula-card" data-formula="right">
+        <div class="formula-title">RIGHT</div>
+        <div class="formula-desc">Mengambil sejumlah karakter dari kanan teks</div>
+      </div>
+      
+      <div class="formula-card" data-formula="mid">
+        <div class="formula-title">MID</div>
+        <div class="formula-desc">Mengambil teks dari tengah string mulai posisi tertentu</div>
+      </div>
+    </div>
+    
+    <div id="tabMath" class="tab-content" style="display:none">
+      <div class="formula-card" data-formula="sum">
+        <div class="formula-title">SUM</div>
+        <div class="formula-desc">Menjumlahkan nilai-nilai</div>
+      </div>
+      
+      <div class="formula-card" data-formula="average">
+        <div class="formula-title">AVERAGE</div>
+        <div class="formula-desc">Menghitung rata-rata nilai</div>
+      </div>
+      
+      <div class="formula-card" data-formula="countif">
+        <div class="formula-title">COUNTIF</div>
+        <div class="formula-desc">Menghitung sel yang memenuhi kriteria</div>
+      </div>
+      
+      <div class="formula-card" data-formula="sumif">
+        <div class="formula-title">SUMIF</div>
+        <div class="formula-desc">Menjumlahkan sel yang memenuhi kriteria</div>
+      </div>
+    </div>
+    
+    <div id="tabDate" class="tab-content" style="display:none">
+      <div class="formula-card" data-formula="datedif">
+        <div class="formula-title">DATEDIF</div>
+        <div class="formula-desc">Menghitung selisih antara dua tanggal</div>
+      </div>
+      
+      <div class="formula-card" data-formula="today">
+        <div class="formula-title">TODAY / NOW</div>
+        <div class="formula-desc">Mengembalikan tanggal/hari ini</div>
+      </div>
+      
+      <div class="formula-card" data-formula="year">
+        <div class="formula-title">YEAR/MONTH/DAY</div>
+        <div class="formula-desc">Mengambil tahun/bulan/hari dari tanggal</div>
+      </div>
+    </div>
+    
+    <div id="tabLogic" class="tab-content" style="display:none">
+      <div class="formula-card" data-formula="if">
+        <div class="formula-title">IF</div>
+        <div class="formula-desc">Pernyataan kondisional</div>
+      </div>
+      
+      <div class="formula-card" data-formula="ifs">
+        <div class="formula-title">IFS</div>
+        <div class="formula-desc">Multiple kondisi tanpa nested IF</div>
+      </div>
+      
+      <div class="formula-card" data-formula="and">
+        <div class="formula-title">AND/OR</div>
+        <div class="formula-desc">Kombinasi beberapa kondisi</div>
+      </div>
+    </div>
+    
+    <div id="tabCustom" class="tab-content" style="display:none">
+      <div class="formula-card" data-formula="custom">
+        <div class="formula-title">CUSTOM FORMULA</div>
+        <div class="formula-desc">Buat formula JavaScript custom untuk memproses data</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card" id="formulaParams" style="display:none">
+    <h2>3) Parameter Formula</h2>
+    <div id="paramsContainer"></div>
+    <div class="sep"></div>
+    <button class="primary" id="btnPreview">Preview Hasil</button>
+    <button class="highlight" id="btnApply">Terapkan ke Data</button>
+  </div>
+  
+  <div class="card">
+    <h2>4) Preview Hasil</h2>
+    <div class="preview-controls">
+      <div>
+        <label>Jumlah baris preview</label>
+        <input type="number" id="previewRows" min="1" value="50">
+      </div>
+      <div>
+        <label>Cari di hasil</label>
+        <input type="text" id="searchPreview" placeholder="Kata kunci...">
+      </div>
+    </div>
+    
+    <div id="columnSelector" class="column-selector"></div>
+    
+    <div id="preview" class="tip">Belum ada data. Unggah file & pilih formula dulu.</div>
+  </div>
+  
+  <div class="card">
+    <button id="btnDownload">Download Hasil (.xlsx)</button>
+  </div>
+
+  <div class="footer">© Excel Formula Automator • Mini app untuk automasi formula Excel/CSV/Sheets — bekerja sepenuhnya di browser.</div>
+</div>
+
+<div class="theme-selector">
+  <div class="theme-btn active" style="background: #0b1220;" data-theme="dark"></div>
+  <div class="theme-btn" style="background: #f8f9fa;" data-theme="light"></div>
+  <div class="theme-btn" style="background: #1a1a2e;" data-theme="purple"></div>
+  <div class="theme-btn" style="background: #0d1b1e;" data-theme="green"></div>
+</div>
+
+<!-- SheetJS & FileSaver (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+<script>
+// Helpers
+const byId = id => document.getElementById(id);
+let mainData = [], refData = [], mainHeaders = [], refHeaders = [];
+let availableColumns = [];
+let columnOrder = [];
+let draggedItem = null;
+let currentFormula = null;
+let processedData = [];
+let currentSort = { column: null, direction: null };
+
+// Theme management
+function setTheme(theme) {
+  const root = document.documentElement;
+  const themes = {
+    dark: {
+      bg: '#0b1220',
+      card: '#121a2a',
+      muted: '#9bb0d1',
+      accent: '#7ee787',
+      danger: '#ff6b6b',
+      text: '#e6edf3',
+      border: '#23304a',
+      highlight: '#1e3a8a'
+    },
+    light: {
+      bg: '#f8f9fa',
+      card: '#ffffff',
+      muted: '#6c757d',
+      accent: '#28a745',
+      danger: '#dc3545',
+      text: '#212529',
+      border: '#dee2e6',
+      highlight: '#d4e6ff'
+    },
+    purple: {
+      bg: '#1a1a2e',
+      card: '#16213e',
+      muted: '#a8b2d1',
+      accent: '#e94560',
+      danger: '#ff6b6b',
+      text: '#f1f1f1',
+      border: '#0f3460',
+      highlight: '#4a1d96'
+    },
+    green: {
+      bg: '#0d1b1e',
+      card: '#1b263b',
+      muted: '#a8dadc',
+      accent: '#2a9d8f',
+      danger: '#e76f51',
+      text: '#f1faee',
+      border: '#415a77',
+      highlight: '#1e3a2d'
+    }
+  };
+  
+  const colors = themes[theme] || themes.dark;
+  Object.entries(colors).forEach(([key, value]) => {
+    root.style.setProperty(`--${key}`, value);
+  });
+  
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === theme);
+  });
+  
+  localStorage.setItem('formula_automator_theme', theme);
+}
+
+// Load saved theme
+const savedTheme = localStorage.getItem('formula_automator_theme') || 'dark';
+setTheme(savedTheme);
+
+// Theme selector event
+document.querySelectorAll('.theme-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    setTheme(btn.dataset.theme);
+  });
+});
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+    
+    tab.classList.add('active');
+    byId(`tab${tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1)}`).style.display = 'block';
+  });
+});
+
+// Formula selection
+document.querySelectorAll('.formula-card').forEach(card => {
+  card.addEventListener('click', () => {
+    currentFormula = card.dataset.formula;
+    showFormulaParams(currentFormula);
+  });
+});
+
+function showFormulaParams(formula) {
+  byId('formulaParams').style.display = 'block';
+  const paramsContainer = byId('paramsContainer');
+  paramsContainer.innerHTML = '';
+  
+  // Common parameters for all formulas
+  let html = `
+    <div class="formula-params">
+      <div class="param-group">
+        <label>Nama Kolom Hasil</label>
+        <input type="text" id="resultCol" placeholder="hasil_formula">
+      </div>
+  `;
+  
+  // Formula-specific parameters
+  switch(formula) {
+    case 'vlookup':
+      html += `
+        <div class="param-group">
+          <label>Kolom Pencarian (Main)</label>
+          <select id="lookupCol"></select>
+        </div>
+        <div class="param-group">
+          <label>Kolom Hasil (Ref)</label>
+          <select id="returnCol"></select>
+        </div>
+        <div class="param-group">
+          <label>Tabel Referensi</label>
+          <select id="refTable">
+            <option value="main">Data Utama</option>
+            <option value="ref">Data Referensi</option>
+          </select>
+        </div>
+        <div class="param-group">
+          <label>Persis Match?</label>
+          <select id="exactMatch">
+            <option value="true">Ya</option>
+            <option value="false">Tidak</option>
+          </select>
+        </div>
+      `;
+      break;
+      
+    case 'xlookup':
+      html += `
+        <div class="param-group">
+          <label>Kolom Pencarian (Main)</label>
+          <select id="lookupCol"></select>
+        </div>
+        <div class="param-group">
+          <label>Kolom Hasil (Ref)</label>
+          <select id="returnCol"></select>
+        </div>
+        <div class="param-group">
+          <label>Kolom Pencarian (Ref)</label>
+          <select id="lookupColRef"></select>
+        </div>
+        <div class="param-group">
+          <label>Jika Tidak Ditemukan</label>
+          <input type="text" id="notFoundVal" placeholder="Kosongkan untuk #N/A">
+        </div>
+      `;
+      break;
+      
+    case 'concat':
+      html += `
+        <div class="param-group">
+          <label>Kolom 1</label>
+          <select id="concatCol1"></select>
+        </div>
+        <div class="param-group">
+          <label>Kolom 2</label>
+          <select id="concatCol2"></select>
+        </div>
+        <div class="param-group">
+          <label>Pemisah</label>
+          <input type="text" id="concatSep" value=" ">
+        </div>
+      `;
+      break;
+      
+    case 'sumif':
+      html += `
+        <div class="param-group">
+          <label>Kolom Kriteria</label>
+          <select id="criteriaCol"></select>
+        </div>
+        <div class="param-group">
+          <label>Kriteria</label>
+          <input type="text" id="criteriaVal" placeholder=">100 atau 'teks'">
+        </div>
+        <div class="param-group">
+          <label>Kolom yang Dijumlah</label>
+          <select id="sumCol"></select>
+        </div>
+      `;
+      break;
+      
+    case 'custom':
+      html += `
+        <div class="param-group" style="grid-column: 1 / -1">
+          <label>JavaScript Function</label>
+          <textarea id="customFunc" style="width:100%; height:100px; padding:10px; border-radius:8px; background:#0f1726; color:var(--text); border:1px solid var(--border)" placeholder="function(row, index) {\n  // row berisi data baris saat ini\n  // return nilai yang ingin ditambahkan\n  return row.nama + ' (' + row.usia + ')';\n}"></textarea>
+          <div class="tip">Gunakan row.nama_kolom untuk mengakses nilai kolom</div>
+        </div>
+      `;
+      break;
+      
+    default:
+      html += `
+        <div class="param-group">
+          <label>Kolom Input</label>
+          <select id="inputCol"></select>
+        </div>
+      `;
+  }
+  
+  html += `</div>`;
+  paramsContainer.innerHTML = html;
+  
+  // Populate column selects
+  const columnSelects = paramsContainer.querySelectorAll('select');
+  columnSelects.forEach(select => {
+    if (select.id !== 'refTable' && select.id !== 'exactMatch') {
+      select.innerHTML = '<option value="">— pilih —</option>' + 
+        mainHeaders.map(h => `<option value="${h}">${h}</option>`).join('');
+    }
+  });
+  
+  // Special handling for reference data selects
+  if (formula === 'vlookup' || formula === 'xlookup') {
+    byId('lookupColRef').innerHTML = '<option value="">— pilih —</option>' + 
+      refHeaders.map(h => `<option value="${h}">${h}</option>`).join('');
+    byId('returnCol').innerHTML = '<option value="">— pilih —</option>' + 
+      refHeaders.map(h => `<option value="${h}">${h}</option>`).join('');
+  }
+}
+
+function loadFile(file, cb, type) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = new Uint8Array(e.target.result);
+    const wb = XLSX.read(data, {type: 'array'});
+    const sheets = wb.SheetNames;
+    const json = [];
+    
+    // Process all sheets
+    sheets.forEach(sheetName => {
+      const ws = wb.Sheets[sheetName];
+      const sheetData = XLSX.utils.sheet_to_json(ws, {defval: ""});
+      json.push(...sheetData);
+    });
+    
+    cb(json);
+    
+    if (type === 'main') {
+      mainData = json;
+      mainHeaders = [...new Set(json.flatMap(row => Object.keys(row || {})))];
+    } else if (type === 'ref') {
+      refData = json;
+      refHeaders = [...new Set(json.flatMap(row => Object.keys(row || {})))];
+    }
+    
+    updateAvailableColumns();
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function updateAvailableColumns() {
+  if (!mainData.length) return;
+  
+  // Get all unique columns from both files
+  const allColumns = new Set();
+  mainData.forEach(row => Object.keys(row).forEach(col => allColumns.add(col)));
+  refData.forEach(row => Object.keys(row).forEach(col => allColumns.add(col)));
+  
+  availableColumns = Array.from(allColumns).filter(col => col);
+  
+  // Initialize column order if empty
+  if (columnOrder.length === 0) {
+    columnOrder = [...availableColumns];
+  } else {
+    // Add any new columns to the end
+    availableColumns.forEach(col => {
+      if (!columnOrder.includes(col)) {
+        columnOrder.push(col);
+      }
+    });
+  }
+  
+  updateColumnSelector();
+}
+
+function updateColumnSelector() {
+  const container = byId('columnSelector');
+  container.innerHTML = '';
+  
+  columnOrder.forEach(col => {
+    if (!availableColumns.includes(col)) return;
+    
+    const option = document.createElement('div');
+    option.className = 'column-option';
+    option.textContent = col;
+    option.draggable = true;
+    option.dataset.column = col;
+    
+    option.addEventListener('dragstart', e => {
+      draggedItem = option;
+      option.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', col);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    
+    option.addEventListener('dragend', () => {
+      option.classList.remove('dragging');
+      draggedItem = null;
+    });
+    
+    option.addEventListener('click', () => {
+      option.classList.toggle('selected');
+      renderPreview(processedData);
+    });
+    
+    container.appendChild(option);
+  });
+  
+  // Add drag and drop events
+  container.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    
+    if (!draggedItem) return;
+    
+    const afterElement = getDragAfterElement(container, e.clientY);
+    if (afterElement) {
+      container.insertBefore(draggedItem, afterElement);
+    } else {
+      container.appendChild(draggedItem);
+    }
+  });
+  
+  container.addEventListener('drop', e => {
+    e.preventDefault();
+    if (!draggedItem) return;
+    
+    // Update column order based on new position
+    const newColumnOrder = [];
+    Array.from(container.children).forEach(child => {
+      newColumnOrder.push(child.dataset.column);
+    });
+    
+    columnOrder = newColumnOrder;
+    renderPreview(processedData);
+  });
+}
+
+function getDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('.column-option:not(.dragging)')];
+  
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function applyFormula() {
+  if (!mainData.length) {
+    alert('Unggah file utama dulu.');
+    return;
+  }
+  
+  const resultCol = byId('resultCol').value || 'hasil_formula';
+  let resultData = [...mainData];
+  
+  switch(currentFormula) {
+    case 'vlookup':
+      const lookupCol = byId('lookupCol').value;
+      const returnCol = byId('returnCol').value;
+      const exactMatch = byId('exactMatch').value === 'true';
+      const refTable = byId('refTable').value === 'ref' ? refData : mainData;
+      
+      if (!lookupCol || !returnCol) {
+        alert('Pilih kolom pencarian dan kolom hasil.');
+        return;
+      }
+      
+      // Create lookup map
+      const lookupMap = new Map();
+      refTable.forEach(row => {
+        const key = String(row[lookupCol] || '').toLowerCase();
+        if (key) lookupMap.set(key, row[returnCol]);
+      });
+      
+      // Apply to each row
+      resultData.forEach(row => {
+        const lookupVal = String(row[lookupCol] || '').toLowerCase();
+        if (exactMatch) {
+          row[resultCol] = lookupMap.has(lookupVal) ? lookupMap.get(lookupVal) : '#N/A';
+        } else {
+          // Find closest match (simple implementation)
+          let found = null;
+          for (const [key, value] of lookupMap) {
+            if (key.includes(lookupVal) || lookupVal.includes(key)) {
+              found = value;
+              break;
+            }
+          }
+          row[resultCol] = found || '#N/A';
+        }
+      });
+      break;
+      
+    case 'xlookup':
+      const xlookupCol = byId('lookupCol').value;
+      const xreturnCol = byId('returnCol').value;
+      const xlookupColRef = byId('lookupColRef').value;
+      const notFoundVal = byId('notFoundVal').value;
+      
+      if (!xlookupCol || !xreturnCol || !xlookupColRef) {
+        alert('Pilih semua kolom yang diperlukan.');
+        return;
+      }
+      
+      // Create lookup map from reference data
+      const xlookupMap = new Map();
+      refData.forEach(row => {
+        const key = String(row[xlookupColRef] || '').toLowerCase();
+        if (key) xlookupMap.set(key, row[xreturnCol]);
+      });
+      
+      // Apply to each row
+      resultData.forEach(row => {
+        const lookupVal = String(row[xlookupCol] || '').toLowerCase();
+        row[resultCol] = xlookupMap.has(lookupVal) ? xlookupMap.get(lookupVal) : (notFoundVal || '#N/A');
+      });
+      break;
+      
+    case 'concat':
+      const col1 = byId('concatCol1').value;
+      const col2 = byId('concatCol2').value;
+      const sep = byId('concatSep').value;
+      
+      if (!col1 || !col2) {
+        alert('Pilih kolom yang akan digabungkan.');
+        return;
+      }
+      
+      resultData.forEach(row => {
+        row[resultCol] = (row[col1] || '') + sep + (row[col2] || '');
+      });
+      break;
+      
+    case 'sumif':
+      const criteriaCol = byId('criteriaCol').value;
+      const criteriaVal = byId('criteriaVal').value;
+      const sumCol = byId('sumCol').value;
+      
+      if (!criteriaCol || !criteriaVal || !sumCol) {
+        alert('Isi semua parameter sumif.');
+        return;
+      }
+      
+      // Simple sumif implementation
+      let sum = 0;
+      resultData.forEach(row => {
+        const val = String(row[criteriaCol] || '');
+        const num = parseFloat(row[sumCol]) || 0;
+        
+        if (criteriaVal.startsWith('>')) {
+          const threshold = parseFloat(criteriaVal.slice(1));
+          if (num > threshold) sum += num;
+        } else if (criteriaVal.startsWith('<')) {
+          const threshold = parseFloat(criteriaVal.slice(1));
+          if (num < threshold) sum += num;
+        } else if (val.includes(criteriaVal)) {
+          sum += num;
+        }
+      });
+      
+      // Add sum to each row (might want to change this behavior)
+      resultData.forEach(row => {
+        row[resultCol] = sum;
+      });
+      break;
+      
+    case 'custom':
+      const customFuncStr = byId('customFunc').value;
+      
+      if (!customFuncStr) {
+        alert('Masukkan fungsi JavaScript custom.');
+        return;
+      }
+      
+      try {
+        const customFunc = new Function('row', 'index', `return (${customFuncStr})(row, index);`);
+        
+        resultData.forEach((row, index) => {
+          try {
+            row[resultCol] = customFunc(row, index);
+          } catch (e) {
+            row[resultCol] = `#ERROR: ${e.message}`;
+          }
+        });
+      } catch (e) {
+        alert(`Error dalam fungsi custom: ${e.message}`);
+        return;
+      }
+      break;
+      
+    default:
+      alert('Formula belum diimplementasikan.');
+      return;
+  }
+  
+  processedData = resultData;
+  renderPreview(resultData);
+}
+
+function renderPreview(rows) {
+  if (!rows || rows.length === 0) {
+    byId('preview').innerHTML = '<div class="tip">Tidak ada data.</div>';
+    return;
+  }
+  
+  const rowLimit = parseInt(byId('previewRows').value) || 50;
+  const searchTerm = byId('searchPreview').value.toLowerCase();
+  
+  // Get selected columns in the current order
+  const selectedColumns = [...columnOrder].filter(col => {
+    if (!availableColumns.includes(col)) return false;
+    const option = document.querySelector(`.column-option[data-column="${col}"]`);
+    return !option || !option.classList.contains('selected');
+  });
+  
+  // Filter rows based on search
+  let filteredRows = rows;
+  if (searchTerm) {
+    filteredRows = rows.filter(row => {
+      return Object.values(row).some(val => 
+        String(val).toLowerCase().includes(searchTerm)
+      );
+    });
+  }
+  
+  // Apply sorting if any
+  if (currentSort.column) {
+    filteredRows.sort((a, b) => {
+      const valA = String(a[currentSort.column] || '').toLowerCase();
+      const valB = String(b[currentSort.column] || '').toLowerCase();
+      return currentSort.direction === 'asc' 
+        ? valA.localeCompare(valB)
+        : valB.localeCompare(valA);
+    });
+  }
+  
+  // Filter columns to show
+  const displayRows = filteredRows.map(row => {
+    const filtered = {};
+    selectedColumns.forEach(col => {
+      if (row.hasOwnProperty(col)) {
+        filtered[col] = row[col];
+      }
+    });
+    return filtered;
+  });
+  
+  let html = `
+    <div class="small">Menampilkan ${Math.min(rowLimit, displayRows.length)} dari ${displayRows.length} baris:</div>
+    <div style="max-height:70vh;overflow:auto;margin-top:8px">
+      <table class="grid">
+        <thead><tr>`;
+  
+  // Add headers with sorting capability
+  selectedColumns.forEach(col => {
+    const isSorted = col === currentSort.column;
+    const sortClass = isSorted ? `sorted ${currentSort.direction}` : '';
+    html += `<th class="${sortClass}" data-column="${col}">${col}</th>`;
+  });
+  
+  html += `</tr></thead><tbody>`;
+  
+  // Add rows
+  displayRows.slice(0, rowLimit).forEach(r => {
+    html += '<tr>';
+    selectedColumns.forEach(col => {
+      html += `<td>${String(r[col] || '')}</td>`;
+    });
+    html += '</tr>';
+  });
+  
+  html += '</tbody></table></div>';
+  byId('preview').innerHTML = html;
+  
+  // Add sorting functionality to headers
+  document.querySelectorAll('.grid th').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.column;
+      
+      if (currentSort.column === col) {
+        if (currentSort.direction === 'asc') {
+          currentSort.direction = 'desc';
+        } else {
+          currentSort.column = null;
+          currentSort.direction = null;
+        }
+      } else {
+        currentSort.column = col;
+        currentSort.direction = 'asc';
+      }
+      
+      renderPreview(processedData);
+    });
+  });
+}
+
+function downloadResults() {
+  if (!processedData.length) {
+    alert('Tidak ada data untuk diunduh.');
+    return;
+  }
+  
+  const ws = XLSX.utils.json_to_sheet(processedData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Hasil');
+  const out = XLSX.write(wb, {bookType: 'xlsx', type: 'array'});
+  saveAs(new Blob([out], {type: "application/octet-stream"}), 'hasil_formula.xlsx');
+}
+
+// Event wires
+byId('fileMain').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  loadFile(f, rows => {
+    mainData = rows;
+    mainHeaders = [...new Set(rows.flatMap(row => Object.keys(row || {})))];
+    updateAvailableColumns();
+  }, 'main');
+});
+
+byId('fileRef').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  loadFile(f, rows => {
+    refData = rows;
+    refHeaders = [...new Set(rows.flatMap(row => Object.keys(row || {})))];
+    updateAvailableColumns();
+  }, 'ref');
+});
+
+byId('btnPreview').addEventListener('click', () => {
+  applyFormula();
+});
+
+byId('btnApply').addEventListener('click', () => {
+  applyFormula();
+  mainData = processedData;
+  mainHeaders = [...new Set(processedData.flatMap(row => Object.keys(row || {})))];
+  updateAvailableColumns();
+});
+
+byId('btnDownload').addEventListener('click', downloadResults);
+
+byId('searchPreview').addEventListener('input', () => {
+  renderPreview(processedData);
+});
+
+byId('previewRows').addEventListener('change', () => {
+  renderPreview(processedData);
+});
+
+// Load saved data when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  // Load any saved data here if needed
+});
+</script>
+</body>
+</html>

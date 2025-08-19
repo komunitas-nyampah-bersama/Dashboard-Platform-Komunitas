@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Nexus - Manajemen API Berbasis AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --dark: #1d3557;
+            --light: #f8f9fa;
+            --danger: #e63946;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1d3557 0%, #457b9d 100%);
+            color: var(--light);
+            min-height: 100vh;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 70px 1fr;
+            grid-template-areas:
+                "sidebar header"
+                "sidebar main";
+            height: 100vh;
+        }
+        
+        /* Header Styles */
+        header {
+            grid-area: header;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            width: 400px;
+        }
+        
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            width: 100%;
+            outline: none;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            grid-area: sidebar;
+            background: rgba(29, 53, 87, 0.8);
+            padding: 1.5rem 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            margin-left: 10px;
+        }
+        
+        .nav-links {
+            list-style: none;
+            margin-top: 2rem;
+        }
+        
+        .nav-links li {
+            padding: 0.8rem 1.5rem;
+            margin: 0.5rem 0;
+            border-radius: 0 50px 50px 0;
+            transition: all 0.3s;
+        }
+        
+        .nav-links li:hover, .nav-links li.active {
+            background: var(--primary);
+        }
+        
+        .nav-links li a {
+            color: var(--light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-links li a i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        /* Main Content Styles */
+        main {
+            grid-area: main;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card h3 {
+            font-size: 1.2rem;
+        }
+        
+        .stat {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin-top: 1rem;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .api-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .api-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .api-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .api-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        
+        .api-status {
+            margin-left: auto;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4ade80;
+        }
+        
+        .api-status.down {
+            background: var(--danger);
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        
+        .btn i {
+            margin-right: 5px;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+        }
+        
+        .ai-recommendation {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="global-search" placeholder="Cari API, analisis, atau rekomendasi...">
+            </div>
+            <div class="user-actions">
+                <button class="btn"><i class="fas fa-robot"></i> AI Assistant</button>
+            </div>
+        </header>
+        
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-brain fa-2x"></i>
+                <h1>API Nexus</h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li class="active"><a href="#"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#"><i class="fas fa-plug"></i> API Connections</a></li>
+                <li><a href="#"><i class="fas fa-chart-line"></i> Analytics</a></li>
+                <li><a href="#"><i class="fas fa-shield-alt"></i> Security</a></li>
+                <li><a href="#"><i class="fas fa-cogs"></i> Integrations</a></li>
+                <li><a href="#"><i class="fas fa-history"></i> Logs</a></li>
+                <li><a href="#"><i class="fas fa-lightbulb"></i> AI Recommendations</a></li>
+                <li><a href="#"><i class="fas fa-wallet"></i> Web3 Services</a></li>
+            </ul>
+        </aside>
+        
+        <main>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-database"></i> Total API Calls</h3>
+                        <span class="api-status"></span>
+                    </div>
+                    <div class="stat" id="total-calls">24,589</div>
+                    <div class="chart-container">
+                        <canvas id="api-traffic-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bolt"></i> Response Time</h3>
+                        <span class="api-status"></span>
+                    </div>
+                    <div class="stat" id="avg-response">142ms</div>
+                    <div class="chart-container">
+                        <canvas id="response-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Error Rate</h3>
+                        <span class="api-status"></span>
+                    </div>
+                    <div class="stat" id="error-rate">1.2%</div>
+                    <div class="chart-container">
+                        <canvas id="error-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-money-bill-wave"></i> Cost Analysis</h3>
+                        <span class="api-status"></span>
+                    </div>
+                    <div class="stat" id="monthly-cost">$382.50</div>
+                    <div class="chart-container">
+                        <canvas id="cost-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-plug"></i> API Connections</h2>
+                    <button class="btn" id="add-api-btn"><i class="fas fa-plus"></i> Add API</button>
+                </div>
+                
+                <div class="api-list" id="api-list">
+                    <!-- API cards will be populated here -->
+                </div>
+            </div>
+            
+            <div class="ai-recommendation">
+                <h3><i class="fas fa-lightbulb"></i> AI Recommendation</h3>
+                <p id="ai-recommendation-text">Menganalisis pola penggunaan API... Depseek AI merekomendasikan untuk mengkonsolidasi 3 panggilan Algolia menjadi satu untuk mengurangi biaya sebesar $42/bulan.</p>
+                <button class="btn" style="background: white; color: var(--primary); margin-top: 1rem;">
+                    <i class="fas fa-magic"></i> Terapkan Rekomendasi
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Konfigurasi API
+        const API_CONFIG = {
+            depseek: {
+                apiKey: 'sk-645879dcc9a840d08a7ad17d6ccbc8df',
+                endpoint: 'https://api.depseek.ai/v1/analyze'
+            },
+            supabase: {
+                url: 'https://weueopblwiliyjqaaqvb.supabase.co',
+                anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+            },
+            algolia: {
+                appId: '98OWDY6VGA',
+                apiKey: '88c70961cce43a01b9406b03e3f8d1f5'
+            },
+            openai: {
+                apiKey: 'sk-svcacct-jJoQt5DUW...'
+            },
+            pinata: {
+                jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+            }
+        };
+
+        // Inisialisasi chart
+        const trafficCtx = document.getElementById('api-traffic-chart').getContext('2d');
+        const trafficChart = new Chart(trafficCtx, {
+            type: 'line',
+            data: {
+                labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+                datasets: [{
+                    label: 'API Calls',
+                    data: [3200, 4100, 3800, 5200, 4700, 2900, 3800],
+                    borderColor: '#4cc9f0',
+                    tension: 0.3,
+                    fill: true,
+                    backgroundColor: 'rgba(76, 201, 240, 0.1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+        
+        // API Data (contoh)
+        const apis = [
+            { name: 'Supabase', icon: 'fa-database', status: 'up', usage: '1.2K calls' },
+            { name: 'Algolia', icon: 'fa-search', status: 'up', usage: '4.5K calls' },
+            { name: 'OpenAI', icon: 'fa-robot', status: 'up', usage: '890 calls' },
+            { name: 'Pinata IPFS', icon: 'fa-cloud-upload-alt', status: 'down', usage: '120 calls' },
+            { name: 'Twilio', icon: 'fa-sms', status: 'up', usage: '320 calls' },
+            { name: 'Resend', icon: 'fa-envelope', status: 'up', usage: '210 calls' },
+            { name: 'Web3', icon: 'fa-ethereum', status: 'up', usage: '540 calls' },
+            { name: 'Climatiq', icon: 'fa-leaf', status: 'up', usage: '76 calls' }
+        ];
+        
+        // Render API cards
+        const apiList = document.getElementById('api-list');
+        apis.forEach(api => {
+            const card = document.createElement('div');
+            card.className = 'api-card';
+            card.innerHTML = `
+                <div class="api-card-header">
+                    <div class="api-icon">
+                        <i class="fas ${api.icon}"></i>
+                    </div>
+                    <h4>${api.name}</h4>
+                    <span class="api-status ${api.status === 'down' ? 'down' : ''}"></span>
+                </div>
+                <p><strong>Usage:</strong> ${api.usage}</p>
+                <p><strong>Status:</strong> <span class="${api.status === 'down' ? 'down' : ''}">${api.status === 'down' ? 'Offline' : 'Online'}</span></p>
+                <button class="btn" style="margin-top: 10px; width:100%;">
+                    <i class="fas fa-cog"></i> Manage
+                </button>
+            `;
+            apiList.appendChild(card);
+        });
+        
+        // AI Assistant
+        const aiRecommendationText = document.getElementById('ai-recommendation-text');
+        
+        // Simulasi AI analysis
+        setTimeout(() => {
+            aiRecommendationText.innerHTML = "Depseek AI telah menganalisis: Penggunaan Algolia meningkat 40% minggu ini. Pertimbangkan untuk meningkatkan paket atau mengoptimalkan query.";
+        }, 3000);
+        
+        // Load real data
+        async function loadDashboardData() {
+            try {
+                // Contoh panggilan ke backend untuk data real
+                // const response = await fetch('/api/dashboard');
+                // const data = await response.json();
+                
+                // Untuk demo, gunakan data dummy
+                const data = {
+                    totalCalls: 24589,
+                    avgResponse: 142,
+                    errorRate: 1.2,
+                    monthlyCost: 382.50
+                };
+                
+                document.getElementById('total-calls').textContent = data.totalCalls.toLocaleString();
+                document.getElementById('avg-response').textContent = `${data.avgResponse}ms`;
+                document.getElementById('error-rate').textContent = `${data.errorRate}%`;
+                document.getElementById('monthly-cost').textContent = `$${data.monthlyCost.toFixed(2)}`;
+            } catch (error) {
+                console.error("Failed to load dashboard data:", error);
+            }
+        }
+        
+        // Analisis API dengan Depseek AI
+        async function analyzeWithDepseek() {
+            try {
+                const response = await axios.post(API_CONFIG.depseek.endpoint, {
+                    api_data: apis,
+                    analysis_type: "cost_optimization"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${API_CONFIG.depseek.apiKey}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const recommendation = response.data.recommendations[0];
+                aiRecommendationText.textContent = recommendation.message;
+                
+            } catch (error) {
+                console.error("Depseek AI analysis failed:", error);
+                aiRecommendationText.textContent = "Gagal mendapatkan rekomendasi AI. Silakan coba lagi nanti.";
+            }
+        }
+        
+        // Integrasi dengan Supabase
+        async function connectToSupabase() {
+            try {
+                const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
+                const supabase = createClient(
+                    API_CONFIG.supabase.url,
+                    API_CONFIG.supabase.anonKey
+                );
+                
+                // Contoh: ambil data dari tabel
+                const { data, error } = await supabase
+                    .from('api_logs')
+                    .select('*');
+                
+                if (error) throw error;
+                
+                console.log("Supabase data:", data);
+                
+            } catch (error) {
+                console.error("Supabase connection failed:", error);
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('add-api-btn').addEventListener('click', () => {
+            alert("Fitur penambahan API akan segera tersedia!");
+        });
+        
+        document.querySelector('.btn').addEventListener('click', () => {
+            analyzeWithDepseek();
+        });
+        
+        // Inisialisasi
+        loadDashboardData();
+        connectToSupabase();
+    </script>
+</body>
+</html>

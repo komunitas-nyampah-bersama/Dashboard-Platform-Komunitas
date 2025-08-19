@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nyampah Sync — Master ↔ Log (HTML)</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --card: #121a2a;
+    --muted: #9bb0d1;
+    --accent: #7ee787;
+    --danger: #ff6b6b;
+    --text: #e6edf3;
+    --border: #23304a;
+  }
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    line-height: 1.5;
+  }
+  
+  h1, h2 {
+    margin: 8px 0 6px;
+  }
+  
+  .wrap {
+    max-width: 1000px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+  
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 1px 12px rgba(0,0,0,.25);
+  }
+  
+  .row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .col {
+    flex: 1 1 280px;
+    min-width: 0;
+  }
+  
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  
+  input[type=file], select, button, input[type=number] {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #2a3a59;
+    background: #0f1726;
+    color: var(--text);
+    box-sizing: border-box;
+  }
+  
+  button {
+    background: #1f2a44;
+    border-color: #33446a;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  button:hover {
+    opacity: 0.9;
+  }
+  
+  button.primary {
+    background: #1a3b2b;
+    border-color: #2a5c40;
+    color: #d6ffe6;
+  }
+  
+  button.warn {
+    background: #3c1a1a;
+    border-color: #6a3333;
+    color: #ffd6d6;
+  }
+  
+  .grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  
+  .grid th, .grid td {
+    border: 1px solid var(--border);
+    padding: 6px 8px;
+    white-space: nowrap;
+  }
+  
+  .grid th {
+    background: #16233b;
+    color: #cfe2f3;
+    position: sticky;
+    top: 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .grid th:hover {
+    background: #1d2e4d;
+  }
+  
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    border: 1px solid #2a3a59;
+    color: var(--muted);
+  }
+  
+  .ok {
+    color: var(--accent);
+  }
+  
+  .err {
+    color: var(--danger);
+  }
+  
+  .tip {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  
+  .footer {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  
+  .small {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  
+  .sep {
+    height: 1px;
+    background: #22304b;
+    margin: 12px 0;
+  }
+  
+  .title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .badge {
+    background: #12243a;
+    border: 1px solid #254a75;
+    color: #9fd1ff;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+  }
+  
+  .preview-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .preview-controls > div {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .column-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  
+  .column-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    background: var(--card);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    cursor: grab;
+  }
+  
+  .column-option:hover {
+    background: #1a2438;
+  }
+  
+  .column-option.dragging {
+    opacity: 0.5;
+  }
+  
+  .theme-selector {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 100;
+  }
+  
+  .theme-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+  
+  .theme-btn.active {
+    border-color: var(--text);
+  }
+  
+  @media (max-width: 768px) {
+    .col {
+      flex: 1 1 100%;
+    }
+    
+    .title {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .theme-selector {
+      bottom: 10px;
+      right: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">
+    <h1>Nyampah Sync <span class="small">— Master ↔ Log (HTML)</span></h1>
+    <span class="badge">Client‑side • No server</span>
+  </div>
+  <div class="card">
+    <h2>1) Unggah data</h2>
+    <div class="row">
+      <div class="col">
+        <label>File <b>Master</b> (.xlsx / .csv)</label>
+        <input type="file" id="fileMaster" accept=".xlsx,.xls,.csv">
+      </div>
+      <div class="col">
+        <label>File <b>Log Aktivitas</b> (.xlsx / .csv)</label>
+        <input type="file" id="fileLog" accept=".xlsx,.xls,.csv">
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="row">
+      <div class="col"><label>Peta kolom <b>Master</b> — NIM</label><select id="mNIM"></select></div>
+      <div class="col"><label>Peta kolom <b>Master</b> — NIK</label><select id="mNIK"></select></div>
+      <div class="col"><label>Peta kolom <b>Master</b> — Email</label><select id="mEmail"></select></div>
+    </div>
+    <div class="sep"></div>
+    <div class="row">
+      <div class="col"><label>Peta kolom <b>Log</b> — NIM</label><select id="lNIM"></select></div>
+      <div class="col"><label>Peta kolom <b>Log</b> — NIK</label><select id="lNIK"></select></div>
+      <div class="col"><label>Peta kolom <b>Log</b> — Email</label><select id="lEmail"></select></div>
+    </div>
+    <div class="sep"></div>
+    <div class="row">
+      <div class="col"><button class="primary" id="btnPreview">Preview sinkron</button></div>
+      <div class="col"><button id="btnSyncView">Download SYNC_VIEW.xlsx</button></div>
+      <div class="col"><button class="warn" id="btnMasterUpdate">Download Master_Updated.xlsx</button></div>
+    </div>
+    <div class="footer">Kunci prioritas: <span class="pill">NIM</span> → <span class="pill">NIK</span> → <span class="pill">Email_norm</span>. Normalisasi otomatis.</div>
+  </div>
+
+  <div class="card">
+    <h2>2) Preview hasil</h2>
+    <div class="preview-controls">
+      <div>
+        <label>Jumlah baris preview</label>
+        <input type="number" id="previewRows" min="1" value="50">
+      </div>
+    </div>
+    
+    <div id="columnSelector" class="column-selector"></div>
+    
+    <div id="preview" class="tip">Belum ada data. Unggah file & mapping kolom dulu, lalu klik <b>Preview sinkron</b>.</div>
+  </div>
+
+  <div class="footer">© Nyampah Bersama • HTML alat bantu sinkron data — bekerja sepenuhnya di browser kamu.</div>
+</div>
+
+<div class="theme-selector">
+  <div class="theme-btn active" style="background: #0b1220;" data-theme="dark"></div>
+  <div class="theme-btn" style="background: #f8f9fa;" data-theme="light"></div>
+  <div class="theme-btn" style="background: #1a1a2e;" data-theme="purple"></div>
+  <div class="theme-btn" style="background: #0d1b1e;" data-theme="green"></div>
+</div>
+
+<!-- SheetJS & FileSaver (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+<script>
+// Helpers
+const byId = id => document.getElementById(id);
+let master = [], log = [], mHeaders = [], lHeaders = [];
+const STORAGE_KEY = 'nyampahsync_data';
+let availableColumns = [];
+let columnOrder = [];
+let draggedItem = null;
+
+// Theme management
+function setTheme(theme) {
+  const root = document.documentElement;
+  const themes = {
+    dark: {
+      bg: '#0b1220',
+      card: '#121a2a',
+      muted: '#9bb0d1',
+      accent: '#7ee787',
+      danger: '#ff6b6b',
+      text: '#e6edf3',
+      border: '#23304a'
+    },
+    light: {
+      bg: '#f8f9fa',
+      card: '#ffffff',
+      muted: '#6c757d',
+      accent: '#28a745',
+      danger: '#dc3545',
+      text: '#212529',
+      border: '#dee2e6'
+    },
+    purple: {
+      bg: '#1a1a2e',
+      card: '#16213e',
+      muted: '#a8b2d1',
+      accent: '#e94560',
+      danger: '#ff6b6b',
+      text: '#f1f1f1',
+      border: '#0f3460'
+    },
+    green: {
+      bg: '#0d1b1e',
+      card: '#1b263b',
+      muted: '#a8dadc',
+      accent: '#2a9d8f',
+      danger: '#e76f51',
+      text: '#f1faee',
+      border: '#415a77'
+    }
+  };
+  
+  const colors = themes[theme] || themes.dark;
+  Object.entries(colors).forEach(([key, value]) => {
+    root.style.setProperty(`--${key}`, value);
+  });
+  
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === theme);
+  });
+  
+  localStorage.setItem('nyampahsync_theme', theme);
+}
+
+// Load saved theme
+const savedTheme = localStorage.getItem('nyampahsync_theme') || 'dark';
+setTheme(savedTheme);
+
+// Theme selector event
+document.querySelectorAll('.theme-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    setTheme(btn.dataset.theme);
+  });
+});
+
+// Load saved data from localStorage
+function loadFromStorage() {
+  const savedData = localStorage.getItem(STORAGE_KEY);
+  if (savedData) {
+    try {
+      const data = JSON.parse(savedData);
+      if (data.master) {
+        master = data.master.data;
+        mHeaders = data.master.headers;
+        ['mNIM','mNIK','mEmail'].forEach(id => {
+          optionize(byId(id), mHeaders);
+          if (data.master.mapping[id.slice(1)]) {
+            byId(id).value = data.master.mapping[id.slice(1)];
+          }
+        });
+      }
+      if (data.log) {
+        log = data.log.data;
+        lHeaders = data.log.headers;
+        ['lNIM','lNIK','lEmail'].forEach(id => {
+          optionize(byId(id), lHeaders);
+          if (data.log.mapping[id.slice(1)]) {
+            byId(id).value = data.log.mapping[id.slice(1)];
+          }
+        });
+      }
+      if (data.columnOrder) {
+        columnOrder = data.columnOrder;
+        updateColumnSelector();
+      }
+    } catch (e) {
+      console.error('Failed to load saved data:', e);
+    }
+  }
+}
+
+// Save data to localStorage
+function saveToStorage() {
+  const data = {
+    master: {
+      data: master,
+      headers: mHeaders,
+      mapping: mapFromUI('m')
+    },
+    log: {
+      data: log,
+      headers: lHeaders,
+      mapping: mapFromUI('l')
+    },
+    columnOrder: columnOrder
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function optionize(select, headers) {
+  select.innerHTML = '<option value="">— pilih —</option>' + headers.map(h => `<option>${h}</option>`).join('');
+}
+
+function loadFile(file, cb, type) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = new Uint8Array(e.target.result);
+    const wb = XLSX.read(data, {type: 'array'});
+    const sheets = wb.SheetNames;
+    const json = [];
+    
+    // Process all sheets
+    sheets.forEach(sheetName => {
+      const ws = wb.Sheets[sheetName];
+      const sheetData = XLSX.utils.sheet_to_json(ws, {defval: ""});
+      json.push(...sheetData);
+    });
+    
+    cb(json);
+    
+    if (type === 'master') {
+      master = json;
+      mHeaders = [...new Set(json.flatMap(row => Object.keys(row || {})))];
+    } else if (type === 'log') {
+      log = json;
+      lHeaders = [...new Set(json.flatMap(row => Object.keys(row || {})))];
+    }
+    
+    saveToStorage();
+    updateAvailableColumns();
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function normEmail(v) {
+  return String(v || '').trim().toLowerCase();
+}
+
+function makeKey(row, map) {
+  const NIM = row[map.NIM] || '';
+  const NIK = row[map.NIK] || '';
+  const EM = normEmail(row[map.Email]);
+  if (NIM) return 'NIM:' + NIM;
+  if (NIK) return 'NIK:' + NIK;
+  if (EM) return 'EM:' + EM;
+  return '';
+}
+
+function mapFromUI(prefix) {
+  return {
+    NIM: byId(prefix + 'NIM').value,
+    NIK: byId(prefix + 'NIK').value,
+    Email: byId(prefix + 'Email').value
+  };
+}
+
+function indexByKey(arr, map) {
+  const m = new Map();
+  for (const row of arr) {
+    const key = makeKey(row, map);
+    if (!key) continue;
+    m.set(key, row);
+  }
+  return m;
+}
+
+function updateAvailableColumns() {
+  if (!master.length) return;
+  
+  // Get all unique columns from both files
+  const allColumns = new Set();
+  master.forEach(row => Object.keys(row).forEach(col => allColumns.add(col)));
+  log.forEach(row => Object.keys(row).forEach(col => allColumns.add(col)));
+  
+  availableColumns = Array.from(allColumns).filter(col => col);
+  
+  // Initialize column order if empty
+  if (columnOrder.length === 0) {
+    columnOrder = [...availableColumns];
+  } else {
+    // Add any new columns to the end
+    availableColumns.forEach(col => {
+      if (!columnOrder.includes(col)) {
+        columnOrder.push(col);
+      }
+    });
+  }
+  
+  updateColumnSelector();
+}
+
+function updateColumnSelector() {
+  const container = byId('columnSelector');
+  container.innerHTML = '';
+  
+  columnOrder.forEach(col => {
+    if (!availableColumns.includes(col)) return;
+    
+    const option = document.createElement('div');
+    option.className = 'column-option';
+    option.textContent = col;
+    option.draggable = true;
+    option.dataset.column = col;
+    
+    option.addEventListener('dragstart', e => {
+      draggedItem = option;
+      option.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', col);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    
+    option.addEventListener('dragend', () => {
+      option.classList.remove('dragging');
+      draggedItem = null;
+    });
+    
+    option.addEventListener('click', () => {
+      option.classList.toggle('selected');
+      saveToStorage();
+      renderPreview(currentPreviewData);
+    });
+    
+    container.appendChild(option);
+  });
+  
+  // Add drag and drop events
+  container.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    
+    if (!draggedItem) return;
+    
+    const afterElement = getDragAfterElement(container, e.clientY);
+    if (afterElement) {
+      container.insertBefore(draggedItem, afterElement);
+    } else {
+      container.appendChild(draggedItem);
+    }
+  });
+  
+  container.addEventListener('drop', e => {
+    e.preventDefault();
+    if (!draggedItem) return;
+    
+    // Update column order based on new position
+    const newColumnOrder = [];
+    Array.from(container.children).forEach(child => {
+      newColumnOrder.push(child.dataset.column);
+    });
+    
+    columnOrder = newColumnOrder;
+    saveToStorage();
+  });
+}
+
+function getDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('.column-option:not(.dragging)')];
+  
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+let currentPreviewData = [];
+
+function renderPreview(rows) {
+  currentPreviewData = rows;
+  const wrap = byId('preview');
+  if (!rows || rows.length === 0) {
+    wrap.innerHTML = '<div class="tip">Tidak ada data.</div>';
+    return;
+  }
+  
+  const rowLimit = parseInt(byId('previewRows').value) || 50;
+  
+  // Get selected columns in the current order
+  const selectedColumns = [...columnOrder].filter(col => 
+    availableColumns.includes(col)
+  );
+  
+  // Filter rows to only show selected columns
+  const displayRows = rows.map(row => {
+    const filtered = {};
+    selectedColumns.forEach(col => {
+      if (row.hasOwnProperty(col)) {
+        filtered[col] = row[col];
+      }
+    });
+    return filtered;
+  });
+  
+  let html = `
+    <div class="small">Menampilkan ${Math.min(rowLimit, displayRows.length)} dari ${displayRows.length} baris:</div>
+    <div style="max-height:70vh;overflow:auto;margin-top:8px">
+      <table class="grid">
+        <thead><tr>`;
+  
+  // Add headers with sorting capability
+  selectedColumns.forEach(col => {
+    html += `<th>${col}</th>`;
+  });
+  
+  html += `</tr></thead><tbody>`;
+  
+  // Add rows
+  displayRows.slice(0, rowLimit).forEach(r => {
+    html += '<tr>';
+    selectedColumns.forEach(col => {
+      html += `<td>${String(r[col] || '')}</td>`;
+    });
+    html += '</tr>';
+  });
+  
+  html += '</tbody></table></div>';
+  wrap.innerHTML = html;
+  
+  // Add sorting functionality to headers
+  document.querySelectorAll('.grid th').forEach((th, index) => {
+    th.addEventListener('click', () => {
+      const col = selectedColumns[index];
+      const isAsc = th.classList.contains('asc');
+      const isDesc = th.classList.contains('desc');
+      
+      // Clear all sort classes
+      document.querySelectorAll('.grid th').forEach(h => {
+        h.classList.remove('asc', 'desc');
+      });
+      
+      // Sort data
+      if (!isAsc && !isDesc) {
+        // Sort ascending
+        rows.sort((a, b) => {
+          const valA = String(a[col] || '').toLowerCase();
+          const valB = String(b[col] || '').toLowerCase();
+          return valA.localeCompare(valB);
+        });
+        th.classList.add('asc');
+      } else if (isAsc) {
+        // Sort descending
+        rows.sort((a, b) => {
+          const valA = String(a[col] || '').toLowerCase();
+          const valB = String(b[col] || '').toLowerCase();
+          return valB.localeCompare(valA);
+        });
+        th.classList.add('desc');
+      } else {
+        // Return to original order
+        rows = [...currentPreviewData];
+      }
+      
+      renderPreview(rows);
+    });
+  });
+}
+
+function toSheetAndDownload(json, filename) {
+  const ws = XLSX.utils.json_to_sheet(json);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Data');
+  const out = XLSX.write(wb, {bookType: 'xlsx', type: 'array'});
+  saveAs(new Blob([out], {type: "application/octet-stream"}), filename);
+}
+
+// Event wires
+byId('fileMaster').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  loadFile(f, rows => {
+    master = rows;
+    mHeaders = [...new Set(rows.flatMap(row => Object.keys(row || {})))];
+    ['mNIM','mNIK','mEmail'].forEach(id => optionize(byId(id), mHeaders));
+    saveToStorage();
+    updateAvailableColumns();
+  }, 'master');
+});
+
+byId('fileLog').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  loadFile(f, rows => {
+    log = rows;
+    lHeaders = [...new Set(rows.flatMap(row => Object.keys(row || {})))];
+    ['lNIM','lNIK','lEmail'].forEach(id => optionize(byId(id), lHeaders));
+    saveToStorage();
+    updateAvailableColumns();
+  }, 'log');
+});
+
+// Add change listeners to all select elements to save mapping
+document.querySelectorAll('select[id^="m"], select[id^="l"]').forEach(select => {
+  select.addEventListener('change', saveToStorage);
+});
+
+byId('btnPreview').addEventListener('click', () => {
+  if (!master.length) {
+    alert('Unggah file Master dulu.');
+    return;
+  }
+  const mMap = mapFromUI('m');
+  const lMap = mapFromUI('l');
+  const lIndex = indexByKey(log, lMap);
+  
+  // Merge all data from both files
+  const allData = [];
+  const allKeys = new Set();
+  
+  // Add master data first
+  master.forEach(mr => {
+    const key = makeKey(mr, mMap);
+    const lr = lIndex.get(key);
+    const merged = {...mr};
+    
+    if (lr) {
+      // Merge with log data
+      Object.keys(lr).forEach(k => {
+        if (!merged[k]) {
+          merged[k] = lr[k];
+        }
+      });
+    }
+    
+    allData.push(merged);
+    if (key) allKeys.add(key);
+  });
+  
+  // Add log data that doesn't exist in master
+  log.forEach(lr => {
+    const key = makeKey(lr, lMap);
+    if (key && !allKeys.has(key)) {
+      allData.push({...lr});
+    }
+  });
+  
+  renderPreview(allData);
+});
+
+byId('btnSyncView').addEventListener('click', () => {
+  if (!master.length) {
+    alert('Unggah file Master dulu.');
+    return;
+  }
+  
+  const mMap = mapFromUI('m');
+  const lMap = mapFromUI('l');
+  const lIndex = indexByKey(log, lMap);
+  
+  const allData = [];
+  const allKeys = new Set();
+  
+  master.forEach(mr => {
+    const key = makeKey(mr, mMap);
+    const lr = lIndex.get(key);
+    const merged = {...mr};
+    
+    if (lr) {
+      Object.keys(lr).forEach(k => {
+        if (!merged[k]) {
+          merged[k] = lr[k];
+        }
+      });
+    }
+    
+    allData.push(merged);
+    if (key) allKeys.add(key);
+  });
+  
+  log.forEach(lr => {
+    const key = makeKey(lr, lMap);
+    if (key && !allKeys.has(key)) {
+      allData.push({...lr});
+    }
+  });
+  
+  toSheetAndDownload(allData, 'SYNC_VIEW.xlsx');
+});
+
+byId('btnMasterUpdate').addEventListener('click', () => {
+  if (!master.length) {
+    alert('Unggah file Master dulu.');
+    return;
+  }
+  
+  const mMap = mapFromUI('m');
+  const lMap = mapFromUI('l');
+  const lIndex = indexByKey(log, lMap);
+  
+  const updated = master.map(mr => {
+    const key = makeKey(mr, mMap);
+    const lr = lIndex.get(key);
+    if (!lr) return mr;
+    
+    const updatedRow = {...mr};
+    Object.keys(lr).forEach(k => {
+      if (!updatedRow[k] && lr[k]) {
+        updatedRow[k] = lr[k];
+      }
+    });
+    
+    return updatedRow;
+  });
+  
+  toSheetAndDownload(updated, 'Master_Updated.xlsx');
+});
+
+// Load saved data when page loads
+document.addEventListener('DOMContentLoaded', loadFromStorage);
+</script>
+</body>
+</html>

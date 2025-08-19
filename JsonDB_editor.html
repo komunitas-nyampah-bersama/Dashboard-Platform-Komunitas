@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel-like JSON Storage | IndexedDB & CryptoJS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --danger: #e63946;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+            --sidebar-bg: #f8f9fa;
+            --code-bg: #1e1e1e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        header {
+            grid-column: 1 / -1;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .header-text h1 {
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+
+        .header-text p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn i {
+            font-size: 0.9rem;
+        }
+
+        .btn.btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn.btn-outline:hover {
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .btn.btn-danger {
+            background: var(--danger);
+            box-shadow: 0 4px 6px rgba(230, 57, 70, 0.2);
+        }
+
+        .btn.btn-danger:hover {
+            background: #d32f2f;
+            box-shadow: 0 6px 8px rgba(230, 57, 70, 0.3);
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 6px 15px var(--shadow);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .sidebar-title i {
+            width: 28px;
+            height: 28px;
+            background: rgba(114, 9, 183, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            background: var(--light);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .main-content {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 6px 15px var(--shadow);
+            padding: 25px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box {
+            position: relative;
+            flex-grow: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--light);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            background: var(--sidebar-bg);
+            padding: 5px;
+            border-radius: 10px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+            flex: 1;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        th {
+            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(248, 249, 250, 0.5);
+        }
+
+        tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .editable-cell {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: transparent;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .editable-cell:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+            background: white;
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .action-btn.delete {
+            background: rgba(230, 57, 70, 0.1);
+            color: var(--danger);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .json-editor-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 600px;
+        }
+
+        .json-editor {
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #json-ace {
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+        }
+
+        .storage-info {
+            background: rgba(67, 97, 238, 0.08);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+
+        .info-card h4 {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .info-card p {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: white;
+            color: var(--dark);
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            border-left: 4px solid var(--primary);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification i {
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+
+        .notification-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .notification-content p {
+            font-size: 0.95rem;
+            color: var(--gray);
+        }
+
+        .notification-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: var(--primary);
+            width: 100%;
+            transform-origin: left;
+        }
+
+        .footer {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .controls-row {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Excel-like JSON Storage</h1>
+                    <p>IndexedDB dengan Enkripsi AES-256</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn" id="add-row-btn">
+                    <i class="fas fa-plus-circle"></i> Tambah Baris
+                </button>
+                <button class="btn btn-outline" id="toggle-theme">
+                    <i class="fas fa-moon"></i> Dark Mode
+                </button>
+            </div>
+        </header>
+        
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">
+                    <i class="fas fa-sliders-h"></i>
+                    <span>Operasi Data</span>
+                </div>
+                <div class="btn-group">
+                    <button class="btn" id="export-btn">
+                        <i class="fas fa-file-export"></i> Export ke JSON
+                    </button>
+                    <button class="btn" id="import-btn">
+                        <i class="fas fa-file-import"></i> Import dari JSON
+                    </button>
+                    <button class="btn btn-danger" id="clear-btn">
+                        <i class="fas fa-trash-alt"></i> Hapus Semua Data
+                    </button>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">
+                    <i class="fas fa-key"></i>
+                    <span>Pengaturan Keamanan</span>
+                </div>
+                <div class="form-group">
+                    <label for="encryption-key">Kunci Enkripsi</label>
+                    <input type="password" id="encryption-key" placeholder="Masukkan kunci enkripsi" value="secureKey123">
+                </div>
+                <div class="form-group">
+                    <label for="auto-encrypt">
+                        <input type="checkbox" id="auto-encrypt" checked> Enkripsi Otomatis
+                    </label>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Info Penyimpanan</span>
+                </div>
+                <div class="storage-info">
+                    <p>Database: <strong>excelDB</strong></p>
+                    <p>Store Name: <strong>excelStore</strong></p>
+                    
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Total Data</h4>
+                            <p id="total-data">0</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Ukuran Data</h4>
+                            <p id="data-size">0 KB</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Status Enkripsi</h4>
+                            <p id="encryption-status">Aktif</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Versi DB</h4>
+                            <p id="db-version">1.0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="controls-row">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Cari data...">
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="table-view">Tabel Data</div>
+                    <div class="tab" data-tab="json-view">JSON Editor</div>
+                    <div class="tab" data-tab="query-view">NoSQL Query</div>
+                </div>
+            </div>
+            
+            <div class="tab-content active" id="table-view">
+                <div class="table-container">
+                    <table id="excel-table">
+                        <thead>
+                            <tr>
+                                <th width="5%">ID</th>
+                                <th width="20%">Nama</th>
+                                <th width="15%">NIM</th>
+                                <th width="20%">Jurusan</th>
+                                <th width="10%">Angkatan</th>
+                                <th width="20%">Email</th>
+                                <th width="10%">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Data akan dimuat di sini -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="json-view">
+                <div class="json-editor-container">
+                    <div class="json-editor">
+                        <div id="json-ace"></div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" id="save-json-btn">
+                            <i class="fas fa-save"></i> Simpan Perubahan JSON
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="query-view">
+                <div class="form-group">
+                    <label for="nosql-query">NoSQL Query (MongoDB-like)</label>
+                    <input type="text" id="nosql-query" placeholder='Contoh: {"angkatan": 2021}'>
+                </div>
+                <div class="btn-group">
+                    <button class="btn" id="execute-query">
+                        <i class="fas fa-play"></i> Jalankan Query
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table id="query-results">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama</th>
+                                <th>NIM</th>
+                                <th>Jurusan</th>
+                                <th>Angkatan</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody id="query-results-body">
+                            <!-- Hasil query akan ditampilkan di sini -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="footer">
+            <p>© 2023 Excel-like JSON Storage | IndexedDB dengan Enkripsi AES-256 | Kapasitas Hingga 250MB</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <div class="notification-content">
+            <h3>Operasi Berhasil</h3>
+            <p>Data berhasil disimpan ke database</p>
+        </div>
+        <div class="notification-progress"></div>
+    </div>
+
+    <!-- Load Ace Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.15.2/ace.js"></script>
+    <script>
+        // ==============================
+        // KONFIGURASI INDEXEDDB & CRYPTO
+        // ==============================
+        const DB_NAME = "excelDB";
+        const STORE_NAME = "excelStore";
+        const DB_VERSION = 1;
+        let db = null;
+        
+        // Konfigurasi enkripsi
+        let encryptionKey = "secureKey123";
+        let autoEncrypt = true;
+        
+        // Fungsi untuk enkripsi data
+        function encryptData(data) {
+            if (!autoEncrypt) return data;
+            return CryptoJS.AES.encrypt(JSON.stringify(data), encryptionKey).toString();
+        }
+        
+        // Fungsi untuk dekripsi data
+        function decryptData(ciphertext) {
+            if (!autoEncrypt) return ciphertext;
+            try {
+                const bytes = CryptoJS.AES.decrypt(ciphertext, encryptionKey);
+                return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+            } catch (e) {
+                console.error("Decryption error:", e);
+                showNotification("Gagal mendekripsi data", "error");
+                return null;
+            }
+        }
+        
+        // ==============================
+        // INDEXEDDB OPERATIONS
+        // ==============================
+        function openDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = (event) => {
+                    console.error("Database error:", event.target.error);
+                    reject(event.target.error);
+                };
+                
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    resolve(db);
+                    updateStorageInfo();
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        const store = db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+                        store.createIndex("nama", "nama", { unique: false });
+                        store.createIndex("nim", "nim", { unique: false });
+                        store.createIndex("angkatan", "angkatan", { unique: false });
+                    }
+                };
+            });
+        }
+        
+        function getAllData() {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    reject("Database not open");
+                    return;
+                }
+                
+                const transaction = db.transaction([STORE_NAME], "readonly");
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.getAll();
+                
+                request.onsuccess = (event) => {
+                    const encryptedData = event.target.result;
+                    const decryptedData = encryptedData.map(item => {
+                        return {
+                            id: item.id,
+                            ...decryptData(item.data)
+                        };
+                    });
+                    resolve(decryptedData);
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        function addData(data) {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    reject("Database not open");
+                    return;
+                }
+                
+                const transaction = db.transaction([STORE_NAME], "readwrite");
+                const store = transaction.objectStore(STORE_NAME);
+                
+                const encryptedData = encryptData(data);
+                const request = store.add({ data: encryptedData });
+                
+                request.onsuccess = (event) => {
+                    resolve({ id: event.target.result, ...data });
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        function updateData(id, newData) {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    reject("Database not open");
+                    return;
+                }
+                
+                const transaction = db.transaction([STORE_NAME], "readwrite");
+                const store = transaction.objectStore(STORE_NAME);
+                
+                // Pertama, dapatkan data yang ada
+                const getRequest = store.get(id);
+                
+                getRequest.onsuccess = (event) => {
+                    const existingData = event.target.result;
+                    if (!existingData) {
+                        reject("Data not found");
+                        return;
+                    }
+                    
+                    // Dekripsi data yang ada
+                    const decryptedData = decryptData(existingData.data);
+                    
+                    // Gabungkan dengan data baru
+                    const updatedData = { ...decryptedData, ...newData };
+                    
+                    // Enkripsi kembali
+                    const encryptedData = encryptData(updatedData);
+                    
+                    // Perbarui data
+                    const updateRequest = store.put({ id: id, data: encryptedData });
+                    
+                    updateRequest.onsuccess = () => {
+                        resolve({ id: id, ...updatedData });
+                    };
+                    
+                    updateRequest.onerror = (event) => {
+                        reject(event.target.error);
+                    };
+                };
+                
+                getRequest.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        function deleteData(id) {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    reject("Database not open");
+                    return;
+                }
+                
+                const transaction = db.transaction([STORE_NAME], "readwrite");
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.delete(id);
+                
+                request.onsuccess = () => {
+                    resolve(true);
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        function clearDatabase() {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    reject("Database not open");
+                    return;
+                }
+                
+                const transaction = db.transaction([STORE_NAME], "readwrite");
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.clear();
+                
+                request.onsuccess = () => {
+                    resolve(true);
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        function queryData(query) {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    reject("Database not open");
+                    return;
+                }
+                
+                getAllData().then(data => {
+                    try {
+                        // Implementasi sederhana query MongoDB-like
+                        const filteredData = data.filter(item => {
+                            for (const key in query) {
+                                if (query.hasOwnProperty(key)) {
+                                    if (item[key] !== query[key]) {
+                                        return false;
+                                    }
+                                }
+                            }
+                            return true;
+                        });
+                        resolve(filteredData);
+                    } catch (e) {
+                        reject(e);
+                    }
+                }).catch(reject);
+            });
+        }
+        
+        // ==============================
+        // UI FUNCTIONS
+        // ==============================
+        function showNotification(message, type = "success") {
+            const notification = document.getElementById("notification");
+            const notificationContent = notification.querySelector(".notification-content");
+            
+            notificationContent.querySelector("h3").textContent = 
+                type === "success" ? "Operasi Berhasil" : 
+                type === "error" ? "Terjadi Kesalahan" : "Pemberitahuan";
+                
+            notificationContent.querySelector("p").textContent = message;
+            
+            // Update icon based on type
+            const icon = notification.querySelector("i");
+            icon.className = 
+                type === "success" ? "fas fa-check-circle" :
+                type === "error" ? "fas fa-exclamation-circle" : "fas fa-info-circle";
+            
+            notification.classList.add("show");
+            
+            // Reset and animate progress bar
+            const progress = notification.querySelector(".notification-progress");
+            progress.style.transform = "scaleX(1)";
+            progress.style.transition = "transform 5s linear";
+            
+            setTimeout(() => {
+                progress.style.transform = "scaleX(0)";
+            }, 10);
+            
+            // Hide notification after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove("show");
+            }, 5000);
+        }
+        
+        function renderTable(data) {
+            const tableBody = document.getElementById("table-body");
+            
+            if (!data || data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px;">Tidak ada data. Silakan tambah data baru.</td></tr>`;
+                return;
+            }
+            
+            tableBody.innerHTML = data.map(item => `
+                <tr data-id="${item.id}">
+                    <td>${item.id}</td>
+                    <td><input type="text" class="editable-cell" data-field="nama" value="${item.nama || ''}"></td>
+                    <td><input type="text" class="editable-cell" data-field="nim" value="${item.nim || ''}"></td>
+                    <td><input type="text" class="editable-cell" data-field="jurusan" value="${item.jurusan || ''}"></td>
+                    <td><input type="number" class="editable-cell" data-field="angkatan" value="${item.angkatan || ''}"></td>
+                    <td><input type="email" class="editable-cell" data-field="email" value="${item.email || ''}"></td>
+                    <td class="action-cell">
+                        <button class="action-btn save-btn" title="Simpan Perubahan"><i class="fas fa-save"></i></button>
+                        <button class="action-btn delete delete-btn" title="Hapus Baris"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            `).join("");
+            
+            // Tambahkan event listener untuk sel yang dapat diedit
+            document.querySelectorAll(".editable-cell").forEach(cell => {
+                cell.addEventListener("change", function() {
+                    const rowId = parseInt(this.closest("tr").dataset.id);
+                    const field = this.dataset.field;
+                    const value = this.value;
+                    
+                    updateData(rowId, { [field]: value })
+                        .then(() => showNotification(`Data ID ${rowId} diperbarui`))
+                        .catch(e => {
+                            console.error("Update error:", e);
+                            showNotification("Gagal memperbarui data", "error");
+                        });
+                });
+            });
+            
+            // Tambahkan event listener untuk tombol simpan per baris
+            document.querySelectorAll(".save-btn").forEach(btn => {
+                btn.addEventListener("click", function() {
+                    const row = this.closest("tr");
+                    const rowId = parseInt(row.dataset.id);
+                    
+                    const data = {};
+                    row.querySelectorAll(".editable-cell").forEach(cell => {
+                        const field = cell.dataset.field;
+                        data[field] = cell.value;
+                    });
+                    
+                    updateData(rowId, data)
+                        .then(() => showNotification(`Data ID ${rowId} disimpan`))
+                        .catch(e => {
+                            console.error("Save error:", e);
+                            showNotification("Gagal menyimpan data", "error");
+                        });
+                });
+            });
+            
+            // Tambahkan event listener untuk tombol hapus
+            document.querySelectorAll(".delete-btn").forEach(btn => {
+                btn.addEventListener("click", function() {
+                    const row = this.closest("tr");
+                    const rowId = parseInt(row.dataset.id);
+                    
+                    if (confirm(`Apakah Anda yakin ingin menghapus data ID ${rowId}?`)) {
+                        deleteData(rowId)
+                            .then(() => {
+                                row.remove();
+                                showNotification(`Data ID ${rowId} dihapus`);
+                                
+                                // Perbarui tabel jika semua data dihapus
+                                if (tableBody.children.length === 1) {
+                                    renderTable([]);
+                                }
+                                updateStorageInfo();
+                            })
+                            .catch(e => {
+                                console.error("Delete error:", e);
+                                showNotification("Gagal menghapus data", "error");
+                            });
+                    }
+                });
+            });
+        }
+        
+        function renderJSONEditor(data) {
+            const jsonData = JSON.stringify(data, null, 2);
+            if (window.jsonEditor) {
+                window.jsonEditor.setValue(jsonData);
+            }
+        }
+        
+        function updateStorageInfo() {
+            if (!db) return;
+            
+            // Update total data
+            getAllData().then(data => {
+                document.getElementById("total-data").textContent = data.length;
+                
+                // Hitung ukuran data
+                const size = new Blob([JSON.stringify(data)]).size;
+                const sizeKB = (size / 1024).toFixed(2);
+                document.getElementById("data-size").textContent = `${sizeKB} KB`;
+            });
+            
+            // Update status enkripsi
+            document.getElementById("encryption-status").textContent = autoEncrypt ? "Aktif" : "Nonaktif";
+            document.getElementById("encryption-status").style.color = autoEncrypt ? "green" : "var(--danger)";
+            
+            // Update versi DB
+            document.getElementById("db-version").textContent = DB_VERSION.toFixed(1);
+        }
+        
+        // ==============================
+        // INISIALISASI APLIKASI
+        // ==============================
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Buka database
+            try {
+                await openDatabase();
+                const data = await getAllData();
+                renderTable(data);
+                updateStorageInfo();
+                
+                // Inisialisasi Ace Editor
+                window.jsonEditor = ace.edit("json-ace");
+                jsonEditor.setTheme("ace/theme/tomorrow_night");
+                jsonEditor.session.setMode("ace/mode/json");
+                jsonEditor.setOptions({
+                    fontSize: "14px",
+                    tabSize: 2,
+                    useSoftTabs: true,
+                    wrap: true
+                });
+                
+                renderJSONEditor(data);
+                
+                showNotification("Database berhasil dimuat");
+            } catch (e) {
+                console.error("Initialization error:", e);
+                showNotification("Gagal memuat database", "error");
+            }
+            
+            // Event listeners
+            document.getElementById("add-row-btn").addEventListener("click", async () => {
+                const newData = {
+                    nama: "Nama Baru",
+                    nim: "NIM Baru",
+                    jurusan: "Jurusan Baru",
+                    angkatan: new Date().getFullYear(),
+                    email: "email@contoh.com"
+                };
+                
+                try {
+                    const addedData = await addData(newData);
+                    const allData = await getAllData();
+                    renderTable(allData);
+                    renderJSONEditor(allData);
+                    updateStorageInfo();
+                    showNotification(`Data baru ditambahkan (ID: ${addedData.id})`);
+                } catch (e) {
+                    console.error("Add error:", e);
+                    showNotification("Gagal menambahkan data", "error");
+                }
+            });
+            
+            document.getElementById("export-btn").addEventListener("click", async () => {
+                try {
+                    const data = await getAllData();
+                    const jsonData = JSON.stringify(data, null, 2);
+                    
+                    // Buat file download
+                    const blob = new Blob([jsonData], { type: "application/json" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `excel-data-${new Date().toISOString().slice(0, 10)}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showNotification("Data berhasil diekspor");
+                } catch (e) {
+                    console.error("Export error:", e);
+                    showNotification("Gagal mengekspor data", "error");
+                }
+            });
+            
+            document.getElementById("import-btn").addEventListener("click", () => {
+                const input = document.createElement("input");
+                input.type = "file";
+                input.accept = ".json";
+                
+                input.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    try {
+                        const fileContent = await file.text();
+                        const jsonData = JSON.parse(fileContent);
+                        
+                        if (!Array.isArray(jsonData)) {
+                            throw new Error("File JSON harus berupa array");
+                        }
+                        
+                        // Hapus semua data yang ada
+                        await clearDatabase();
+                        
+                        // Tambahkan data baru
+                        for (const item of jsonData) {
+                            await addData(item);
+                        }
+                        
+                        const allData = await getAllData();
+                        renderTable(allData);
+                        renderJSONEditor(allData);
+                        updateStorageInfo();
+                        
+                        showNotification(`${jsonData.length} data berhasil diimpor`);
+                    } catch (e) {
+                        console.error("Import error:", e);
+                        showNotification("Gagal mengimpor data: " + e.message, "error");
+                    }
+                };
+                
+                input.click();
+            });
+            
+            document.getElementById("clear-btn").addEventListener("click", async () => {
+                if (confirm("Apakah Anda yakin ingin menghapus SEMUA data? Tindakan ini tidak dapat dibatalkan.")) {
+                    try {
+                        await clearDatabase();
+                        renderTable([]);
+                        renderJSONEditor([]);
+                        updateStorageInfo();
+                        showNotification("Semua data telah dihapus");
+                    } catch (e) {
+                        console.error("Clear error:", e);
+                        showNotification("Gagal menghapus data", "error");
+                    }
+                }
+            });
+            
+            document.getElementById("save-json-btn").addEventListener("click", async () => {
+                try {
+                    const jsonValue = window.jsonEditor.getValue();
+                    const jsonData = JSON.parse(jsonValue);
+                    
+                    if (!Array.isArray(jsonData)) {
+                        throw new Error("Data JSON harus berupa array");
+                    }
+                    
+                    // Hapus semua data yang ada
+                    await clearDatabase();
+                    
+                    // Tambahkan data baru
+                    for (const item of jsonData) {
+                        await addData(item);
+                    }
+                    
+                    const allData = await getAllData();
+                    renderTable(allData);
+                    updateStorageInfo();
+                    
+                    showNotification("Data JSON berhasil disimpan ke database");
+                } catch (e) {
+                    console.error("JSON save error:", e);
+                    showNotification("Gagal menyimpan data JSON: " + e.message, "error");
+                }
+            });
+            
+            document.getElementById("execute-query").addEventListener("click", async () => {
+                const queryInput = document.getElementById("nosql-query").value;
+                
+                try {
+                    const query = JSON.parse(queryInput);
+                    const results = await queryData(query);
+                    
+                    const resultsBody = document.getElementById("query-results-body");
+                    resultsBody.innerHTML = results.map(item => `
+                        <tr>
+                            <td>${item.id}</td>
+                            <td>${item.nama || ''}</td>
+                            <td>${item.nim || ''}</td>
+                            <td>${item.jurusan || ''}</td>
+                            <td>${item.angkatan || ''}</td>
+                            <td>${item.email || ''}</td>
+                        </tr>
+                    `).join("");
+                    
+                    if (results.length === 0) {
+                        resultsBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px;">Tidak ada data yang cocok dengan query</td></tr>`;
+                    }
+                    
+                    showNotification(`Ditemukan ${results.length} data yang cocok`);
+                } catch (e) {
+                    console.error("Query error:", e);
+                    showNotification("Format query tidak valid", "error");
+                }
+            });
+            
+            // Tab navigation
+            document.querySelectorAll(".tab").forEach(tab => {
+                tab.addEventListener("click", function() {
+                    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+                    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+                    
+                    this.classList.add("active");
+                    document.getElementById(`${this.dataset.tab}`).classList.add("active");
+                    
+                    if (this.dataset.tab === "json-view") {
+                        getAllData().then(renderJSONEditor);
+                    }
+                });
+            });
+            
+            // Enkripsi settings
+            document.getElementById("encryption-key").addEventListener("change", function() {
+                encryptionKey = this.value;
+                showNotification("Kunci enkripsi diperbarui");
+            });
+            
+            document.getElementById("auto-encrypt").addEventListener("change", function() {
+                autoEncrypt = this.checked;
+                showNotification(`Enkripsi otomatis ${autoEncrypt ? "diaktifkan" : "dinonaktifkan"}`);
+                updateStorageInfo();
+            });
+            
+            // Pencarian
+            document.getElementById("search-input").addEventListener("input", async function() {
+                const searchTerm = this.value.toLowerCase();
+                if (searchTerm === "") {
+                    const data = await getAllData();
+                    renderTable(data);
+                    return;
+                }
+                
+                try {
+                    const allData = await getAllData();
+                    const filteredData = allData.filter(item => 
+                        (item.nama && item.nama.toLowerCase().includes(searchTerm)) ||
+                        (item.nim && item.nim.toLowerCase().includes(searchTerm)) ||
+                        (item.jurusan && item.jurusan.toLowerCase().includes(searchTerm)) ||
+                        (item.email && item.email.toLowerCase().includes(searchTerm)) ||
+                        (item.angkatan && item.angkatan.toString().includes(searchTerm))
+                    );
+                    
+                    renderTable(filteredData);
+                } catch (e) {
+                    console.error("Search error:", e);
+                }
+            });
+            
+            // Toggle tema
+            document.getElementById("toggle-theme").addEventListener("click", function() {
+                document.body.classList.toggle("dark-theme");
+                const icon = this.querySelector("i");
+                
+                if (document.body.classList.contains("dark-theme")) {
+                    icon.className = "fas fa-sun";
+                    this.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+                    if (window.jsonEditor) {
+                        jsonEditor.setTheme("ace/theme/tomorrow_night");
+                    }
+                } else {
+                    icon.className = "fas fa-moon";
+                    this.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+                    if (window.jsonEditor) {
+                        jsonEditor.setTheme("ace/theme/chrome");
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

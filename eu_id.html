@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="id" data-lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Erasmus+ & ESC • Pitch | Nyampah Bersama</title>
+  <meta name="description" content="Professional pitch page for Erasmus+ & European Solidarity Corps – Research, Grants, Collaboration, and Open Science (ORCID & Zenodo).">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+  <style>
+    :root {
+      --eu-blue: #1a49a4;
+      --eu-blue-dark: #0e2f6e;
+      --eu-gold: #ffcc00;
+      --eu-gold-light: #ffde5e;
+      --ink: #0b1021;
+      --muted: #5b6478;
+      --bg: #f7f9ff;
+      --card: #ffffff;
+      --ok: #1f8a6b;
+      --ok-light: #e0f3ee;
+      --shadow: 0 10px 30px rgba(6, 33, 86, .08);
+      --shadow-hover: 0 12px 40px rgba(6, 33, 86, .15);
+      --radius: 16px;
+      --transition: all 0.25s ease;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0 }
+    html, body { 
+      background: var(--bg); 
+      color: var(--ink); 
+      font: 16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      scroll-behavior: smooth;
+    }
+    a { color: var(--eu-blue); text-decoration: none; transition: var(--transition) }
+    
+    /* Layout */
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+    
+    /* Hero section */
+    .hero {
+      position: relative;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--eu-blue), var(--eu-blue-dark));
+      color: #fff;
+      padding: 42px 32px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 150px;
+      height: 150px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff10' d='M12 0c-1.3 0-2.6.3-3.8.9-1.1.6-2.1 1.5-2.9 2.5-1.6 1.9-2.3 4.4-2.3 7.1 0 2.7.8 5.2 2.3 7.1.8 1 1.8 1.9 2.9 2.5 1.2.6 2.5.9 3.8.9 1.3 0 2.6-.3 3.8-.9 1.1-.6 2.1-1.5 2.9-2.5 1.6-1.9 2.3-4.4 2.3-7.1 0-2.7-.8-5.2-2.3-7.1-.8-1-1.8-1.9-2.9-2.5-1.2-.6-2.5-.9-3.8-.9z'/%3E%3C/svg%3E");
+      opacity: 0.1;
+    }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      background: rgba(255, 255, 255, .14);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      backdrop-filter: blur(4px);
+    }
+    .badge .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--eu-gold);
+      box-shadow: 0 0 0 3px rgba(255, 204, 0, .25);
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.4) }
+      70% { box-shadow: 0 0 0 8px rgba(255, 204, 0, 0) }
+      100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0) }
+    }
+    
+    h1 {
+      margin: 1.2rem 0 0;
+      font-size: clamp(1.8rem, 2.5vw + 1rem, 2.8rem);
+      line-height: 1.2;
+      max-width: 20ch;
+      letter-spacing: -0.02em;
+    }
+    .sub {
+      opacity: .95;
+      margin-top: .8rem;
+      color: #e6edff;
+      max-width: 60ch;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+    
+    /* Language switch */
+    .lang-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 1.5rem 0 1rem;
+    }
+    .chip {
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: rgba(232, 238, 252, 0.15);
+      color: #fff;
+      font-weight: 700;
+      border: 1px solid rgba(213, 226, 255, 0.3);
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chip::before {
+      content: "✓";
+      opacity: 0;
+      transition: var(--transition);
+    }
+    .chip[aria-pressed="true"] {
+      background: #fff;
+      color: var(--eu-blue);
+      padding-left: 18px;
+    }
+    .chip[aria-pressed="true"]::before {
+      opacity: 1;
+    }
+    
+    /* Buttons */
+    .cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 1.5rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .8rem;
+      padding: 14px 22px;
+      border-radius: 14px;
+      font-weight: 700;
+      border: 2px solid rgba(255, 255, 255, .3);
+      color: #fff;
+      background: rgba(255, 255, 255, .08);
+      backdrop-filter: blur(3px);
+      transition: var(--transition);
+      flex: 1 1 auto;
+      min-width: 220px;
+    }
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+      background: rgba(255, 255, 255, .16);
+    }
+    .btn.primary {
+      background: var(--eu-gold);
+      color: var(--eu-blue-dark);
+      border-color: var(--eu-gold);
+      font-weight: 800;
+    }
+    .btn.primary:hover {
+      background: var(--eu-gold-light);
+    }
+    .ghost {
+      background: transparent;
+      border: 2px solid rgba(255, 255, 255, .65);
+      color: #fff;
+      min-width: auto;
+    }
+    .btn-icon {
+      width: 20px;
+      height: 20px;
+    }
+    
+    /* Grid & Cards */
+    .section {
+      margin-bottom: 2.5rem;
+    }
+    .section h2 {
+      margin: 0 0 1.5rem;
+      font-size: 1.5rem;
+      position: relative;
+      display: inline-block;
+    }
+    .section h2::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      width: 50px;
+      height: 3px;
+      background: var(--eu-gold);
+      border-radius: 3px;
+    }
+    
+    .grid {
+      display: grid;
+      gap: 24px;
+      margin: 28px 0;
+    }
+    .grid.cols-3 {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      transition: var(--transition);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+    }
+    .card h3 {
+      margin: 0 0 .8rem;
+      font-size: 1.2rem;
+      color: var(--eu-blue);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card h3::before {
+      content: "";
+      display: block;
+      width: 8px;
+      height: 8px;
+      background: var(--eu-gold);
+      border-radius: 50%;
+    }
+    .muted {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    
+    /* List items */
+    .li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin: .8rem 0;
+    }
+    .li .tick {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: var(--ok-light);
+      color: var(--ok);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    
+    /* Two column layout */
+    .two {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: 1fr;
+      align-items: stretch;
+    }
+    @media (min-width: 900px) {
+      .two {
+        grid-template-columns: 1.1fr .9fr;
+      }
+    }
+    
+    /* Pills */
+    .pill {
+      display: inline-flex;
+      background: #eef5ff;
+      color: var(--eu-blue);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      border: 1px solid #dbe8ff;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+    .pill:hover {
+      background: #e0eaff;
+      transform: translateY(-2px);
+    }
+    .pill-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 1.2rem;
+    }
+    
+    /* Pitch section */
+    .pitch-card {
+      background: linear-gradient(135deg, rgba(26, 73, 164, 0.05), rgba(255, 204, 0, 0.03));
+      border-left: 4px solid var(--eu-gold);
+      padding-left: 24px;
+    }
+    .pitch-card p {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      font-weight: 700;
+      color: var(--eu-blue-dark);
+    }
+    
+    /* Footer */
+    footer {
+      margin: 48px 0 24px;
+      color: var(--muted);
+      font-size: .92rem;
+      text-align: center;
+      padding-top: 24px;
+      border-top: 1px solid rgba(11, 16, 33, 0.08);
+    }
+    .kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: rgba(26, 73, 164, 0.08);
+      color: var(--eu-blue);
+      border-radius: 8px;
+      padding: 6px 12px;
+      display: inline-block;
+      margin: 0 4px;
+    }
+    
+    /* Stats */
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .stat-item {
+      min-width: 140px;
+    }
+    .stat-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--eu-blue);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    
+    /* Language visibility */
+    [data-lang="id"] .en { display: none }
+    [data-lang="en"] .id { display: none }
+    
+    /* Mobile optimization */
+    @media (max-width: 768px) {
+      .hero { padding: 32px 24px; }
+      .btn { min-width: 100%; }
+      .chip { flex: 1; text-align: center; justify-content: center; }
+      .lang-switch { margin: 1rem 0; }
+      .sub { font-size: 1rem; }
+      .grid.cols-3 { grid-template-columns: 1fr; }
+    }
+    
+    /* Print styles */
+    @media print {
+      .lang-switch, .ghost { display: none; }
+      .hero { background: var(--eu-blue); }
+      .btn { display: none; }
+      .card { box-shadow: none; border: 1px solid #eee; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="badge"><span class="dot"></span><span>Co‑funded by the European Union</span></div>
+      <h1>Erasmus+ & European Solidarity Corps</h1>
+      <p class="sub en">Professional Career • Funding & Research Grants • Open Science</p>
+      <p class="sub id">Karier Profesional • Pendanaan & Hibah Penelitian • Open Science</p>
+
+      <div class="lang-switch">
+        <button class="chip" id="btn-id" aria-pressed="true">Bahasa Indonesia</button>
+        <button class="chip" id="btn-en" aria-pressed="false">English</button>
+        <a class="btn ghost" href="javascript:window.print()" aria-label="Print or Save as PDF">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m4 4h6a2 2 0 002-2v-4a2 2 0 00-2-2h-6a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+          </svg>
+          <span>Print/PDF</span>
+        </a>
+      </div>
+
+      <div class="cta">
+        <a class="btn primary" href="#register">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+          </svg>
+          <span class="en">Start Registration</span>
+          <span class="id">Mulai Daftar</span>
+        </a>
+        <a class="btn" href="https://orcid.org" target="_blank">
+          <svg class="btn-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zm-2 10h-1v4h1v-4zm3 0h-1v4h1v-4zm3 0h-1v4h1v-4z"/>
+          </svg>
+          <span>ORCID</span>
+          <span class="en">Create Researcher ID</span>
+          <span class="id">Buat Identitas Peneliti</span>
+        </a>
+        <a class="btn" href="https://zenodo.org" target="_blank">
+          <svg class="btn-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-.001 21.5c-5.238 0-9.5-4.262-9.5-9.5s4.262-9.5 9.5-9.5 9.5 4.262 9.5 9.5-4.262 9.5-9.5 9.5zm5.5-10.5l-5.5 3.3-5.5-3.3V9.2l5.5 3.3 5.5-3.3v1.8z"/>
+          </svg>
+          <span>Zenodo</span>
+          <span class="en">Publish (Open Access)</span>
+          <span class="id">Publikasi (Open Access)</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-value">50+</div>
+        <div class="stat-label en">Countries</div>
+        <div class="stat-label id">Negara</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">€26B</div>
+        <div class="stat-label en">Funding</div>
+        <div class="stat-label id">Pendanaan</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">10M+</div>
+        <div class="stat-label en">Participants</div>
+        <div class="stat-label id">Peserta</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">40K+</div>
+        <div class="stat-label en">Projects</div>
+        <div class="stat-label id">Proyek</div>
+      </div>
+    </div>
+
+    <!-- Focus Areas -->
+    <section class="section">
+      <h2 class="en">Key Focus Areas</h2>
+      <h2 class="id">Fokus Utama</h2>
+      <div class="grid cols-3">
+        <div class="card">
+          <h3>Research</h3>
+          <p class="muted en">Advancing scientific and social‑impact initiatives with EU support.</p>
+          <p class="muted id">Mendorong riset ilmiah & dampak sosial dengan dukungan UE.</p>
+        </div>
+        <div class="card">
+          <h3>Journals</h3>
+          <p class="muted en">Publishing high‑quality papers with global reach and impact.</p>
+          <p class="muted id">Publikasi berkualitas tinggi dengan jangkauan & dampak global.</p>
+        </div>
+        <div class="card">
+          <h3 class="en">Funding Opportunities</h3>
+          <h3 class="id">Peluang Hibah</h3>
+          <p class="muted en">International grants for education, digitalization, and sustainability.</p>
+          <p class="muted id">Hibah internasional untuk pendidikan, digitalisasi, dan keberlanjutan.</p>
+        </div>
+        <div class="card">
+          <h3>Collaboration</h3>
+          <p class="muted en">Building strong networks with 5,000+ EU institutions.</p>
+          <p class="muted id">Membangun jejaring dengan 5,000+ institusi UE.</p>
+        </div>
+        <div class="card">
+          <h3 class="en">Research Projects</h3>
+          <h3 class="id">Proyek Penelitian</h3>
+          <p class="muted en">Turning ideas into measurable outcomes with EU funding.</p>
+          <p class="muted id">Mengubah ide menjadi hasil terukur dengan pendanaan UE.</p>
+        </div>
+        <div class="card">
+          <h3>Writing</h3>
+          <p class="muted en">Supporting academic and professional dissemination excellence.</p>
+          <p class="muted id">Mendukung keunggulan diseminasi akademik & profesional.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Strategic Tools -->
+    <section class="section">
+      <h2 class="en">Strategic Tools</h2>
+      <h2 class="id">Alat Strategis</h2>
+      <div class="two">
+        <div class="card">
+          <h2>ORCID</h2>
+          <p class="muted en">Establish a trusted global researcher identity (persistent ID).</p>
+          <p class="muted id">Bangun identitas peneliti global yang tepercaya (ID persisten).</p>
+          <div class="li"><span class="tick">✓</span><div>
+            <div class="en">Link publications and grants across systems</div>
+            <div class="id">Tautkan publikasi & hibah lintas sistem</div>
+          </div></div>
+          <div class="li"><span class="tick">✓</span><div>
+            <div class="en">Avoid name ambiguity; boost credibility</div>
+            <div class="id">Hindari ambiguitas nama; tingkatkan kredibilitas</div>
+          </div></div>
+          <div class="li"><span class="tick">✓</span><div>
+            <div class="en">Required for EU funding applications</div>
+            <div class="id">Diperlukan untuk aplikasi pendanaan UE</div>
+          </div></div>
+        </div>
+        <div class="card">
+          <h2>Zenodo</h2>
+          <p class="muted en">EU‑hosted open repository for datasets, papers, and software with DOI.</p>
+          <p class="muted id">Repositori terbuka EU untuk data, paper, dan software dengan DOI.</p>
+          <div class="li"><span class="tick">✓</span><div>
+            <div class="en">Permanent archiving & open access</div>
+            <div class="id">Arsip permanen & akses terbuka</div>
+          </div></div>
+          <div class="li"><span class="tick">✓</span><div>
+            <div class="en">Recognized in EU funding workflows</div>
+            <div class="id">Diakui dalam alur pendanaan UE</div>
+          </div></div>
+          <div class="li"><span class="tick">✓</span><div>
+            <div class="en">Compliance with open science mandates</div>
+            <div class="id">Memenuhi mandat open science</div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why It Matters -->
+    <section class="section">
+      <h2 class="en">Why this matters</h2>
+      <h2 class="id">Kenapa ini penting</h2>
+      <div class="card">
+        <div class="li"><span class="tick">✓</span><div class="en">Access €26B+ European research & innovation funding</div><div class="id">Akses pendanaan riset & inovasi Eropa €26B+</div></div>
+        <div class="li"><span class="tick">✓</span><div class="en">Secure funding for sustainability & digital transformation</div><div class="id">Dapatkan pendanaan untuk keberlanjutan & transformasi digital</div></div>
+        <div class="li"><span class="tick">✓</span><div class="en">Gain recognition through open, citable outputs (DOI)</div><div class="id">Dapat pengakuan melalui luaran terbuka & dapat disitasi (DOI)</div></div>
+        <div class="li"><span class="tick">✓</span><div class="en">Join 10M+ participants in global mobility programs</div><div class="id">Bergabung dengan 10Jt+ peserta program mobilitas global</div></div>
+      </div>
+    </section>
+
+    <!-- Fit for Nyampah Bersama -->
+    <section class="section" id="register">
+      <h2 class="en">Program Fit: Nyampah Bersama</h2>
+      <h2 class="id">Kesesuaian Program: Nyampah Bersama</h2>
+      <div class="card">
+        <p class="muted en">Aligns with community‑based sustainability, digital inclusion, and open science principles.</p>
+        <p class="muted id">Selaras dengan prinsip keberlanjutan berbasis komunitas, inklusi digital, dan open science.</p>
+        
+        <div class="pill-grid">
+          <div class="pill">2BCycle • PoCA</div>
+          <div class="pill">Zero‑Waste School 2030</div>
+          <div class="pill">Open Data • DOI</div>
+          <div class="pill">Community Empowerment</div>
+          <div class="pill">Digital Inclusion</div>
+          <div class="pill">Circular Economy</div>
+        </div>
+        
+        <div class="cta" style="margin-top: 1.5rem;">
+          <a class="btn primary" href="#">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            <span class="en">Apply for Funding</span>
+            <span class="id">Ajukan Pendanaan</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Strong pitch line -->
+    <section class="section">
+      <div class="card pitch-card">
+        <h2 class="en">Our Vision</h2><h2 class="id">Visi Kami</h2>
+        <p>
+          <span class="en">“Through Erasmus+ & European Solidarity Corps, we transform local action into global impact — combining sustainability, digital innovation, and community empowerment to create measurable change.”</span>
+          <span class="id">“Melalui Erasmus+ & European Solidarity Corps, kami mengubah aksi lokal menjadi dampak global — memadukan keberlanjutan, inovasi digital, dan pemberdayaan komunitas untuk menciptakan perubahan terukur.”</span>
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <div>
+        <span class="en">Organisation ID (OID):</span>
+        <span class="id">Organisation ID (OID):</span> 
+        <span class="kbd">E10404020</span>
+        &nbsp;•&nbsp;
+        <span class="en">Zenodo DOI:</span>
+        <span class="id">DOI Zenodo:</span> 
+        <span class="kbd">10.5281/zenodo.16663697</span>
+      </div>
+      <div style="margin-top:12px">
+        <span class="en">Contact:</span>
+        <span class="id">Kontak:</span> 
+        <span class="kbd">partnership@nyampahbersama.org</span>
+      </div>
+      <div style="margin-top:14px">© Nyampah Bersama – Open Science & Community Innovation</div>
+    </footer>
+  </div>
+
+  <script>
+    const root = document.documentElement;
+    const idBtn = document.getElementById('btn-id');
+    const enBtn = document.getElementById('btn-en');
+    
+    function setLang(lang) {
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang);
+      idBtn.setAttribute('aria-pressed', lang === 'id');
+      enBtn.setAttribute('aria-pressed', lang === 'en');
+      document.title = lang === 'en' 
+        ? 'Erasmus+ & ESC • Pitch | Nyampah Bersama' 
+        : 'Erasmus+ & ESC • Pitch (ID) | Nyampah Bersama';
+        
+      // Save preference to localStorage
+      localStorage.setItem('preferredLang', lang);
+    }
+    
+    // Load saved language preference
+    const savedLang = localStorage.getItem('preferredLang') || 'id';
+    setLang(savedLang);
+    
+    idBtn.addEventListener('click', () => setLang('id'));
+    enBtn.addEventListener('click', () => setLang('en'));
+    
+    // Print functionality enhancement
+    document.querySelector('.ghost').addEventListener('click', () => {
+      window.print();
+    });
+  </script>
+</body>
+</html>

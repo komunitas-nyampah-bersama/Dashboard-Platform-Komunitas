@@ -1,0 +1,279 @@
+
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glide Tools Suite — Generator Link + Arsip Dokumen</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg:#f7f7fb; --card:#fff; --border:#e6e6ef; --text:#111827; --muted:#6b7280;
+    --brand:#4f46e5; --brand2:#06b6d4; --danger:#f43f5e; --ok:#22c55e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  header{padding:20px 14px;text-align:center;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff}
+  header h1{margin:0 0 6px;font-size:22px}
+  header p{margin:0;opacity:.9}
+  .wrap{max-width:1200px;margin:0 auto;padding:12px}
+  .tabs{display:flex;gap:10px;margin:10px 0 14px}
+  .tab{flex:1;padding:12px;border:1px solid var(--border);background:#fff;border-radius:10px;cursor:pointer;text-align:center;font-weight:700}
+  .tab.active{background:var(--brand);color:#fff;border-color:transparent}
+  .panel{display:none;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px}
+  .panel.active{display:block}
+  .box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  textarea{width:100%;min-height:120px;padding:10px;border:1px solid var(--border);border-radius:10px;font-family:ui-monospace,monospace}
+  input[type="text"], input[type="file"], select{padding:10px 12px;border:1px solid var(--border);border-radius:10px;flex:1;min-width:140px}
+  .btn{padding:10px 12px;border:1px solid var(--border);background:#fff;border-radius:10px;cursor:pointer}
+  .btn.brand{background:var(--brand);color:#fff;border-color:transparent}
+  .btn.ok{background:var(--ok);color:#fff;border-color:transparent}
+  .btn.danger{background:var(--danger);color:#fff;border-color:transparent}
+  table{width:100%;border-collapse:collapse}
+  th,td{border-top:1px solid var(--border);padding:8px;vertical-align:top}
+  th{background:#fafbff;text-align:left;font-size:12px}
+  td input{width:100%;padding:8px;border:1px solid var(--border);border-radius:8px}
+  .mono{font-family:ui-monospace,monospace;font-size:12px}
+  .scroll{overflow:auto;max-height:60vh}
+  .muted{color:var(--muted);font-size:12px}
+  /* viewer */
+  .viewer{height:500px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .viewer iframe{width:100%;height:100%;border:0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+  figure{margin:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+  figure img{width:100%;height:160px;object-fit:cover;background:#eee}
+  figcaption{padding:10px 12px 6px;font-weight:700}
+  .meta{padding:0 12px 12px;color:var(--muted);font-size:12px}
+  .chip{border:1px solid var(--border);padding:2px 8px;border-radius:999px;background:#fafbff;margin-right:6px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Glide Tools Suite</h1>
+  <p>Generator Link Google Drive → Glide + Arsip PDF/Excel dengan Viewer</p>
+</header>
+
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab active" data-tab="gen"><i class="fa-solid fa-link"></i> Generator Link</div>
+    <div class="tab" data-tab="gallery"><i class="fa-solid fa-images"></i> Galeri dari CSV</div>
+    <div class="tab" data-tab="arsip"><i class="fa-solid fa-box-archive"></i> Arsip PDF/Excel</div>
+  </div>
+
+  <!-- PANEL 1: GENERATOR -->
+  <section class="panel active" id="gen">
+    <div class="box">
+      <div class="row">
+        <textarea id="src" placeholder="Tempel link Google Drive (satu baris per link). Boleh juga format: Nama, LINK"></textarea>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <input id="prefix" type="text" placeholder="Prefix Nama (opsional)">
+        <input id="kelas" type="text" placeholder="Kelas (opsional)">
+        <input id="angkatan" type="text" placeholder="Angkatan (opsional)">
+        <button class="btn brand" id="genBtn">Generate</button>
+        <button class="btn" id="clearGen">Clear</button>
+        <button class="btn" id="copyCSV">Copy CSV</button>
+        <button class="btn ok" id="dlCSV">Download CSV</button>
+      </div>
+      <div class="muted" style="margin-top:6px">Regex File ID: <code>[-\w]{25,}</code>. Kolom hasil: Nama, Link Asli, File ID, View, Direct, Thumb, Angkatan, Kelas, Catatan.</div>
+    </div>
+    <div class="box scroll">
+      <table id="genTbl">
+        <thead><tr>
+          <th>#</th><th>Nama</th><th>Link Drive Asli</th><th>File ID</th><th>View Link</th><th>Direct Link</th><th>Thumbnail Link</th><th>Angkatan</th><th>Kelas</th><th>Catatan</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PANEL 2: GALLERY -->
+  <section class="panel" id="gallery">
+    <div class="box">
+      <div class="row">
+        <input id="csvUrl" placeholder="Tempel URL CSV (Sheets → Publish to web → CSV)">
+        <input id="q" placeholder="Cari nama…">
+        <select id="angkSel"><option value="">Semua Angkatan</option></select>
+        <select id="kelasSel"><option value="">Semua Kelas</option></select>
+        <button class="btn brand" id="loadCSV">Muat</button>
+      </div>
+    </div>
+    <div class="box">
+      <div class="grid" id="grid"></div>
+    </div>
+    <div class="box viewer">
+      <iframe id="viewer" src=""></iframe>
+    </div>
+  </section>
+
+  <!-- PANEL 3: ARSIP -->
+  <section class="panel" id="arsip">
+    <div class="box">
+      <div class="row">
+        <input id="docUrl" placeholder="https://contoh.com/file.pdf">
+        <select id="docType">
+          <option value="pdf">PDF</option>
+          <option value="excel">Excel</option>
+        </select>
+        <input type="file" id="docFile" accept=".pdf,.xlsx,.xls">
+        <button class="btn brand" id="addUrl">Tambah dari URL</button>
+        <button class="btn ok" id="addFile">Unggah File</button>
+        <button class="btn danger" id="clrArsip">Hapus Semua</button>
+      </div>
+    </div>
+    <div class="box">
+      <div class="grid" id="arsipList"></div>
+    </div>
+    <div class="box viewer" id="arsipViewerBox">
+      <iframe id="arsipViewer" src=""></iframe>
+    </div>
+  </section>
+</div>
+
+<script>
+// ==== tabs ====
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById(t.dataset.tab).classList.add('active');
+}));
+
+// ==== GENERATOR ====
+const reId=/[-\w]{25,}/;
+const genBody=document.querySelector('#genTbl tbody');
+function parseLines(text){
+  return text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(line=>{
+    let name='',link=line;
+    const m=line.match(/^([^,;]+)[,;]\s*(https?:\/\/\S+)/i);
+    if(m){name=m[1].trim();link=m[2].trim()}
+    return {name,link};
+  });
+}
+function extractId(url){const m=url.match(reId);return m?m[0]:''}
+function viewLink(id){return id?`https://drive.google.com/file/d/${id}/view?usp=sharing`:''}
+function directLink(id){return id?`https://drive.google.com/uc?export=view&id=${id}`:''}
+function thumbLink(id){return id?`https://drive.google.com/thumbnail?id=${id}&sz=w800`:''}
+function recomputeRow(tr){
+  const link = tr.querySelector('input[data-f="link"]').value.trim();
+  const id = extractId(link);
+  tr.querySelector('[data-f="id"]').textContent=id;
+  tr.querySelector('[data-f="view"]').textContent=viewLink(id);
+  tr.querySelector('[data-f="direct"]').textContent=directLink(id);
+  tr.querySelector('[data-f="thumb"]').textContent=thumbLink(id);
+}
+function addRow(obj){
+  const idx=genBody.children.length+1;
+  const tr=document.createElement('tr');
+  tr.innerHTML=`
+    <td class="mono">${idx}</td>
+    <td><input data-f="nama" value="${(document.getElementById('prefix').value||'')+(obj.name||'')}"></td>
+    <td><input data-f="link" value="${obj.link||''}"></td>
+    <td class="mono" data-f="id"></td>
+    <td class="mono" data-f="view"></td>
+    <td class="mono" data-f="direct"></td>
+    <td class="mono" data-f="thumb"></td>
+    <td><input data-f="angkatan" value="${document.getElementById('angkatan').value||''}"></td>
+    <td><input data-f="kelas" value="${document.getElementById('kelas').value||''}"></td>
+    <td><input data-f="catatan"></td>`;
+  genBody.appendChild(tr);
+  ['input'].forEach(ev=>tr.querySelectorAll('input').forEach(i=>i.addEventListener(ev,()=>recomputeRow(tr))));
+  recomputeRow(tr);
+}
+function tableToCSV(){
+  const rows=[['Nama','Link Drive Asli','File ID','View Link','Direct Link','Thumbnail Link','Angkatan','Kelas','Catatan']];
+  Array.from(genBody.children).forEach(tr=>{
+    const g=f=>tr.querySelector(`[data-f="${f}"]`);
+    rows.push([g('nama').value,g('link').value,tr.querySelector('[data-f="id"]').textContent,
+    tr.querySelector('[data-f="view"]').textContent,tr.querySelector('[data-f="direct"]').textContent,
+    tr.querySelector('[data-f="thumb"]').textContent,g('angkatan').value,g('kelas').value,g('catatan').value]);
+  });
+  return rows.map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+}
+document.getElementById('genBtn').addEventListener('click',()=>{
+  const rows=parseLines(document.getElementById('src').value);
+  if(!rows.length){alert('Tempel minimal satu link dulu ya.');return}
+  genBody.innerHTML=''; rows.forEach(addRow);
+});
+document.getElementById('clearGen').addEventListener('click',()=>{document.getElementById('src').value='';genBody.innerHTML=''});
+document.getElementById('dlCSV').addEventListener('click',()=>{
+  const csv=tableToCSV();
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='drive_links.csv'; a.click();
+});
+document.getElementById('copyCSV').addEventListener('click',async()=>{
+  const csv=tableToCSV(); try{await navigator.clipboard.writeText(csv); alert('CSV tersalin ✅')}catch(e){alert('Gagal copy')} });
+
+// ==== GALLERY dari CSV ====
+async function loadCSV(url){
+  const res=await fetch(url); if(!res.ok) throw new Error('Gagal memuat CSV'); const text=await res.text(); return parseCSV(text);
+}
+function parseCSV(text){
+  const rows=[]; let row=[]; let cur=''; let inQ=false;
+  for(let i=0;i<text.length;i++){ const c=text[i], n=text[i+1];
+    if(inQ){ if(c=='"' && n=='"'){cur+='"'; i++;} else if(c=='"'){inQ=false;} else cur+=c; }
+    else { if(c=='"'){inQ=true;} else if(c==','){row.push(cur);cur='';}
+      else if(c=='\n' || c=='\r'){ if(cur!==''|| (c=='\n' && text[i-1]==',')) row.push(cur); if(row.length){rows.push(row)} row=[]; cur=''; if(c=='\r' && n=='\n') i++; }
+      else cur+=c; } }
+  if(cur.length||row.length){ row.push(cur); rows.push(row); }
+  const header=rows.shift().map(h=>h.trim());
+  return rows.filter(r=>r.some(x=>x && x.trim().length)).map(r=>{const o={}; header.forEach((h,idx)=>o[h]=(r[idx]||'').trim()); return o;});
+}
+const grid=document.getElementById('grid'); const vIframe=document.getElementById('viewer');
+const q=document.getElementById('q'), selA=document.getElementById('angkSel'), selK=document.getElementById('kelasSel');
+let DATA=[];
+function uniq(a){return Array.from(new Set(a.filter(Boolean)));}
+function renderGallery(){
+  const qq=(q.value||'').toLowerCase(); const fa=selA.value; const fk=selK.value;
+  const filtered=DATA.filter(d=>(!qq || (d['Nama']||'').toLowerCase().includes(qq)) && (!fa || d['Angkatan']===fa) && (!fk || d['Kelas']===fk));
+  grid.innerHTML = filtered.map(d=>{
+    const name=d['Nama']||''; const img=d['Thumbnail Link']||d['Thumb URL']||d['Image URL']||''; const full=d['Direct Link']||d['Image URL']||img;
+    const chips=[d['Angkatan']?('Angkatan '+d['Angkatan']):'', d['Kelas']?('Kelas '+d['Kelas']):'', d['Catatan']||''].filter(Boolean).map(x=>`<span class="chip">${x}</span>`).join(' ');
+    return `<figure data-full="${full}"><img loading="lazy" src="${img}" alt="${name}"><figcaption>${name}</figcaption><div class="meta">${chips}</div></figure>`;
+  }).join('');
+  grid.querySelectorAll('figure').forEach(f=>f.addEventListener('click',()=>{ vIframe.src=f.dataset.full; }));
+}
+document.getElementById('loadCSV').addEventListener('click', async ()=>{
+  try{ DATA = await loadCSV(document.getElementById('csvUrl').value.trim()); selA.innerHTML='<option value="">Semua Angkatan</option>'+uniq(DATA.map(d=>d['Angkatan'])).map(x=>`<option>${x}</option>`).join(''); selK.innerHTML='<option value="">Semua Kelas</option>'+uniq(DATA.map(d=>d['Kelas'])).map(x=>`<option>${x}</option>`).join(''); renderGallery(); }
+  catch(e){ alert('Gagal muat CSV: '+e.message) }
+});
+[q, selA, selK].forEach(el=>el.addEventListener('input',renderGallery));
+
+// ==== ARSIP ==== (mini versi)
+// localStorage
+const KEY='arsipDocs'; let ARSIP = JSON.parse(localStorage.getItem(KEY)||'[]');
+const arsipList=document.getElementById('arsipList'); const aUrl=document.getElementById('docUrl'); const aType=document.getElementById('docType'); const aFile=document.getElementById('docFile'); const aView=document.getElementById('arsipViewer');
+function saveArsip(){ localStorage.setItem(KEY, JSON.stringify(ARSIP)); }
+function renderArsip(){
+  arsipList.innerHTML = ARSIP.length? '' : '<div class="muted">Belum ada dokumen.</div>';
+  ARSIP.forEach((d,i)=>{
+    const card=document.createElement('div'); card.className='box'; card.innerHTML=`
+      <div class="row">
+        <div style="flex:1"><b>${d.name||'(tanpa nama)'}</b><div class="muted">${d.type.toUpperCase()}</div></div>
+        <button class="btn" data-i="${i}" data-act="open">Buka</button>
+        <button class="btn danger" data-i="${i}" data-act="del">Hapus</button>
+      </div>`;
+    arsipList.appendChild(card);
+  });
+  arsipList.querySelectorAll('button').forEach(b=>b.addEventListener('click',e=>{
+    const i=+b.dataset.i, act=b.dataset.act;
+    if(act==='open'){ aView.src = ARSIP[i].url; document.querySelector('.tab[data-tab="arsip"]').click(); }
+    else { if(ARSIP[i].local){ URL.revokeObjectURL(ARSIP[i].url); } ARSIP.splice(i,1); saveArsip(); renderArsip(); }
+  }));
+}
+document.getElementById('addUrl').addEventListener('click',()=>{
+  const url=aUrl.value.trim(); if(!url) return alert('Isi URL dulu ya'); const type=aType.value;
+  const name = url.split('/').pop();
+  ARSIP.push({type, url, name, local:false}); saveArsip(); renderArsip(); aUrl.value='';
+});
+document.getElementById('addFile').addEventListener('click',()=>{
+  const f=aFile.files[0]; if(!f) return alert('Pilih file dulu'); const url=URL.createObjectURL(f); const type=(/pdf$/.test(f.type))?'pdf':'excel';
+  ARSIP.push({type, url, name:f.name, local:true}); saveArsip(); renderArsip(); aFile.value='';
+});
+document.getElementById('clrArsip').addEventListener('click',()=>{ ARSIP.forEach(d=>{if(d.local) URL.revokeObjectURL(d.url)}); ARSIP=[]; saveArsip(); renderArsip(); aView.src=''; });
+renderArsip();
+</script>
+</body>
+</html>

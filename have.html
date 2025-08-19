@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataViz - Sistem Manajemen Data Interaktif</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --danger: #e63946;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+            --sidebar-bg: #f8f9fa;
+            --code-bg: #1e1e1e;
+            --viz-1: #4361ee;
+            --viz-2: #7209b7;
+            --viz-3: #4cc9f0;
+            --viz-4: #f72585;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 25px 0;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 280px;
+            height: 100vh;
+            z-index: 100;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 0 25px 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .nav-links {
+            margin-top: 30px;
+        }
+
+        .nav-item {
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            border-left: 3px solid white;
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            grid-column: 2;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            align-content: start;
+        }
+
+        header {
+            grid-column: 1 / -1;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-title h2 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+
+        .header-title p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn i {
+            font-size: 0.9rem;
+        }
+
+        .btn.btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn.btn-outline:hover {
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .btn.btn-danger {
+            background: var(--danger);
+            box-shadow: 0 4px 6px rgba(230, 57, 70, 0.2);
+        }
+
+        .btn.btn-danger:hover {
+            background: #d32f2f;
+            box-shadow: 0 6px 8px rgba(230, 57, 70, 0.3);
+        }
+
+        /* Dashboard Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 6px 15px var(--shadow);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header h3 i {
+            width: 32px;
+            height: 32px;
+            background: rgba(114, 9, 183, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+        }
+
+        /* Visualization Cards */
+        .viz-container {
+            flex: 1;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-card .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Table Card */
+        .table-card {
+            grid-column: 1 / -1;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            flex: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(248, 249, 250, 0.5);
+        }
+
+        tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: white;
+            color: var(--dark);
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            border-left: 4px solid var(--primary);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification i {
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+
+        .notification-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .notification-content p {
+            font-size: 0.95rem;
+            color: var(--gray);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                grid-column: 1;
+                padding: 15px;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(67,97,238,0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            animation: fadeIn 0.5s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <div class="notification-content">
+            <h3>Selamat Datang!</h3>
+            <p>Sistem DataViz siap digunakan</p>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo">
+                        <i class="fas fa-chart-network"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>DataViz</h1>
+                        <p>Manajemen & Visualisasi Data</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="nav-links">
+                <div class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-database"></i>
+                    <span>Data Saya</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Visualisasi</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Keamanan</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Kolaborasi</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Pengaturan</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Ide Baru</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header>
+                <div class="header-title">
+                    <h2>Dashboard Analitik</h2>
+                    <p>Manajemen dan visualisasi data interaktif</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn">
+                        <i class="fas fa-plus"></i> Data Baru
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-share-alt"></i> Bagikan
+                    </button>
+                </div>
+            </header>
+
+            <!-- Statistik -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-line"></i> Ringkasan Data</h3>
+                    <div class="time-filter">
+                        <select>
+                            <option>Hari Ini</option>
+                            <option>Minggu Ini</option>
+                            <option>Bulan Ini</option>
+                            <option>Tahun Ini</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--viz-1) 0%, #5a76f1 100%);">
+                        <div class="value">1,248</div>
+                        <div class="label">Total Entri Data</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--viz-2) 0%, #8a2be2 100%);">
+                        <div class="value">24</div>
+                        <div class="label">Kategori Unik</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--viz-3) 0%, #6dd5ed 100%);">
+                        <div class="value">87%</div>
+                        <div class="label">Kelengkapan Data</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--viz-4) 0%, #ff6b9d 100%);">
+                        <div class="value">42</div>
+                        <div class="label">Update Terakhir</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grafik 1 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-pie"></i> Distribusi Data</h3>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download"></i> Ekspor
+                    </button>
+                </div>
+                <div class="viz-container">
+                    <div class="chart-container">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grafik 2 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> Tren Data</h3>
+                    <div class="chart-options">
+                        <select>
+                            <option>Bulanan</option>
+                            <option>Mingguan</option>
+                            <option>Harian</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="viz-container">
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabel Data -->
+            <div class="card table-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-table"></i> Data Terkini</h3>
+                    <div class="actions">
+                        <button class="btn">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="excel-table">
+                        <thead>
+                            <tr>
+                                <th width="5%">ID</th>
+                                <th width="20%">Nama</th>
+                                <th width="15%">Kategori</th>
+                                <th width="15%">Tanggal</th>
+                                <th width="15%">Nilai</th>
+                                <th width="15%">Status</th>
+                                <th width="15%">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <tr>
+                                <td>001</td>
+                                <td>Proyek Alpha</td>
+                                <td>Pengembangan</td>
+                                <td>15 Mei 2023</td>
+                                <td>87%</td>
+                                <td><span class="status-badge success">Selesai</span></td>
+                                <td class="action-cell">
+                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn"><i class="fas fa-chart-bar"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>002</td>
+                                <td>Survei Pelanggan</td>
+                                <td>Pemasaran</td>
+                                <td>22 Mei 2023</td>
+                                <td>64%</td>
+                                <td><span class="status-badge warning">Berjalan</span></td>
+                                <td class="action-cell">
+                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn"><i class="fas fa-chart-bar"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>003</td>
+                                <td>Analisis Pasar</td>
+                                <td>Riset</td>
+                                <td>10 Mei 2023</td>
+                                <td>92%</td>
+                                <td><span class="status-badge success">Selesai</span></td>
+                                <td class="action-cell">
+                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn"><i class="fas fa-chart-bar"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>004</td>
+                                <td>Pelatihan Karyawan</td>
+                                <td>SDM</td>
+                                <td>30 Mei 2023</td>
+                                <td>45%</td>
+                                <td><span class="status-badge danger">Tertunda</span></td>
+                                <td class="action-cell">
+                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn"><i class="fas fa-chart-bar"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>005</td>
+                                <td>Optimasi Server</td>
+                                <td>Teknologi</td>
+                                <td>18 Mei 2023</td>
+                                <td>78%</td>
+                                <td><span class="status-badge warning">Berjalan</span></td>
+                                <td class="action-cell">
+                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn"><i class="fas fa-chart-bar"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Ide Baru -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-lightbulb"></i> Bagikan Ide Baru</h3>
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="idea-form">
+                    <p>Punya ide untuk meningkatkan sistem? Bagikan dengan tim!</p>
+                    <textarea placeholder="Deskripsikan ide Anda di sini..." rows="4"></textarea>
+                    <div class="idea-actions">
+                        <button class="btn">
+                            <i class="fas fa-paper-plane"></i> Kirim Ide
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-plus"></i> Tambah Lampiran
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Tampilkan notifikasi
+        setTimeout(() => {
+            document.getElementById('notification').classList.add('show');
+            setTimeout(() => {
+                document.getElementById('notification').classList.remove('show');
+            }, 3000);
+        }, 1000);
+
+        // Inisialisasi chart
+        document.addEventListener('DOMContentLoaded', function() {
+            // Grafik Distribusi
+            const distCtx = document.getElementById('distributionChart').getContext('2d');
+            const distributionChart = new Chart(distCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pengembangan', 'Pemasaran', 'Riset', 'SDM', 'Teknologi'],
+                    datasets: [{
+                        data: [30, 22, 18, 15, 15],
+                        backgroundColor: [
+                            'rgba(67, 97, 238, 0.8)',
+                            'rgba(114, 9, 183, 0.8)',
+                            'rgba(76, 201, 240, 0.8)',
+                            'rgba(247, 37, 133, 0.8)',
+                            'rgba(106, 76, 147, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.parsed}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Grafik Tren
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            const trendChart = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul'],
+                    datasets: [{
+                        label: 'Data Masuk',
+                        data: [65, 59, 80, 81, 76, 72, 85],
+                        borderColor: 'rgba(67, 97, 238, 1)',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }, {
+                        label: 'Data Diproses',
+                        data: [45, 52, 65, 70, 68, 75, 80],
+                        borderColor: 'rgba(114, 9, 183, 1)',
+                        backgroundColor: 'rgba(114, 9, 183, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Animasi card
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>

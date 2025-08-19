@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Erasmus+ & European Solidarity Corps • Pitch</title>
+  <meta name="description" content="Professional pitch page for Erasmus+ & European Solidarity Corps – Research, Grants, Collaboration, and Open Science (ORCID & Zenodo).">
+  <style>
+    :root{
+      --eu-blue:#1a49a4;
+      --eu-gold:#ffcc00;
+      --ink:#0b1021;
+      --muted:#5b6478;
+      --bg:#f7f9ff;
+      --card:#ffffff;
+      --ok:#1f8a6b;
+      --shadow:0 10px 30px rgba(6, 33, 86, .08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font: 16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif}
+    a{color:var(--eu-blue);text-decoration:none}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    .hero{
+      position:relative;border-radius:var(--radius);background:linear-gradient(135deg, var(--eu-blue), #0e2f6e);
+      color:#fff;padding:36px 28px;box-shadow:var(--shadow);overflow:hidden;
+    }
+    .badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.14);padding:6px 10px;border-radius:999px;font-weight:600}
+    .badge .dot{width:10px;height:10px;border-radius:50%;background:var(--eu-gold);box-shadow:0 0 0 3px rgba(255,204,0,.25)}
+    h1{margin:.6rem 0 0;font-size:clamp(1.6rem, 2.2vw + 1rem, 2.4rem);line-height:1.2}
+    .sub{opacity:.95;margin-top:.4rem;color:#e6edff;max-width:60ch}
+    .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+    .btn{
+      display:inline-flex;align-items:center;gap:.6rem;
+      padding:12px 16px;border-radius:12px;font-weight:700;border:2px solid rgba(255,255,255,.3);
+      color:#fff;background:rgba(255,255,255,.08);backdrop-filter: blur(3px);
+      transition:.2s transform ease, .2s background;
+    }
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.16)}
+    .btn.primary{background:#fff;color:var(--eu-blue);border-color:#fff}
+    .grid{display:grid;gap:18px;margin:28px 0}
+    .grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+    .card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:18px}
+    .card h3{margin:.2rem 0 .4rem;font-size:1.05rem}
+    .muted{color:var(--muted)}
+    .li{display:flex;gap:10px;align-items:flex-start;margin:.2rem 0}
+    .li .tick{width:22px;height:22px;border-radius:6px;background:var(--ok);color:#fff;display:inline-grid;place-items:center;font-weight:800}
+    .section h2{margin:6px 0 12px;font-size:1.3rem}
+    .two{display:grid;gap:18px;grid-template-columns:1fr;align-items:stretch}
+    @media (min-width: 900px){ .two{grid-template-columns:1.1fr .9fr} }
+    footer{margin:32px 0 12px;color:var(--muted);font-size:.92rem;text-align:center}
+    .lang-switch{display:flex;gap:10px;margin:8px 0 18px}
+    .chip{padding:8px 12px;border-radius:999px;background:#e8eefc;color:var(--eu-blue);font-weight:700;border:1px solid #d5e2ff;cursor:pointer}
+    .chip[aria-pressed="true"]{background:var(--eu-blue);color:#fff;border-color:var(--eu-blue)}
+    /* language visibility */
+    [data-lang="id"] .en{display:none}
+    [data-lang="en"] .id{display:none}
+    /* small print button */
+    .ghost{background:transparent;border:1.5px solid rgba(255,255,255,.65);color:#fff}
+    .pill{display:inline-flex;background:#eef5ff;color:var(--eu-blue);padding:6px 10px;border-radius:999px;font-weight:700;border:1px solid #dbe8ff}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0f1f45;color:#fff;border-radius:8px;padding:2px 6px}
+  </style>
+</head>
+<body data-lang="id">
+  <div class="wrap">
+    <div class="hero">
+      <div class="badge"><span class="dot"></span><span>Co‑funded by the European Union</span></div>
+      <h1>Erasmus+ & European Solidarity Corps</h1>
+      <p class="sub en">Professional Career • Funding & Research Grants • Open Science</p>
+      <p class="sub id">Karier Profesional • Pendanaan & Hibah Penelitian • Open Science</p>
+
+      <div class="lang-switch">
+        <button class="chip" id="btn-id" aria-pressed="true">Bahasa Indonesia</button>
+        <button class="chip" id="btn-en" aria-pressed="false">English</button>
+        <a class="btn ghost" href="javascript:window.print()">Print / Save PDF</a>
+      </div>
+
+      <div class="cta">
+        <a class="btn primary" href="#" id="cta-register">
+          <span class="en">Start Registration</span>
+          <span class="id">Mulai Daftar</span>
+        </a>
+        <a class="btn" href="#" id="cta-orcid">
+          <span>ORCID</span>
+          <span class="en">Create Researcher ID</span>
+          <span class="id">Buat Identitas Peneliti</span>
+        </a>
+        <a class="btn" href="#" id="cta-zenodo">
+          <span>Zenodo</span>
+          <span class="en">Publish (Open Access)</span>
+          <span class="id">Publikasi (Open Access)</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Focus Areas -->
+    <section class="section">
+      <h2 class="en">Key Focus Areas</h2>
+      <h2 class="id">Fokus Utama</h2>
+      <div class="grid cols-3">
+        <div class="card">
+          <h3>Research</h3>
+          <p class="muted en">Advancing scientific and social‑impact initiatives.</p>
+          <p class="muted id">Mendorong riset ilmiah & dampak sosial.</p>
+        </div>
+        <div class="card">
+          <h3>Journals</h3>
+          <p class="muted en">Publishing high‑quality papers with global reach.</p>
+          <p class="muted id">Publikasi berkualitas dengan jangkauan global.</p>
+        </div>
+        <div class="card">
+          <h3 class="en">Funding Opportunities</h3>
+          <h3 class="id">Peluang Hibah</h3>
+          <p class="muted en">International grants for education, digitalization, and sustainability.</p>
+          <p class="muted id">Hibah internasional untuk pendidikan, digitalisasi, dan keberlanjutan.</p>
+        </div>
+        <div class="card">
+          <h3>Collaboration</h3>
+          <p class="muted en">Building strong networks with EU partners.</p>
+          <p class="muted id">Membangun jejaring kokoh dengan mitra UE.</p>
+        </div>
+        <div class="card">
+          <h3 class="en">Research Projects</h3>
+          <h3 class="id">Proyek Penelitian</h3>
+          <p class="muted en">Turning ideas into measurable outcomes.</p>
+          <p class="muted id">Mengubah ide menjadi hasil terukur.</p>
+        </div>
+        <div class="card">
+          <h3>Writing</h3>
+          <p class="muted en">Supporting academic and professional dissemination.</p>
+          <p class="muted id">Mendukung diseminasi akademik & profesional.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Strategic Tools -->
+    <section class="section two">
+      <div class="card">
+        <h2>ORCID</h2>
+        <p class="muted en">Establish a trusted global researcher identity (persistent ID).</p>
+        <p class="muted id">Bangun identitas peneliti global yang tepercaya (ID persisten).</p>
+        <div class="li"><span class="tick">✓</span><div>
+          <div class="en">Link publications and grants across systems</div>
+          <div class="id">Tautkan publikasi & hibah lintas sistem</div>
+        </div></div>
+        <div class="li"><span class="tick">✓</span><div>
+          <div class="en">Avoid name ambiguity; boost credibility</div>
+          <div class="id">Hindari ambiguitas nama; tingkatkan kredibilitas</div>
+        </div></div>
+      </div>
+      <div class="card">
+        <h2>Zenodo</h2>
+        <p class="muted en">EU‑hosted open repository for datasets, papers, and software with DOI.</p>
+        <p class="muted id">Repositori terbuka EU untuk data, paper, dan software dengan DOI.</p>
+        <div class="li"><span class="tick">✓</span><div>
+          <div class="en">Permanent archiving & open access</div>
+          <div class="id">Arsip permanen & akses terbuka</div>
+        </div></div>
+        <div class="li"><span class="tick">✓</span><div>
+          <div class="en">Recognized in EU funding workflows</div>
+          <div class="id">Diakui dalam alur pendanaan UE</div>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- Why It Matters -->
+    <section class="section">
+      <h2 class="en">Why this matters</h2>
+      <h2 class="id">Kenapa ini penting</h2>
+      <div class="card">
+        <div class="li"><span class="tick">✓</span><div class="en">Access European research & innovation networks</div><div class="id">Akses jejaring riset & inovasi Eropa</div></div>
+        <div class="li"><span class="tick">✓</span><div class="en">Secure funding for sustainability & digital transformation</div><div class="id">Dapatkan pendanaan untuk keberlanjutan & transformasi digital</div></div>
+        <div class="li"><span class="tick">✓</span><div class="en">Gain recognition through open, citable outputs (DOI)</div><div class="id">Dapat pengakuan melalui luaran terbuka & dapat disitasi (DOI)</div></div>
+      </div>
+    </section>
+
+    <!-- Fit for Nyampah Bersama -->
+    <section class="section">
+      <h2 class="en">Program Fit: Nyampah Bersama</h2>
+      <h2 class="id">Kesesuaian Program: Nyampah Bersama</h2>
+      <div class="card">
+        <p class="muted en">Aligns with community‑based sustainability, digital inclusion, and open science.</p>
+        <p class="muted id">Selaras dengan keberlanjutan berbasis komunitas, inklusi digital, dan open science.</p>
+        <div class="grid cols-3">
+          <div class="pill">2BCycle • PoCA</div>
+          <div class="pill">Zero‑Waste School 2030</div>
+          <div class="pill">Open Data • DOI</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Strong pitch line -->
+    <section class="section">
+      <div class="card">
+        <h2 class="en">Pitch</h2><h2 class="id">Pernyataan Pitch</h2>
+        <p style="font-weight:700">
+          <span class="en">“Through Erasmus+ & European Solidarity Corps, we transform local action into global impact — combining sustainability, digital innovation, and community empowerment.”</span>
+          <span class="id">“Lewat Erasmus+ & European Solidarity Corps, kami mengubah aksi lokal menjadi dampak global — memadukan keberlanjutan, inovasi digital, dan pemberdayaan komunitas.”</span>
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <div>
+        <span class="en">Organisation ID (OID):</span>
+        <span class="id">Organisation ID (OID):</span> <span class="kbd">E10404020</span>
+        &nbsp;•&nbsp;
+        <span class="en">Zenodo DOI:</span>
+        <span class="id">DOI Zenodo:</span> <span class="kbd">10.5281/zenodo.16663697</span>
+      </div>
+      <div style="margin-top:6px">© Nyampah Bersama – Open Science & Community Innovation</div>
+    </footer>
+  </div>
+
+  <script>
+    const root = document.body;
+    const idBtn = document.getElementById('btn-id');
+    const enBtn = document.getElementById('btn-en');
+    function setLang(lang){
+      root.setAttribute('data-lang', lang);
+      idBtn.setAttribute('aria-pressed', String(lang==='id'));
+      enBtn.setAttribute('aria-pressed', String(lang==='en'));
+      // update CTA labels (optional)
+      document.title = (lang==='en') ? 'Erasmus+ & ESC • Pitch' : 'Erasmus+ & ESC • Pitch (ID)';
+    }
+    idBtn.addEventListener('click', ()=>setLang('id'));
+    enBtn.addEventListener('click', ()=>setLang('en'));
+  </script>
+</body>
+</html>

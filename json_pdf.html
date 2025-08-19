@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataViz Pro - Sistem Manajemen Data</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --danger: #e63946;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+            --sidebar-bg: #f8f9fa;
+            --code-bg: #1e1e1e;
+            --viz-1: #4361ee;
+            --viz-2: #7209b7;
+            --viz-3: #4cc9f0;
+            --viz-4: #f72585;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 25px 0;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 280px;
+            height: 100vh;
+            z-index: 100;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 0 25px 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .nav-links {
+            margin-top: 30px;
+        }
+
+        .nav-item {
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            border-left: 3px solid white;
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            grid-column: 2;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            align-content: start;
+        }
+
+        header {
+            grid-column: 1 / -1;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-title h2 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+
+        .header-title p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn i {
+            font-size: 0.9rem;
+        }
+
+        .btn.btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn.btn-outline:hover {
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .btn.btn-danger {
+            background: var(--danger);
+            box-shadow: 0 4px 6px rgba(230, 57, 70, 0.2);
+        }
+
+        .btn.btn-danger:hover {
+            background: #d32f2f;
+            box-shadow: 0 6px 8px rgba(230, 57, 70, 0.3);
+        }
+
+        /* Dashboard Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 6px 15px var(--shadow);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header h3 i {
+            width: 32px;
+            height: 32px;
+            background: rgba(114, 9, 183, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+        }
+
+        /* Visualization Cards */
+        .viz-container {
+            flex: 1;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-card .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Table Card */
+        .table-card {
+            grid-column: 1 / -1;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            flex: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(248, 249, 250, 0.5);
+        }
+
+        tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .success {
+            background: rgba(76, 201, 240, 0.2);
+            color: #0a9396;
+        }
+
+        .warning {
+            background: rgba(247, 37, 133, 0.2);
+            color: #ff006e;
+        }
+
+        .danger {
+            background: rgba(230, 57, 70, 0.2);
+            color: #d00000;
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: white;
+            color: var(--dark);
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            border-left: 4px solid var(--primary);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification i {
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+
+        .notification-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .notification-content p {
+            font-size: 0.95rem;
+            color: var(--gray);
+        }
+
+        /* PDF Modal */
+        .pdf-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pdf-modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pdf-modal-header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pdf-modal-body {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .pdf-preview {
+            width: 100%;
+            height: 500px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .pdf-info {
+            background: rgba(67, 97, 238, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .pdf-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .pdf-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pdf-info-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .pdf-info-value {
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .pdf-modal-footer {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                grid-column: 1;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .pdf-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(67,97,238,0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            animation: fadeIn 0.5s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <div class="notification-content">
+            <h3>Selamat Datang!</h3>
+            <p>Sistem DataViz Pro siap digunakan</p>
+        </div>
+    </div>
+
+    <!-- PDF Modal -->
+    <div class="pdf-modal" id="pdfModal">
+        <div class="pdf-modal-content">
+            <div class="pdf-modal-header">
+                <h3><i class="fas fa-file-pdf"></i> Ekspor Data ke PDF</h3>
+                <button class="btn btn-outline" id="closePdfModal" style="background: rgba(255,255,255,0.2); color: white;">
+                    <i class="fas fa-times"></i> Tutup
+                </button>
+            </div>
+            <div class="pdf-modal-body">
+                <div class="pdf-info">
+                    <div class="pdf-info-grid">
+                        <div class="pdf-info-item">
+                            <span class="pdf-info-label">Nomor Laporan</span>
+                            <span class="pdf-info-value" id="reportNumber">DV-2023-001</span>
+                        </div>
+                        <div class="pdf-info-item">
+                            <span class="pdf-info-label">Tanggal Ekspor</span>
+                            <span class="pdf-info-value" id="exportDate">15 Juni 2023, 14:30 WIB</span>
+                        </div>
+                        <div class="pdf-info-item">
+                            <span class="pdf-info-label">Hash SHA-256</span>
+                            <span class="pdf-info-value" id="pdfHash">4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b</span>
+                        </div>
+                        <div class="pdf-info-item">
+                            <span class="pdf-info-label">Status Integritas</span>
+                            <span class="pdf-info-value" id="integrityStatus" style="color: green;">✓ Dokumen Asli (Tidak Dimodifikasi)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pdf-preview" id="pdfPreview">
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #f0f0f0;">
+                        <div style="text-align: center; padding: 20px;">
+                            <i class="fas fa-file-pdf" style="font-size: 4rem; color: #e63946; margin-bottom: 20px;"></i>
+                            <h3>Priview Laporan PDF</h3>
+                            <p>Laporan akan dibuat dengan desain profesional dan fitur keamanan</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pdf-info">
+                    <h4>Fitur Keamanan PDF</h4>
+                    <ul style="padding-left: 20px; margin-top: 10px;">
+                        <li>Penomeran laporan unik untuk pelacakan</li>
+                        <li>Tanda tangan digital SHA-256 untuk verifikasi integritas</li>
+                        <li>Watermark digital dengan logo perusahaan</li>
+                        <li>Tanda tangan elektronik</li>
+                        <li>Timestamp otomatis</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pdf-modal-footer">
+                <button class="btn btn-outline" id="configurePdf">
+                    <i class="fas fa-cog"></i> Konfigurasi
+                </button>
+                <button class="btn" id="exportPdf">
+                    <i class="fas fa-download"></i> Ekspor Sekarang
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo">
+                        <i class="fas fa-chart-network"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>DataViz Pro</h1>
+                        <p>Manajemen & Visualisasi Data</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="nav-links">
+                <div class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-database"></i>
+                    <span>Data Saya</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Visualisasi</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Ekspor PDF</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Keamanan</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Pengaturan</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header>
+                <div class="header-title">
+                    <h2>Dashboard Analitik</h2>
+                    <p>Manajemen dan visualisasi data interaktif</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn" id="newDataBtn">
+                        <i class="fas fa-plus"></i> Data Baru
+                    </button>
+                    <button class="btn" id="exportPdfBtn">
+                        <i class="fas fa-file-pdf"></i> Ekspor PDF
+                    </button>
+                </div>
+            </header>
+
+            <!-- Statistik -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-line"></i> Ringkasan Data</h3>
+                    <div class="time-filter">
+                        <select>
+                            <option>Hari Ini</option>
+                            <option>Minggu Ini</option>
+                            <option>Bulan Ini</option>
+                            <option>Tahun Ini</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--viz-1) 0%, #5a76f1 100%);">
+                        <div class="value">1,248</div>
+                        <div class="label">Total Entri Data</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--viz-2) 0%, #8a2be2 100%);">
+                        <div class="value">24</div>
+                        <div class="label">Kategori Unik</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--viz-3) 0%, #6dd5ed 100%);">
+                        <div class="value">87%</div>
+                        <div class="label">Kelengkapan Data</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--viz-4) 0%, #ff6b9d 100%);">
+                        <div class="value">42</div>
+                        <div class="label">Update Terakhir</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grafik 1 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-pie"></i> Distribusi Data</h3>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download"></i> Ekspor
+                    </button>
+                </div>
+                <div class="viz-container">
+                    <div class="chart-container">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grafik 2 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> Tren Data</h3>
+                    <div class="chart-options">
+                        <select>
+                            <option>Bulanan</option>
+                            <option>Mingguan</option>
+                            <option>Harian</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="viz-container">
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabel Data -->
+            <div class="card table-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-table"></i> Data Terkini</h3>
+                    <div class="actions">
+                        <button class="btn">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="excel-table">
+                        <thead>
+                            <tr>
+                                <th width="5%">ID</th>
+                                <th width="20%">Nama</th>
+                                <th width="15%">Kategori</th>
+                                <th width="15%">Tanggal</th>
+                                <th width="15%">Nilai</th>
+                                <th width="15%">Status</th>
+                                <th width="15%">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <tr>
+                                <td>001</td>
+                                <td>Proyek Alpha</td>
+                                <td>Pengembangan</td>
+                                <td>15 Mei 2023</td>
+                                <td>87%</td>
+                                <td><span class="status-badge success">Selesai</span></td>
+                                <td class="action-cell">
+                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn"><i class="fas fa-chart-bar"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>002</td>
+                                <td>Survei Pelanggan</td>
+                                <td>Pemasaran</td>
+                                <td>22 Mei 2023</td>
+                                <td>64%</td>
+                                <td><span class="status-badge warning">Berjalan</span></td>
+                                <td class="action-cell">
+                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn"><i class="fas fa-chart-bar"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>003</td>
+                                <td>Analisis Pasar</td>
+                                <td>Riset</td>
+                                <td>10 Mei 2023</td>
+                                <td>92%</td>
+                                <td><span class="status-badge success">Selesai</span></td>
+                                <td class="action-cell">
+                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn"><i class="fas fa-chart-bar"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>004</td>
+                                <td>Pelatihan Karyawan</td>
+                                <td>SDM</td>
+                                <td>30 Mei 2023</td>
+                                <td>45%</td>
+                                <td><span class="status-badge danger">Tertunda</span></td>
+                                <td class="action-cell">
+                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn"><i class="fas fa-chart-bar"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>005</td>
+                                <td>Optimasi Server</td>
+                                <td>Teknologi</td>
+                                <td>18 Mei 2023</td>
+                                <td>78%</td>
+                                <td><span class="status-badge warning">Berjalan</span></td>
+                                <td class="action-cell">
+                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn"><i class="fas fa-chart-bar"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Info Ekspor -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-file-certificate"></i> Fitur Keamanan PDF</h3>
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="security-features">
+                    <p>Setiap ekspor PDF dilengkapi dengan:</p>
+                    <ul style="padding-left: 20px; margin-top: 10px;">
+                        <li><strong>Nomor Laporan Unik</strong> - Untuk pelacakan dan referensi</li>
+                        <li><strong>Tanda Tangan SHA-256</strong> - Memastikan integritas dokumen</li>
+                        <li><strong>Watermark Digital</strong> - Mencegah penyalahgunaan</li>
+                        <li><strong>Timestamp</strong> - Mencatat waktu ekspor secara akurat</li>
+                        <li><strong>Verifikasi Online</strong> - Memeriksa keaslian dokumen</li>
+                    </ul>
+                    
+                    <div style="margin-top: 20px; background: rgba(67, 97, 238, 0.1); padding: 15px; border-radius: 10px;">
+                        <h4>Contoh Hash SHA-256</h4>
+                        <p style="word-break: break-all; font-family: monospace; margin-top: 10px;">
+                            4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tampilkan notifikasi
+            setTimeout(() => {
+                document.getElementById('notification').classList.add('show');
+                setTimeout(() => {
+                    document.getElementById('notification').classList.remove('show');
+                }, 3000);
+            }, 1000);
+
+            // Inisialisasi chart
+            initCharts();
+            
+            // Setup event listeners
+            document.getElementById('exportPdfBtn').addEventListener('click', openPdfModal);
+            document.getElementById('closePdfModal').addEventListener('click', closePdfModal);
+            document.getElementById('exportPdf').addEventListener('click', generatePdf);
+            
+            // Generate info PDF
+            updatePdfInfo();
+        });
+
+        // Fungsi untuk inisialisasi chart
+        function initCharts() {
+            // Grafik Distribusi
+            const distCtx = document.getElementById('distributionChart').getContext('2d');
+            new Chart(distCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pengembangan', 'Pemasaran', 'Riset', 'SDM', 'Teknologi'],
+                    datasets: [{
+                        data: [30, 22, 18, 15, 15],
+                        backgroundColor: [
+                            'rgba(67, 97, 238, 0.8)',
+                            'rgba(114, 9, 183, 0.8)',
+                            'rgba(76, 201, 240, 0.8)',
+                            'rgba(247, 37, 133, 0.8)',
+                            'rgba(106, 76, 147, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.parsed}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Grafik Tren
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul'],
+                    datasets: [{
+                        label: 'Data Masuk',
+                        data: [65, 59, 80, 81, 76, 72, 85],
+                        borderColor: 'rgba(67, 97, 238, 1)',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }, {
+                        label: 'Data Diproses',
+                        data: [45, 52, 65, 70, 68, 75, 80],
+                        borderColor: 'rgba(114, 9, 183, 1)',
+                        backgroundColor: 'rgba(114, 9, 183, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Animasi card
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        // Fungsi untuk membuka modal PDF
+        function openPdfModal() {
+            document.getElementById('pdfModal').style.display = 'flex';
+            updatePdfInfo();
+        }
+
+        // Fungsi untuk menutup modal PDF
+        function closePdfModal() {
+            document.getElementById('pdfModal').style.display = 'none';
+        }
+
+        // Update informasi PDF
+        function updatePdfInfo() {
+            const now = new Date();
+            const reportNumber = `DV-${now.getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const exportDate = now.toLocaleString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZoneName: 'short'
+            });
+            
+            // Generate hash SHA-256 untuk contoh
+            const randomHash = CryptoJS.SHA256(reportNumber + exportDate + Math.random().toString()).toString();
+            
+            // Update UI
+            document.getElementById('reportNumber').textContent = reportNumber;
+            document.getElementById('exportDate').textContent = exportDate;
+            document.getElementById('pdfHash').textContent = randomHash;
+        }
+
+        // Fungsi untuk membuat PDF
+        function generatePdf() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const now = new Date();
+            const reportNumber = `DV-${now.getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const exportDate = now.toLocaleString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZoneName: 'short'
+            });
+            
+            // Data untuk hash
+            const dataForHash = reportNumber + exportDate + "DataViz Pro Export";
+            const pdfHash = CryptoJS.SHA256(dataForHash).toString();
+            
+            // Header
+            doc.setFontSize(18);
+            doc.setTextColor(40);
+            doc.text('Laporan Data Analitik', 105, 20, null, null, 'center');
+            
+            doc.setFontSize(12);
+            doc.setTextColor(100);
+            doc.text(`Nomor Laporan: ${reportNumber}`, 105, 30, null, null, 'center');
+            doc.text(`Tanggal Ekspor: ${exportDate}`, 105, 36, null, null, 'center');
+            
+            // Garis pemisah
+            doc.setDrawColor(200);
+            doc.line(20, 42, 190, 42);
+            
+            // Informasi hash
+            doc.setFontSize(10);
+            doc.setTextColor(80);
+            doc.text(`Hash SHA-256: ${pdfHash}`, 20, 50);
+            
+            // Tabel data
+            const headers = [['ID', 'Nama', 'Kategori', 'Tanggal', 'Nilai', 'Status']];
+            const data = [
+                ['001', 'Proyek Alpha', 'Pengembangan', '15 Mei 2023', '87%', 'Selesai'],
+                ['002', 'Survei Pelanggan', 'Pemasaran', '22 Mei 2023', '64%', 'Berjalan'],
+                ['003', 'Analisis Pasar', 'Riset', '10 Mei 2023', '92%', 'Selesai'],
+                ['004', 'Pelatihan Karyawan', 'SDM', '30 Mei 2023', '45%', 'Tertunda'],
+                ['005', 'Optimasi Server', 'Teknologi', '18 Mei 2023', '78%', 'Berjalan']
+            ];
+            
+            doc.autoTable({
+                startY: 55,
+                head: headers,
+                body: data,
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [67, 97, 238],
+                    textColor: 255,
+                    fontStyle: 'bold'
+                },
+                alternateRowStyles: {
+                    fillColor: [240, 240, 240]
+                }
+            });
+            
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for(let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(10);
+                doc.setTextColor(150);
+                
+                // Watermark
+                doc.setGState(new doc.GState({ opacity: 0.1 }));
+                doc.setFontSize(48);
+                doc.text('DataViz Pro', 105, 150, null, null, 'center');
+                doc.setGState(new doc.GState({ opacity: 1 }));
+                
+                // Footer text
+                doc.text(`Halaman ${i} dari ${pageCount}`, 105, 285, null, null, 'center');
+                doc.text(`Hash: ${pdfHash.substring(0, 16)}...`, 20, 285);
+            }
+            
+            // Tanda tangan
+            const lastPageY = doc.lastAutoTable.finalY || 100;
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text('Dokumen ini ditandatangani secara digital oleh:', 20, lastPageY + 20);
+            doc.text('Sistem DataViz Pro', 20, lastPageY + 26);
+            doc.text(`Hash: ${pdfHash}`, 20, lastPageY + 32);
+            
+            // Save the PDF
+            doc.save(`Laporan-${reportNumber}.pdf`);
+            
+            // Tampilkan notifikasi
+            showNotification("PDF berhasil diekspor dengan fitur keamanan", "success");
+            closePdfModal();
+        }
+
+        // Tampilkan notifikasi kustom
+        function showNotification(message, type = "success") {
+            const notification = document.getElementById("notification");
+            const notificationContent = notification.querySelector(".notification-content");
+            
+            notificationContent.querySelector("h3").textContent = 
+                type === "success" ? "Ekspor Berhasil" : 
+                type === "error" ? "Terjadi Kesalahan" : "Pemberitahuan";
+                
+            notificationContent.querySelector("p").textContent = message;
+            
+            // Update icon based on type
+            const icon = notification.querySelector("i");
+            icon.className = 
+                type === "success" ? "fas fa-check-circle" :
+                type === "error" ? "fas fa-exclamation-circle" : "fas fa-info-circle";
+            
+            notification.classList.add("show");
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove("show");
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

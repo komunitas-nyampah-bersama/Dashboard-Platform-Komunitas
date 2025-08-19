@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nyampah Sync — Master ↔ Log (HTML)</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --card: #121a2a;
+    --muted: #9bb0d1;
+    --accent: #7ee787;
+    --danger: #ff6b6b;
+    --text: #e6edf3;
+    --border: #23304a;
+  }
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    line-height: 1.5;
+  }
+  
+  h1, h2 {
+    margin: 8px 0 6px;
+  }
+  
+  .wrap {
+    max-width: 1000px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+  
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 1px 12px rgba(0,0,0,.25);
+  }
+  
+  .row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .col {
+    flex: 1 1 280px;
+    min-width: 0;
+  }
+  
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  
+  input[type=file], select, button, input[type=number] {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #2a3a59;
+    background: #0f1726;
+    color: var(--text);
+    box-sizing: border-box;
+  }
+  
+  button {
+    background: #1f2a44;
+    border-color: #33446a;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  button:hover {
+    opacity: 0.9;
+  }
+  
+  button.primary {
+    background: #1a3b2b;
+    border-color: #2a5c40;
+    color: #d6ffe6;
+  }
+  
+  button.warn {
+    background: #3c1a1a;
+    border-color: #6a3333;
+    color: #ffd6d6;
+  }
+  
+  .grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  
+  .grid th, .grid td {
+    border: 1px solid var(--border);
+    padding: 6px 8px;
+    white-space: nowrap;
+  }
+  
+  .grid th {
+    background: #16233b;
+    color: #cfe2f3;
+    position: sticky;
+    top: 0;
+  }
+  
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    border: 1px solid #2a3a59;
+    color: var(--muted);
+  }
+  
+  .ok {
+    color: var(--accent);
+  }
+  
+  .err {
+    color: var(--danger);
+  }
+  
+  .tip {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  
+  .footer {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  
+  .small {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  
+  .sep {
+    height: 1px;
+    background: #22304b;
+    margin: 12px 0;
+  }
+  
+  .title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .badge {
+    background: #12243a;
+    border: 1px solid #254a75;
+    color: #9fd1ff;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+  }
+  
+  .preview-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .preview-controls > div {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .sync-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  
+  .sync-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  
+  .theme-selector {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 100;
+  }
+  
+  .theme-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+  
+  .theme-btn.active {
+    border-color: var(--text);
+  }
+  
+  @media (max-width: 768px) {
+    .col {
+      flex: 1 1 100%;
+    }
+    
+    .title {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .theme-selector {
+      bottom: 10px;
+      right: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">
+    <h1>Nyampah Sync <span class="small">— Master ↔ Log (HTML)</span></h1>
+    <span class="badge">Client‑side • No server</span>
+  </div>
+  <div class="card">
+    <h2>1) Unggah data</h2>
+    <div class="row">
+      <div class="col">
+        <label>File <b>Master</b> (.xlsx / .csv)</label>
+        <input type="file" id="fileMaster" accept=".xlsx,.xls,.csv">
+      </div>
+      <div class="col">
+        <label>File <b>Log Aktivitas</b> (.xlsx / .csv)</label>
+        <input type="file" id="fileLog" accept=".xlsx,.xls,.csv">
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="row">
+      <div class="col"><label>Peta kolom <b>Master</b> — NIM</label><select id="mNIM"></select></div>
+      <div class="col"><label>Peta kolom <b>Master</b> — NIK</label><select id="mNIK"></select></div>
+      <div class="col"><label>Peta kolom <b>Master</b> — Email</label><select id="mEmail"></select></div>
+      <div class="col"><label>Peta kolom <b>Master</b> — No. WA</label><select id="mWA"></select></div>
+      <div class="col"><label>Peta kolom <b>Master</b> — Nama</label><select id="mNama"></select></div>
+      <div class="col"><label>Peta kolom <b>Master</b> — Tgl Lahir</label><select id="mTTL"></select></div>
+      <div class="col"><label>Peta kolom <b>Master</b> — Alamat</label><select id="mAlamat"></select></div>
+      <div class="col"><label>Peta kolom <b>Master</b> — STATUS DIKTI</label><select id="mStatus"></select></div>
+      <div class="col"><label>Peta kolom <b>Master</b> — Total Pembayaran</label><select id="mBayar"></select></div>
+    </div>
+    <div class="sep"></div>
+    <div class="row">
+      <div class="col"><label>Peta kolom <b>Log</b> — NIM</label><select id="lNIM"></select></div>
+      <div class="col"><label>Peta kolom <b>Log</b> — NIK</label><select id="lNIK"></select></div>
+      <div class="col"><label>Peta kolom <b>Log</b> — Email</label><select id="lEmail"></select></div>
+      <div class="col"><label>Peta kolom <b>Log</b> — No. WA</label><select id="lWA"></select></div>
+      <div class="col"><label>Peta kolom <b>Log</b> — Nama</label><select id="lNama"></select></div>
+      <div class="col"><label>Peta kolom <b>Log</b> — Tgl Lahir</label><select id="lTTL"></select></div>
+      <div class="col"><label>Peta kolom <b>Log</b> — Alamat</label><select id="lAlamat"></select></div>
+      <div class="col"><label>Peta kolom <b>Log</b> — STATUS DIKTI</label><select id="lStatus"></select></div>
+      <div class="col"><label>Peta kolom <b>Log</b> — Total Pembayaran</label><select id="lBayar"></select></div>
+    </div>
+    <div class="sep"></div>
+    <div class="row">
+      <div class="col"><button class="primary" id="btnPreview">Preview sinkron</button></div>
+      <div class="col"><button id="btnSyncView">Download SYNC_VIEW.xlsx</button></div>
+      <div class="col"><button class="warn" id="btnMasterUpdate">Download Master_Updated.xlsx (isi yang kosong)</button></div>
+    </div>
+    <div class="footer">Kunci prioritas: <span class="pill">NIM</span> → <span class="pill">NIK</span> → <span class="pill">Email_norm</span> → <span class="pill">WA_norm</span>. Normalisasi otomatis.</div>
+  </div>
+
+  <div class="card">
+    <h2>2) Preview hasil</h2>
+    <div class="preview-controls">
+      <div>
+        <label>Jumlah baris preview</label>
+        <input type="number" id="previewRows" min="1" max="1000" value="50">
+      </div>
+      <div>
+        <label>Kolom yang ditampilkan</label>
+        <select id="previewColumns" multiple style="height: 42px;">
+          <option value="all" selected>Semua kolom</option>
+          <option value="NIM">NIM</option>
+          <option value="NIK">NIK</option>
+          <option value="Email">Email</option>
+          <option value="WA_final">No. WA</option>
+          <option value="Nama">Nama</option>
+          <option value="TTL_final">Tgl Lahir</option>
+          <option value="Alamat_final">Alamat</option>
+          <option value="STATUS_final">STATUS DIKTI</option>
+          <option value="Pembayaran_final">Pembayaran</option>
+        </select>
+      </div>
+    </div>
+    <div class="sync-options">
+      <div class="sync-option">
+        <input type="checkbox" id="syncAddress" checked>
+        <label for="syncAddress">Sinkronkan Alamat</label>
+      </div>
+      <div class="sync-option">
+        <input type="checkbox" id="syncWA" checked>
+        <label for="syncWA">Sinkronkan No. WA</label>
+      </div>
+      <div class="sync-option">
+        <input type="checkbox" id="syncTTL" checked>
+        <label for="syncTTL">Sinkronkan Tgl Lahir</label>
+      </div>
+      <div class="sync-option">
+        <input type="checkbox" id="syncStatus" checked>
+        <label for="syncStatus">Sinkronkan Status</label>
+      </div>
+      <div class="sync-option">
+        <input type="checkbox" id="syncPayment" checked>
+        <label for="syncPayment">Sinkronkan Pembayaran</label>
+      </div>
+    </div>
+    <div id="preview" class="tip">Belum ada data. Unggah file & mapping kolom dulu, lalu klik <b>Preview sinkron</b>.</div>
+  </div>
+
+  <div class="footer">© Nyampah Bersama • HTML alat bantu sinkron data — bekerja sepenuhnya di browser kamu.</div>
+</div>
+
+<div class="theme-selector">
+  <div class="theme-btn active" style="background: #0b1220;" data-theme="dark"></div>
+  <div class="theme-btn" style="background: #f8f9fa;" data-theme="light"></div>
+  <div class="theme-btn" style="background: #1a1a2e;" data-theme="purple"></div>
+  <div class="theme-btn" style="background: #0d1b1e;" data-theme="green"></div>
+</div>
+
+<!-- SheetJS & FileSaver (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+<script>
+// Helpers
+const byId = id => document.getElementById(id);
+let master = [], log = [], mHeaders = [], lHeaders = [];
+const STORAGE_KEY = 'nyampahsync_data';
+
+// Theme management
+function setTheme(theme) {
+  const root = document.documentElement;
+  const themes = {
+    dark: {
+      bg: '#0b1220',
+      card: '#121a2a',
+      muted: '#9bb0d1',
+      accent: '#7ee787',
+      danger: '#ff6b6b',
+      text: '#e6edf3',
+      border: '#23304a'
+    },
+    light: {
+      bg: '#f8f9fa',
+      card: '#ffffff',
+      muted: '#6c757d',
+      accent: '#28a745',
+      danger: '#dc3545',
+      text: '#212529',
+      border: '#dee2e6'
+    },
+    purple: {
+      bg: '#1a1a2e',
+      card: '#16213e',
+      muted: '#a8b2d1',
+      accent: '#e94560',
+      danger: '#ff6b6b',
+      text: '#f1f1f1',
+      border: '#0f3460'
+    },
+    green: {
+      bg: '#0d1b1e',
+      card: '#1b263b',
+      muted: '#a8dadc',
+      accent: '#2a9d8f',
+      danger: '#e76f51',
+      text: '#f1faee',
+      border: '#415a77'
+    }
+  };
+  
+  const colors = themes[theme] || themes.dark;
+  Object.entries(colors).forEach(([key, value]) => {
+    root.style.setProperty(`--${key}`, value);
+  });
+  
+  // Update active theme button
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === theme);
+  });
+  
+  // Save theme preference
+  localStorage.setItem('nyampahsync_theme', theme);
+}
+
+// Load saved theme
+const savedTheme = localStorage.getItem('nyampahsync_theme') || 'dark';
+setTheme(savedTheme);
+
+// Theme selector event
+document.querySelectorAll('.theme-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    setTheme(btn.dataset.theme);
+  });
+});
+
+// Load saved data from localStorage
+function loadFromStorage() {
+  const savedData = localStorage.getItem(STORAGE_KEY);
+  if (savedData) {
+    try {
+      const data = JSON.parse(savedData);
+      if (data.master) {
+        master = data.master.data;
+        mHeaders = data.master.headers;
+        ['mNIM','mNIK','mEmail','mWA','mNama','mTTL','mAlamat','mStatus','mBayar'].forEach(id => {
+          optionize(byId(id), mHeaders);
+          if (data.master.mapping[id.slice(1)]) {
+            byId(id).value = data.master.mapping[id.slice(1)];
+          }
+        });
+      }
+      if (data.log) {
+        log = data.log.data;
+        lHeaders = data.log.headers;
+        ['lNIM','lNIK','lEmail','lWA','lNama','lTTL','lAlamat','lStatus','lBayar'].forEach(id => {
+          optionize(byId(id), lHeaders);
+          if (data.log.mapping[id.slice(1)]) {
+            byId(id).value = data.log.mapping[id.slice(1)];
+          }
+        });
+      }
+    } catch (e) {
+      console.error('Failed to load saved data:', e);
+    }
+  }
+}
+
+// Save data to localStorage
+function saveToStorage() {
+  const data = {
+    master: {
+      data: master,
+      headers: mHeaders,
+      mapping: mapFromUI('m')
+    },
+    log: {
+      data: log,
+      headers: lHeaders,
+      mapping: mapFromUI('l')
+    }
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function optionize(select, headers) {
+  select.innerHTML = '<option value="">— pilih —</option>' + headers.map(h => `<option>${h}</option>`).join('');
+}
+
+function loadFile(file, cb, type) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = new Uint8Array(e.target.result);
+    const wb = XLSX.read(data, {type: 'array'});
+    // ambil sheet pertama
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(ws, {defval: ""});
+    cb(json);
+    
+    // Save file reference for localStorage
+    if (type === 'master') {
+      master = json;
+      mHeaders = [...new Set(Object.keys(json[0] || {}))];
+    } else if (type === 'log') {
+      log = json;
+      lHeaders = [...new Set(Object.keys(json[0] || {}))];
+    }
+    
+    saveToStorage();
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function normEmail(v) {
+  return String(v || '').trim().toLowerCase();
+}
+
+function onlyDigits(s) {
+  return String(s || '').replace(/[^\d+]/g, '');
+}
+
+function normWA(v) {
+  let x = onlyDigits(v).trim();
+  if (x.startsWith('+62')) return '0' + x.slice(3);
+  if (x.startsWith('62')) return '0' + x.slice(2);
+  if (x.startsWith('8')) return '0' + x;
+  return x;
+}
+
+function makeKey(row, map) {
+  const NIM = row[map.NIM] || '';
+  const NIK = row[map.NIK] || '';
+  const EM = normEmail(row[map.Email]);
+  const WA = normWA(row[map.WA]);
+  if (NIM) return 'NIM:' + NIM;
+  if (NIK) return 'NIK:' + NIK;
+  if (EM) return 'EM:' + EM;
+  if (WA) return 'WA:' + WA;
+  return '';
+}
+
+function mapFromUI(prefix) {
+  return {
+    NIM: byId(prefix + 'NIM').value,
+    NIK: byId(prefix + 'NIK').value,
+    Email: byId(prefix + 'Email').value,
+    WA: byId(prefix + 'WA').value,
+    Nama: byId(prefix + 'Nama').value,
+    TTL: byId(prefix + 'TTL').value,
+    Alamat: byId(prefix + 'Alamat').value,
+    Status: byId(prefix + 'Status').value,
+    Bayar: byId(prefix + 'Bayar').value,
+  };
+}
+
+function indexByKey(arr, map) {
+  const m = new Map();
+  for (const row of arr) {
+    const key = makeKey(row, map);
+    if (!key) continue;
+    m.set(key, row); // terakhir menang (anggap yang terbaru)
+  }
+  return m;
+}
+
+function fillOnly(masterRow, mMap, logRow, lMap) {
+  const out = {...masterRow};
+  // kolom target
+  const targets = [
+    ['Alamat', mMap.Alamat, lMap.Alamat, byId('syncAddress').checked],
+    ['NoWA', mMap.WA, lMap.WA, byId('syncWA').checked],
+    ['TTL', mMap.TTL, lMap.TTL, byId('syncTTL').checked],
+    ['Status', mMap.Status, lMap.Status, byId('syncStatus').checked],
+    ['Bayar', mMap.Bayar, lMap.Bayar, byId('syncPayment').checked],
+  ];
+  
+  for (const [label, mCol, lCol, shouldSync] of targets) {
+    if (!mCol || !lCol || !shouldSync) continue;
+    const cur = out[mCol];
+    if (String(cur || '').trim() !== '') continue; // hanya isi kalau kosong
+    out[mCol] = logRow[lCol] || cur;
+  }
+  return out;
+}
+
+function buildSyncView(masterRow, mMap, logRow, lMap) {
+  // final = pakai master jika ada, kalau kosong ambil dari log
+  function finalOf(mCol, lCol, normalizeWA = false, include = true) {
+    if (!include) return '';
+    const mVal = masterRow[mCol] ?? '';
+    if (String(mVal || '').trim() !== '') return normalizeWA ? normWA(mVal) : mVal;
+    const lVal = logRow ? (logRow[lCol] ?? '') : '';
+    return normalizeWA ? normWA(lVal) : lVal;
+  }
+  
+  const syncOptions = {
+    WA: byId('syncWA').checked,
+    TTL: byId('syncTTL').checked,
+    Alamat: byId('syncAddress').checked,
+    Status: byId('syncStatus').checked,
+    Bayar: byId('syncPayment').checked
+  };
+  
+  return {
+    NIM: masterRow[mMap.NIM] ?? '',
+    NIK: masterRow[mMap.NIK] ?? '',
+    Email: masterRow[mMap.Email] ?? '',
+    WA_final: finalOf(mMap.WA, lMap.WA, true, syncOptions.WA),
+    Nama: masterRow[mMap.Nama] ?? '',
+    TTL_final: finalOf(mMap.TTL, lMap.TTL, false, syncOptions.TTL),
+    Alamat_final: finalOf(mMap.Alamat, lMap.Alamat, false, syncOptions.Alamat),
+    STATUS_final: finalOf(mMap.Status, lMap.Status, false, syncOptions.Status),
+    Pembayaran_final: finalOf(mMap.Bayar, lMap.Bayar, false, syncOptions.Bayar),
+    KEY: makeKey(masterRow, mMap),
+  };
+}
+
+function renderPreview(rows) {
+  const wrap = byId('preview');
+  if (!rows.length) {
+    wrap.innerHTML = '<div class="tip">Tidak ada data.</div>';
+    return;
+  }
+  
+  const rowLimit = parseInt(byId('previewRows').value) || 50;
+  const selectedColumns = Array.from(byId('previewColumns').selectedOptions).map(opt => opt.value);
+  const showAllColumns = selectedColumns.includes('all');
+  
+  // Filter columns to display
+  let displayRows = rows;
+  if (!showAllColumns && selectedColumns.length > 0) {
+    displayRows = rows.map(row => {
+      const filtered = {};
+      selectedColumns.forEach(col => {
+        if (row.hasOwnProperty(col)) {
+          filtered[col] = row[col];
+        }
+      });
+      return filtered;
+    });
+  }
+  
+  const headers = Object.keys(displayRows[0]);
+  let html = `
+    <div class="small">Menampilkan ${Math.min(rowLimit, displayRows.length)} baris pertama:</div>
+    <div style="max-height:70vh;overflow:auto;margin-top:8px">
+      <table class="grid">
+        <thead><tr>`;
+  
+  for (const h of headers) html += `<th>${h}</th>`;
+  html += `</tr></thead><tbody>`;
+  
+  for (const r of displayRows.slice(0, rowLimit)) {
+    html += '<tr>';
+    for (const h of headers) html += `<td>${String(r[h] || '')}</td>`;
+    html += '</tr>';
+  }
+  
+  html += '</tbody></table></div>';
+  html += `<div class="small" style="margin-top:8px">Total baris: ${displayRows.length}</div>`;
+  wrap.innerHTML = html;
+}
+
+function toSheetAndDownload(json, filename) {
+  const ws = XLSX.utils.json_to_sheet(json);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Data');
+  const out = XLSX.write(wb, {bookType: 'xlsx', type: 'array'});
+  saveAs(new Blob([out], {type: "application/octet-stream"}), filename);
+}
+
+// Event wires
+byId('fileMaster').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  loadFile(f, rows => {
+    master = rows;
+    mHeaders = [...new Set(Object.keys(rows[0] || {}))];
+    ['mNIM','mNIK','mEmail','mWA','mNama','mTTL','mAlamat','mStatus','mBayar'].forEach(id => optionize(byId(id), mHeaders));
+    saveToStorage();
+  }, 'master');
+});
+
+byId('fileLog').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  loadFile(f, rows => {
+    log = rows;
+    lHeaders = [...new Set(Object.keys(rows[0] || {}))];
+    ['lNIM','lNIK','lEmail','lWA','lNama','lTTL','lAlamat','lStatus','lBayar'].forEach(id => optionize(byId(id), lHeaders));
+    saveToStorage();
+  }, 'log');
+});
+
+// Add change listeners to all select elements to save mapping
+document.querySelectorAll('select[id^="m"], select[id^="l"]').forEach(select => {
+  select.addEventListener('change', saveToStorage);
+});
+
+byId('btnPreview').addEventListener('click', () => {
+  if (!master.length) {
+    alert('Unggah file Master dulu.');
+    return;
+  }
+  const mMap = mapFromUI('m');
+  const lMap = mapFromUI('l');
+  const lIndex = indexByKey(log, lMap);
+  const rows = [];
+  
+  for (const mr of master) {
+    const key = makeKey(mr, mMap);
+    const lr = lIndex.get(key);
+    rows.push(buildSyncView(mr, mMap, lr, lMap));
+  }
+  
+  renderPreview(rows);
+});
+
+byId('btnSyncView').addEventListener('click', () => {
+  if (!master.length) {
+    alert('Unggah file Master dulu.');
+    return;
+  }
+  const mMap = mapFromUI('m');
+  const lMap = mapFromUI('l');
+  const lIndex = indexByKey(log, lMap);
+  const out = master.map(mr => buildSyncView(mr, mMap, lIndex.get(makeKey(mr, mMap)), lMap));
+  toSheetAndDownload(out, 'SYNC_VIEW.xlsx');
+});
+
+byId('btnMasterUpdate').addEventListener('click', () => {
+  if (!master.length) {
+    alert('Unggah file Master dulu.');
+    return;
+  }
+  const mMap = mapFromUI('m');
+  const lMap = mapFromUI('l');
+  const lIndex = indexByKey(log, lMap);
+  const updated = master.map(mr => {
+    const key = makeKey(mr, mMap);
+    const lr = lIndex.get(key);
+    return lr ? fillOnly(mr, mMap, lr, lMap) : mr;
+  });
+  toSheetAndDownload(updated, 'Master_Updated.xlsx');
+});
+
+// Load saved data when page loads
+document.addEventListener('DOMContentLoaded', loadFromStorage);
+</script>
+</body>
+</html>

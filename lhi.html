@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>💚 Dompet Warga - NyampahChain</title>
+  <style>
+    body { font-family: sans-serif; background: #eef5ea; padding: 2em; color: #333; }
+    .box { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px #0001; }
+    input, select, button, textarea { width: 100%; margin: 8px 0; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+    button { background: #43a047; color: white; font-weight: bold; border: none; cursor: pointer; }
+    button:hover { opacity: 0.9; }
+    h2, h3 { margin-top: 1.2em; }
+    .nft { background: #fafafa; padding: 10px; border-radius: 10px; margin: 10px 0; display: flex; align-items: center; }
+    .nft img { margin-right: 15px; border-radius: 8px; }
+    small { color: gray; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>👛 Dompet Warga Digital</h2>
+
+    <div id="profilForm">
+      <input id="nama" placeholder="Nama Lengkap" />
+      <input id="kontak" placeholder="Email / No. HP" />
+      <input id="lokasi" placeholder="Lokasi / Desa" />
+      <button onclick="simpanProfil()">💾 Simpan Profil</button>
+    </div>
+
+    <div id="dompet" style="display:none">
+      <h3>Halo, <span id="namaTampil"></span>!</h3>
+      <p><strong>Wallet Address:</strong><br><code id="wallet"></code></p>
+      <p><strong>Lokasi:</strong> <span id="lokasiTampil"></span></p>
+      <p><strong>Saldo Token:</strong> <span id="saldo">0</span> NBcoin</p>
+
+      <hr />
+      <h3>🗑️ Setor Sampah & Dapatkan NFT</h3>
+      <select id="layananPilih" onchange="updateLayananInfo()">
+        <option value="">Pilih Layanan</option>
+      </select>
+      <p id="biayaLayananInfo" style="font-size: small; color: #555;"></p>
+
+      <select id="subKategoriSampah">
+        <option value="">Pilih Jenis Sampah</option>
+      </select>
+      <input id="berat" placeholder="Berat Sampah (kg)" type="number" min="0" step="0.1" />
+      <button onclick="mintNFT()">🚀 Simulasi Reward</button>
+
+      <h3>🎁 Koleksi NFT</h3>
+      <div id="koleksi"></div>
+
+      <h3>📜 Riwayat Aktivitas</h3>
+      <table id="logAktivitasTable">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>ID Sumber</th>
+            <th>ID Tujuan</th>
+            <th>Jumlah</th>
+            <th>Harga</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          </tbody>
+      </table>
+
+      <button onclick="resetDompet()" style="margin-top: 20px;">🧹 Reset Dompet</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Master Data ---
+    const dataAktivitas = [
+      { ID_Data: "SMP", Nama_Data: "Sampah", Deskripsi: "Data transaksi sampah", Format_ID: "SMP-001" },
+      { ID_Data: "PROD", Nama_Data: "Produk", Deskripsi: "Produk hasil pengolahan sampah", Format_ID: "PROD-001" },
+      { ID_Data: "LYN", Nama_Data: "Layanan", Deskripsi: "Data layanan sampah", Format_ID: "LYN-001" },
+      { ID_Data: "LOG", Nama_Data: "Log Aktivitas", Deskripsi: "Riwayat aktivitas sampah hingga produk", Format_ID: "LOG-001" },
+      { ID_Data: "WLZ", Nama_Data: "Wilayah", Deskripsi: "Data wilayah Zero Waste", Format_ID: "WLZ-001" },
+      { ID_Data: "PRG", Nama_Data: "Program", Deskripsi: "Program edukasi, monitoring, penghargaan", Format_ID: "PRG-001" },
+      { ID_Data: "RWD", Nama_Data: "Reward", Deskripsi: "Reward coin, poin, voucher", Format_ID: "RWD-001" },
+    ];
+
+    const dataSubKategoriSampah = [
+      { ID_Subkategori: "SUB-001", Kategori_Utama: "Organik", Nama_Subkategori: "Sisa Makanan", Coin_per_Kg: 134, Level_Disiplin: 1, Coin_per_Level: 56 },
+      { ID_Subkategori: "SUB-002", Kategori_Utama: "Organik", Nama_Subkategori: "Sayuran", Coin_per_Kg: 57, Level_Disiplin: 2, Coin_per_Level: 65 },
+      { ID_Subkategori: "SUB-003", Kategori_Utama: "Organik", Nama_Subkategori: "Buah-Buahan", Coin_per_Kg: 76, Level_Disiplin: 3, Coin_per_Level: 38 },
+      { ID_Subkategori: "SUB-004", Kategori_Utama: "Organik", Nama_Subkategori: "Kulit Telur", Coin_per_Kg: 78, Level_Disiplin: 1, Coin_per_Level: 70 },
+      { ID_Subkategori: "SUB-005", Kategori_Utama: "Organik", Nama_Subkategori: "Dedaunan", Coin_per_Kg: 60, Level_Disiplin: 3, Coin_per_Level: 46 },
+      { ID_Subkategori: "SUB-006", Kategori_Utama: "Organik", Nama_Subkategori: "Cangkang Buah", Coin_per_Kg: 89, Level_Disiplin: 3, Coin_per_Level: 20 },
+      { ID_Subkategori: "SUB-007", Kategori_Utama: "Organik", Nama_Subkategori: "Ampas Kopi", Coin_per_Kg: 150, Level_Disiplin: 3, Coin_per_Level: 60 },
+    ];
+
+    const dataLayanan = [
+      { ID_Layanan: "LYN-001", Nama_Layanan: "Jemput Sampah", Coin_per_Kg: 10, Biaya_Layanan: 5000 },
+      { ID_Layanan: "LYN-002", Nama_Layanan: "Setor Mandiri", Coin_per_Kg: 0, Biaya_Layanan: 0 },
+      { ID_Layanan: "LYN-003", Nama_Layanan: "Edukasi Pilah", Coin_per_Kg: 0, Biaya_Layanan: 0 },
+    ];
+
+    // --- Fungsi Utama ---
+    function hashString(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+      }
+      return "0x" + Math.abs(hash).toString(16);
+    }
+
+    function simpanProfil() {
+      const nama = document.getElementById("nama").value.trim();
+      const kontak = document.getElementById("kontak").value.trim();
+      const lokasi = document.getElementById("lokasi").value.trim();
+      if (!nama || !kontak || !lokasi) {
+        alert("Semua field wajib diisi!");
+        return;
+      }
+
+      const wallet = hashString(nama + kontak + Date.now()); // Add timestamp for more uniqueness
+      const profil = { nama, kontak, lokasi, wallet, saldo: 0, nft: [], log: [] };
+      localStorage.setItem("dompetWarga", JSON.stringify(profil));
+      loadDompet();
+    }
+
+    function loadDompet() {
+      const data = JSON.parse(localStorage.getItem("dompetWarga"));
+      if (!data) return;
+
+      document.getElementById("profilForm").style.display = "none";
+      document.getElementById("dompet").style.display = "block";
+      document.getElementById("namaTampil").innerText = data.nama;
+      document.getElementById("lokasiTampil").innerText = data.lokasi;
+      document.getElementById("wallet").innerText = data.wallet;
+      document.getElementById("saldo").innerText = data.saldo;
+
+      // Populate Sub Kategori Sampah dropdown
+      const subKategoriSelect = document.getElementById("subKategoriSampah");
+      subKategoriSelect.innerHTML = '<option value="">Pilih Jenis Sampah</option>'; // Reset
+      dataSubKategoriSampah.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item.ID_Subkategori;
+        option.textContent = item.Nama_Subkategori + ' (' + item.Kategori_Utama + ')';
+        subKategoriSelect.appendChild(option);
+      });
+
+      // Populate Layanan dropdown
+      const layananSelect = document.getElementById("layananPilih");
+      layananSelect.innerHTML = '<option value="">Pilih Layanan</option>'; // Reset
+      dataLayanan.forEach(layanan => {
+        const option = document.createElement("option");
+        option.value = layanan.ID_Layanan;
+        option.textContent = layanan.Nama_Layanan;
+        layananSelect.appendChild(option);
+      });
+
+      renderNFTKoleksi(data.nft);
+      renderLogAktivitas(data.log);
+    }
+
+    function updateLayananInfo() {
+      const layananId = document.getElementById("layananPilih").value;
+      const layananInfo = document.getElementById("biayaLayananInfo");
+      const selectedLayanan = dataLayanan.find(l => l.ID_Layanan === layananId);
+
+      if (selectedLayanan && selectedLayanan.Biaya_Layanan > 0) {
+        layananInfo.innerText = `Biaya Layanan: Rp${selectedLayanan.Biaya_Layanan.toLocaleString('id-ID')}`;
+      } else {
+        layananInfo.innerText = '';
+      }
+    }
+
+    function mintNFT() {
+      const berat = parseFloat(document.getElementById("berat").value);
+      const subKategoriId = document.getElementById("subKategoriSampah").value;
+      const layananId = document.getElementById("layananPilih").value;
+
+      if (!layananId) {
+        alert("Mohon pilih layanan terlebih dahulu!");
+        return;
+      }
+      if (!subKategoriId) {
+        alert("Mohon pilih jenis sampah terlebih dahulu!");
+        return;
+      }
+      if (isNaN(berat) || berat <= 0) {
+        alert("Berat harus diisi dan lebih dari 0!");
+        return;
+      }
+
+      const data = JSON.parse(localStorage.getItem("dompetWarga"));
+      const selectedSubKategori = dataSubKategoriSampah.find(s => s.ID_Subkategori === subKategoriId);
+      const selectedLayanan = dataLayanan.find(l => l.ID_Layanan === layananId);
+
+      if (!selectedSubKategori || !selectedLayanan) {
+        alert("Terjadi kesalahan, data kategori atau layanan tidak ditemukan.");
+        return;
+      }
+
+      let totalToken = (berat * selectedSubKategori.Coin_per_Kg) + (selectedSubKategori.Level_Disiplin * selectedSubKategori.Coin_per_Level);
+      
+      // Deduct token based on service fee (convert IDR to NBcoin, assume 1 NBcoin = 10 IDR for this simulation)
+      if (selectedLayanan.Biaya_Layanan > 0) {
+        totalToken -= selectedLayanan.Biaya_Layanan / 10; // Example conversion
+        if (totalToken < 0) totalToken = 0; // Ensure token doesn't go negative
+      }
+      
+      const image = `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/300/200`; // Random image
+      const namaNFT = `NFT Sampah #${data.nft.length + 1} (${selectedSubKategori.Nama_Subkategori})`;
+
+      data.saldo += Math.floor(totalToken);
+      data.nft.push({
+        nama: namaNFT,
+        kategori: selectedSubKategori.Kategori_Utama,
+        subKategori: selectedSubKategori.Nama_Subkategori,
+        berat: berat,
+        token: Math.floor(totalToken),
+        image: image,
+        timestamp: new Date().toLocaleString()
+      });
+
+      // Log Aktivitas
+      const idSumber = selectedLayanan.ID_Layanan; // Example source ID
+      const idTujuan = dataAktivitas.find(d => d.Nama_Data === "Sampah").Format_ID; // Example target ID
+      const jumlah = berat;
+      const harga = selectedSubKategori.Coin_per_Kg; // Price per kg as activity log "harga"
+      const status = "Reward Diberikan";
+
+      data.log.unshift({
+        Tanggal: new Date().toLocaleString(),
+        ID_Sumber: idSumber,
+        ID_Tujuan: idTujuan,
+        Jumlah: jumlah,
+        Harga: harga,
+        Status: status
+      });
+
+      localStorage.setItem("dompetWarga", JSON.stringify(data));
+      loadDompet(); // Reload UI
+    }
+
+    function renderNFTKoleksi(nfts) {
+      let koleksiDiv = document.getElementById("koleksi");
+      koleksiDiv.innerHTML = "";
+      if (nfts.length === 0) {
+        koleksiDiv.innerHTML = "<p>Belum ada NFT yang terkumpul.</p>";
+        return;
+      }
+      nfts.forEach(n => {
+        koleksiDiv.innerHTML += `
+          <div class="nft">
+            <img src="${n.image}" width="100" height="70" style="object-fit: cover;" />
+            <div>
+              <p><strong>${n.nama}</strong></p>
+              <small>${n.kategori} - ${n.subKategori}, ${n.berat}kg</small><br>
+              <small>Reward: ${n.token} NBcoin</small><br>
+              <small>Minted: ${n.timestamp}</small>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderLogAktivitas(logs) {
+      const logTableBody = document.getElementById("logAktivitasTable").getElementsByTagName("tbody")[0];
+      logTableBody.innerHTML = ""; // Clear existing rows
+
+      if (logs.length === 0) {
+        const row = logTableBody.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 6;
+        cell.innerText = "Belum ada riwayat aktivitas.";
+        cell.style.textAlign = "center";
+        return;
+      }
+
+      logs.forEach(log => {
+        const row = logTableBody.insertRow();
+        row.insertCell().innerText = log.Tanggal;
+        row.insertCell().innerText = log.ID_Sumber;
+        row.insertCell().innerText = log.ID_Tujuan;
+        row.insertCell().innerText = log.Jumlah;
+        row.insertCell().innerText = log.Harga;
+        row.insertCell().innerText = log.Status;
+      });
+    }
+
+    function resetDompet() {
+      if (confirm("Yakin reset semua data dompet? Aksi ini tidak bisa dibatalkan!")) {
+        localStorage.removeItem("dompetWarga");
+        location.reload();
+      }
+    }
+
+    window.onload = loadDompet;
+  </script>
+</body>
+</html>

@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CertiCard Pro - Pembuat Sertifikat & ID Card</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --danger: #e63946;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 25px 0;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+        }
+
+        .sidebar-header {
+            padding: 0 25px 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .nav-links {
+            padding: 0 25px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h2 {
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title p {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn i {
+            font-size: 0.9rem;
+        }
+
+        .btn.btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn.btn-outline:hover {
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+            padding-bottom: 15px;
+        }
+
+        .card-header h3 {
+            font-size: 1.4rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header h3 i {
+            width: 36px;
+            height: 36px;
+            background: rgba(114, 9, 183, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+        }
+
+        /* Form Styles */
+        .form-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        /* Preview Area */
+        .preview-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .preview-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .preview-header {
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+
+        /* Certificate Design */
+        .certificate {
+            width: 100%;
+            max-width: 800px;
+            background: linear-gradient(135deg, #f9f3e9 0%, #fffbf0 100%);
+            border: 20px solid var(--gold);
+            border-image: repeating-linear-gradient(45deg, var(--gold), #e6c200 10px) 20;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .certificate::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 2px solid rgba(0,0,0,0.1);
+            pointer-events: none;
+        }
+
+        .certificate-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .certificate-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #8B4513;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .certificate-subtitle {
+            font-size: 1.2rem;
+            color: #5D4037;
+        }
+
+        .certificate-body {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .certificate-text {
+            font-size: 1.8rem;
+            margin: 20px 0;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .recipient-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin: 30px 0;
+            text-transform: uppercase;
+            border-bottom: 3px solid var(--gold);
+            display: inline-block;
+            padding-bottom: 15px;
+        }
+
+        .certificate-details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+        }
+
+        .certificate-signature {
+            text-align: center;
+            width: 40%;
+        }
+
+        .signature-line {
+            border-top: 2px solid #333;
+            width: 80%;
+            margin: 0 auto 10px;
+            padding-top: 10px;
+        }
+
+        .certificate-seal {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff 0%, #f0f0f0 100%);
+            border: 5px double var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #8B4513;
+            text-align: center;
+            padding: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* ID Card Design */
+        .id-card {
+            width: 100%;
+            max-width: 400px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #d1e0ff 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        .id-header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .id-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .id-organization {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .id-body {
+            padding: 25px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .id-photo {
+            width: 120px;
+            height: 150px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .id-photo img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .id-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .id-field {
+            display: flex;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 5px;
+        }
+
+        .id-label {
+            width: 100px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .id-value {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .id-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin: 10px 0 5px;
+        }
+
+        .id-position {
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .id-footer {
+            background: #f0f0f0;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .id-qr {
+            width: 80px;
+            height: 80px;
+            background: white;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .id-number {
+            font-family: monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .id-validity {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                max-width: 100%;
+            }
+            
+            .form-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .preview-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .certificate {
+                padding: 20px;
+                border-width: 15px;
+            }
+            
+            .certificate-title {
+                font-size: 1.8rem;
+            }
+            
+            .recipient-name {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>CertiCard Pro</h1>
+                        <p>Pembuat Sertifikat & ID Card</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="nav-links">
+                <div class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-certificate"></i>
+                    <span>Pembuat Sertifikat</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-address-card"></i>
+                    <span>Pembuat ID Card</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <span>Riwayat Pembuatan</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Pengaturan</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-download"></i>
+                    <span>Ekspor Data</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header>
+                <div class="header-title">
+                    <h2><i class="fas fa-id-card"></i> CertiCard Pro</h2>
+                    <p>Sistem Profesional Pembuat Sertifikat dan ID Card</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn">
+                        <i class="fas fa-plus"></i> Baru
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-save"></i> Simpan Template
+                    </button>
+                </div>
+            </header>
+
+            <!-- Form Input -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-edit"></i> Data Sertifikat & ID Card</h3>
+                    <div class="actions">
+                        <button class="btn btn-outline">
+                            <i class="fas fa-random"></i> Acak Data Contoh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-container">
+                    <!-- Form Sertifikat -->
+                    <div class="form-section">
+                        <h4>Data Sertifikat</h4>
+                        <div class="form-group">
+                            <label for="cert-title">Judul Sertifikat</label>
+                            <input type="text" id="cert-title" value="Sertifikat Penghargaan">
+                        </div>
+                        <div class="form-group">
+                            <label for="cert-subtitle">Subjudul</label>
+                            <input type="text" id="cert-subtitle" value="Diberikan kepada">
+                        </div>
+                        <div class="form-group">
+                            <label for="recipient-name">Nama Penerima</label>
+                            <input type="text" id="recipient-name" value="Budi Santoso">
+                        </div>
+                        <div class="form-group">
+                            <label for="cert-description">Deskripsi</label>
+                            <textarea id="cert-description" rows="3">Atas dedikasi dan prestasi luar biasa dalam pengembangan teknologi dan inovasi selama tahun 2023</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="cert-date">Tanggal</label>
+                            <input type="date" id="cert-date" value="2023-12-15">
+                        </div>
+                        <div class="form-group">
+                            <label for="cert-signer">Penandatangan</label>
+                            <input type="text" id="cert-signer" value="Dr. Ahmad Riyadi, M.Kom">
+                        </div>
+                        <div class="form-group">
+                            <label for="cert-position">Jabatan Penandatangan</label>
+                            <input type="text" id="cert-position" value="Direktur Utama">
+                        </div>
+                    </div>
+                    
+                    <!-- Form ID Card -->
+                    <div class="form-section">
+                        <h4>Data ID Card</h4>
+                        <div class="form-group">
+                            <label for="id-name">Nama Lengkap</label>
+                            <input type="text" id="id-name" value="Budi Santoso">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-position">Jabatan</label>
+                            <input type="text" id="id-position" value="Senior Developer">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-department">Departemen</label>
+                            <input type="text" id="id-department" value="Teknologi Informasi">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-number">Nomor ID</label>
+                            <input type="text" id="id-number" value="IT-2023-001">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-valid">Berlaku Sampai</label>
+                            <input type="date" id="id-valid" value="2025-12-31">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-photo">Foto</label>
+                            <input type="file" id="id-photo" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-organization">Organisasi</label>
+                            <input type="text" id="id-organization" value="PT. Teknologi Maju Indonesia">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-address">Alamat</label>
+                            <input type="text" id="id-address" value="Jl. Teknologi No. 123, Jakarta">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Preview Area -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-eye"></i> Preview</h3>
+                    <div class="actions">
+                        <button class="btn" id="refresh-preview">
+                            <i class="fas fa-sync"></i> Perbarui
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="preview-container">
+                    <!-- Sertifikat Preview -->
+                    <div class="preview-card">
+                        <div class="preview-header">Preview Sertifikat</div>
+                        <div class="certificate" id="certificate-preview">
+                            <div class="certificate-header">
+                                <div class="certificate-title" id="preview-cert-title">Sertifikat Penghargaan</div>
+                                <div class="certificate-subtitle" id="preview-cert-subtitle">Diberikan kepada</div>
+                            </div>
+                            
+                            <div class="certificate-body">
+                                <div class="recipient-name" id="preview-recipient">Budi Santoso</div>
+                                
+                                <div class="certificate-text" id="preview-description">
+                                    Atas dedikasi dan prestasi luar biasa dalam pengembangan teknologi dan inovasi selama tahun 2023
+                                </div>
+                            </div>
+                            
+                            <div class="certificate-details">
+                                <div class="certificate-signature">
+                                    <div class="signature-line"></div>
+                                    <div id="preview-signer">Dr. Ahmad Riyadi, M.Kom</div>
+                                    <div id="preview-position">Direktur Utama</div>
+                                </div>
+                                
+                                <div class="certificate-date">
+                                    <div>Diberikan pada:</div>
+                                    <div id="preview-date">15 Desember 2023</div>
+                                </div>
+                            </div>
+                            
+                            <div class="certificate-seal">
+                                <div>RESMI<br>DICETAK<br>OLEH<br>CERTICARD PRO</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ID Card Preview -->
+                    <div class="preview-card">
+                        <div class="preview-header">Preview ID Card</div>
+                        <div class="id-card" id="id-card-preview">
+                            <div class="id-header">
+                                <div class="id-title">KARTU IDENTITAS</div>
+                                <div class="id-organization" id="preview-org">PT. Teknologi Maju Indonesia</div>
+                            </div>
+                            
+                            <div class="id-body">
+                                <div class="id-photo" id="preview-photo">
+                                    <i class="fas fa-user" style="font-size: 3rem; color: #ccc;"></i>
+                                </div>
+                                
+                                <div class="id-info">
+                                    <div class="id-name" id="preview-id-name">Budi Santoso</div>
+                                    <div class="id-position" id="preview-id-position">Senior Developer</div>
+                                    
+                                    <div class="id-field">
+                                        <div class="id-label">Dept:</div>
+                                        <div class="id-value" id="preview-dept">Teknologi Informasi</div>
+                                    </div>
+                                    
+                                    <div class="id-field">
+                                        <div class="id-label">ID:</div>
+                                        <div class="id-value" id="preview-id-number">IT-2023-001</div>
+                                    </div>
+                                    
+                                    <div class="id-field">
+                                        <div class="id-label">Alamat:</div>
+                                        <div class="id-value" id="preview-address">Jl. Teknologi No. 123, Jakarta</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="id-footer">
+                                <div class="id-qr" id="qr-code">
+                                    <i class="fas fa-qrcode" style="font-size: 3rem; color: #ccc;"></i>
+                                </div>
+                                
+                                <div>
+                                    <div class="id-number" id="preview-full-id">IT-2023-001</div>
+                                    <div class="id-validity">Berlaku hingga: <span id="preview-valid">31 Desember 2025</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn" id="download-cert">
+                        <i class="fas fa-download"></i> Unduh Sertifikat (PDF)
+                    </button>
+                    <button class="btn" id="download-id">
+                        <i class="fas fa-download"></i> Unduh ID Card (PNG)
+                    </button>
+                    <button class="btn btn-outline" id="print-both">
+                        <i class="fas fa-print"></i> Cetak Keduanya
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', function() {
+            // Format tanggal
+            const formatDate = (dateString) => {
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('id-ID', options);
+            };
+            
+            // Update preview
+            function updatePreview() {
+                // Sertifikat
+                document.getElementById('preview-cert-title').textContent = 
+                    document.getElementById('cert-title').value;
+                
+                document.getElementById('preview-cert-subtitle').textContent = 
+                    document.getElementById('cert-subtitle').value;
+                
+                document.getElementById('preview-recipient').textContent = 
+                    document.getElementById('recipient-name').value;
+                
+                document.getElementById('preview-description').textContent = 
+                    document.getElementById('cert-description').value;
+                
+                document.getElementById('preview-signer').textContent = 
+                    document.getElementById('cert-signer').value;
+                
+                document.getElementById('preview-position').textContent = 
+                    document.getElementById('cert-position').value;
+                
+                document.getElementById('preview-date').textContent = 
+                    formatDate(document.getElementById('cert-date').value);
+                
+                // ID Card
+                document.getElementById('preview-id-name').textContent = 
+                    document.getElementById('id-name').value;
+                
+                document.getElementById('preview-id-position').textContent = 
+                    document.getElementById('id-position').value;
+                
+                document.getElementById('preview-dept').textContent = 
+                    document.getElementById('id-department').value;
+                
+                document.getElementById('preview-id-number').textContent = 
+                    document.getElementById('id-number').value;
+                
+                document.getElementById('preview-full-id').textContent = 
+                    document.getElementById('id-number').value;
+                
+                document.getElementById('preview-org').textContent = 
+                    document.getElementById('id-organization').value;
+                
+                document.getElementById('preview-address').textContent = 
+                    document.getElementById('id-address').value;
+                
+                document.getElementById('preview-valid').textContent = 
+                    formatDate(document.getElementById('id-valid').value);
+                
+                // Generate QR Code
+                const qrData = `Nama: ${document.getElementById('id-name').value}
+ID: ${document.getElementById('id-number').value}
+Jabatan: ${document.getElementById('id-position').value}
+Dept: ${document.getElementById('id-department').value}
+Valid: ${formatDate(document.getElementById('id-valid').value)}`;
+                
+                const qrContainer = document.getElementById('qr-code');
+                qrContainer.innerHTML = '';
+                
+                QRCode.toCanvas(qrData, { 
+                    width: 150,
+                    margin: 1,
+                    color: {
+                        dark: '#000000',
+                        light: '#ffffff'
+                    }
+                }, function (error, canvas) {
+                    if (error) {
+                        console.error(error);
+                        qrContainer.innerHTML = '<i class="fas fa-qrcode" style="font-size: 3rem; color: #ccc;"></i>';
+                    } else {
+                        canvas.style.width = '100%';
+                        canvas.style.height = '100%';
+                        qrContainer.appendChild(canvas);
+                    }
+                });
+            }
+            
+            // Handle photo upload
+            document.getElementById('id-photo').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.style.maxWidth = '100%';
+                        img.style.maxHeight = '100%';
+                        
+                        const photoContainer = document.getElementById('preview-photo');
+                        photoContainer.innerHTML = '';
+                        photoContainer.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Download Certificate as PDF
+            document.getElementById('download-cert').addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('l', 'mm', 'a4');
+                
+                // Add certificate
+                html2canvas(document.getElementById('certificate-preview')).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 297; // A4 width in mm
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    
+                    doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                    doc.save('sertifikat.pdf');
+                });
+            });
+            
+            // Download ID Card as PNG
+            document.getElementById('download-id').addEventListener('click', function() {
+                html2canvas(document.getElementById('id-card-preview')).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'id-card.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                });
+            });
+            
+            // Print both
+            document.getElementById('print-both').addEventListener('click', function() {
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Cetak Sertifikat dan ID Card</title>
+                        <style>
+                            body { 
+                                font-family: Arial, sans-serif; 
+                                margin: 20px;
+                                text-align: center;
+                            }
+                            .print-container { 
+                                max-width: 1000px; 
+                                margin: 0 auto; 
+                            }
+                            .print-section { 
+                                margin-bottom: 50px; 
+                                page-break-after: always;
+                            }
+                            .print-header {
+                                margin-bottom: 20px;
+                                font-size: 1.5rem;
+                                color: #333;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="print-container">
+                            <div class="print-section">
+                                <div class="print-header">Sertifikat</div>
+                                <img src="${document.getElementById('certificate-preview').outerHTML.replace(/"/g, "'")}" style="max-width: 100%;">
+                            </div>
+                            <div class="print-section">
+                                <div class="print-header">ID Card</div>
+                                <img src="${document.getElementById('id-card-preview').outerHTML.replace(/"/g, "'")}" style="max-width: 400px;">
+                            </div>
+                        </div>
+                        <script>
+                            window.onload = function() {
+                                window.print();
+                            };
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            });
+            
+            // Refresh preview
+            document.getElementById('refresh-preview').addEventListener('click', updatePreview);
+            
+            // Set default values and update preview
+            document.getElementById('cert-date').valueAsDate = new Date();
+            const nextYear = new Date();
+            nextYear.setFullYear(nextYear.getFullYear() + 2);
+            document.getElementById('id-valid').valueAsDate = nextYear;
+            
+            updatePreview();
+            
+            // Live update on input change
+            const inputs = document.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                input.addEventListener('input', updatePreview);
+            });
+        });
+    </script>
+</body>
+</html>

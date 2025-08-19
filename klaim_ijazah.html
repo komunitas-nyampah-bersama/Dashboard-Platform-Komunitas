@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Data Mahasiswa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --danger: #e63946;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+            --sidebar-bg: #f8f9fa;
+            --code-bg: #1e1e1e;
+            --viz-1: #4361ee;
+            --viz-2: #7209b7;
+            --viz-3: #4cc9f0;
+            --viz-4: #f72585;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 25px 0;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 280px;
+            height: 100vh;
+            z-index: 100;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 0 25px 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .nav-links {
+            margin-top: 30px;
+        }
+
+        .nav-item {
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            border-left: 3px solid white;
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            grid-column: 2;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            align-content: start;
+        }
+
+        header {
+            grid-column: 1 / -1;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-title h2 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+
+        .header-title p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn i {
+            font-size: 0.9rem;
+        }
+
+        .btn.btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn.btn-outline:hover {
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .btn.btn-danger {
+            background: var(--danger);
+            box-shadow: 0 4px 6px rgba(230, 57, 70, 0.2);
+        }
+
+        .btn.btn-danger:hover {
+            background: #d32f2f;
+            box-shadow: 0 6px 8px rgba(230, 57, 70, 0.3);
+        }
+
+        /* Dashboard Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 6px 15px var(--shadow);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header h3 i {
+            width: 32px;
+            height: 32px;
+            background: rgba(114, 9, 183, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+        }
+
+        /* Visualization Cards */
+        .viz-container {
+            flex: 1;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-card .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Table Card */
+        .table-card {
+            grid-column: 1 / -1;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            flex: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(248, 249, 250, 0.5);
+        }
+
+        tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .success {
+            background: rgba(76, 201, 240, 0.2);
+            color: #0a9396;
+        }
+
+        .warning {
+            background: rgba(247, 37, 133, 0.2);
+            color: #ff006e;
+        }
+
+        .danger {
+            background: rgba(230, 57, 70, 0.2);
+            color: #d00000;
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: white;
+            color: var(--dark);
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            border-left: 4px solid var(--primary);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification i {
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+
+        .notification-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .notification-content p {
+            font-size: 0.95rem;
+            color: var(--gray);
+        }
+
+        /* Login Section */
+        .login-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h2 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: var(--gray);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .login-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        /* Upload Section */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .upload-area h4 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .upload-area p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .file-info {
+            background: rgba(67, 97, 238, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .file-info h5 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .file-info ul {
+            padding-left: 20px;
+        }
+
+        /* User Info */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(67, 97, 238, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .user-details h4 {
+            margin-bottom: 5px;
+        }
+
+        .user-details p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                grid-column: 1;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .login-box {
+                padding: 20px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(67,97,238,0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            animation: fadeIn 0.5s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <div class="login-header">
+                <h2><i class="fas fa-lock"></i> Masuk ke Sistem</h2>
+                <p>Masukkan email dan password untuk mengakses data Anda</p>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="email" placeholder="email@universitas.ac.id" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-key"></i> Password</label>
+                    <input type="password" id="password" placeholder="Masukkan password Anda" required>
+                </div>
+                
+                <div class="login-actions">
+                    <button type="submit" class="btn">
+                        <i class="fas fa-sign-in-alt"></i> Masuk
+                    </button>
+                    <button type="button" class="btn btn-outline" id="registerBtn">
+                        <i class="fas fa-user-plus"></i> Buat Akun Baru
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <div class="notification-content">
+            <h3>Selamat Datang!</h3>
+            <p>Sistem Data Mahasiswa siap digunakan</p>
+        </div>
+    </div>
+
+    <div class="dashboard-container" id="dashboard" style="display: none;">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Data Mahasiswa</h1>
+                        <p>Sistem Akademik</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="nav-links">
+                <div class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-database"></i>
+                    <span>Data Saya</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-upload"></i>
+                    <span>Unggah Data</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Ekspor PDF</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Pengaturan</span>
+                </div>
+                <div class="nav-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Keluar</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header>
+                <div class="header-title">
+                    <h2>Dashboard Mahasiswa</h2>
+                    <p>Manajemen data akademik dan transkrip</p>
+                </div>
+                <div class="header-actions">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-details">
+                            <h4 id="userName">Mahasiswa</h4>
+                            <p id="userEmail">email@universitas.ac.id</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Statistik -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-line"></i> Ringkasan Akademik</h3>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--viz-1) 0%, #5a76f1 100%);">
+                        <div class="value" id="ipkValue">3.75</div>
+                        <div class="label">IPK Terakhir</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--viz-2) 0%, #8a2be2 100%);">
+                        <div class="value" id="sksValue">120</div>
+                        <div class="label">Total SKS</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--viz-3) 0%, #6dd5ed 100%);">
+                        <div class="value" id="matkulValue">42</div>
+                        <div class="label">Mata Kuliah</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, var(--viz-4) 0%, #ff6b9d 100%);">
+                        <div class="value" id="statusValue">Aktif</div>
+                        <div class="label">Status</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-upload"></i> Unggah Data Akademik</h3>
+                </div>
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h4>Unggah File Excel atau PDF</h4>
+                    <p>Seret file ke sini atau klik untuk memilih file</p>
+                    <button class="btn">
+                        <i class="fas fa-folder-open"></i> Pilih File
+                    </button>
+                    <input type="file" id="fileInput" accept=".xlsx,.xls,.pdf" style="display: none;">
+                    
+                    <div class="file-info" id="fileInfo" style="display: none;">
+                        <h5>File Terpilih:</h5>
+                        <p id="fileName">Nama File</p>
+                        <p id="fileSize">Ukuran: 0 KB</p>
+                        <p id="fileType">Tipe: PDF</p>
+                        
+                        <button class="btn" id="processFile" style="margin-top: 15px;">
+                            <i class="fas fa-cogs"></i> Proses File
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabel Data -->
+            <div class="card table-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-table"></i> Transkrip Nilai</h3>
+                    <div class="actions">
+                        <button class="btn">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="transkrip-table">
+                        <thead>
+                            <tr>
+                                <th width="10%">Kode</th>
+                                <th width="40%">Mata Kuliah</th>
+                                <th width="15%">SKS</th>
+                                <th width="15%">Nilai</th>
+                                <th width="20%">Semester</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <tr>
+                                <td>CS101</td>
+                                <td>Pengantar Ilmu Komputer</td>
+                                <td>3</td>
+                                <td>A</td>
+                                <td>Semester 1</td>
+                            </tr>
+                            <tr>
+                                <td>MA102</td>
+                                <td>Kalkulus Dasar</td>
+                                <td>4</td>
+                                <td>B+</td>
+                                <td>Semester 1</td>
+                            </tr>
+                            <tr>
+                                <td>PH103</td>
+                                <td>Fisika Dasar</td>
+                                <td>3</td>
+                                <td>A-</td>
+                                <td>Semester 2</td>
+                            </tr>
+                            <tr>
+                                <td>EN201</td>
+                                <td>Bahasa Inggris Teknik</td>
+                                <td>2</td>
+                                <td>A</td>
+                                <td>Semester 2</td>
+                            </tr>
+                            <tr>
+                                <td>CS202</td>
+                                <td>Struktur Data</td>
+                                <td>3</td>
+                                <td>A</td>
+                                <td>Semester 3</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Grafik Prestasi -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> Grafik Prestasi</h3>
+                </div>
+                <div class="viz-container">
+                    <div class="chart-container">
+                        <canvas id="prestasiChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Ekspor -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-file-certificate"></i> Ekspor Transkrip</h3>
+                    <i class="fas fa-download"></i>
+                </div>
+                <div class="security-features">
+                    <p>Ekspor transkrip nilai Anda dalam format PDF:</p>
+                    <ul style="padding-left: 20px; margin-top: 10px;">
+                        <li><strong>Resmi</strong> - Tanda tangan digital</li>
+                        <li><strong>Aman</strong> - Verifikasi keaslian</li>
+                        <li><strong>Legal</strong> - Diakui oleh institusi</li>
+                    </ul>
+                    
+                    <button class="btn" id="exportPdfBtn" style="margin-top: 20px;">
+                        <i class="fas fa-file-pdf"></i> Ekspor ke PDF
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Data pengguna (simulasi database)
+        const users = [
+            { 
+                email: "mahasiswa@universitas.ac.id", 
+                password: "password123", 
+                name: "Budi Santoso",
+                nim: "123456789",
+                prodi: "Teknik Informatika",
+                data: [
+                    { kode: "CS101", matkul: "Pengantar Ilmu Komputer", sks: 3, nilai: "A", semester: "Semester 1" },
+                    { kode: "MA102", matkul: "Kalkulus Dasar", sks: 4, nilai: "B+", semester: "Semester 1" },
+                    { kode: "PH103", matkul: "Fisika Dasar", sks: 3, nilai: "A-", semester: "Semester 2" },
+                    { kode: "EN201", matkul: "Bahasa Inggris Teknik", sks: 2, nilai: "A", semester: "Semester 2" },
+                    { kode: "CS202", matkul: "Struktur Data", sks: 3, nilai: "A", semester: "Semester 3" }
+                ]
+            },
+            { 
+                email: "mahasiswa2@universitas.ac.id", 
+                password: "password456", 
+                name: "Ani Wijaya",
+                nim: "987654321",
+                prodi: "Sistem Informasi",
+                data: [
+                    { kode: "SI101", matkul: "Pengantar Sistem Informasi", sks: 3, nilai: "A", semester: "Semester 1" },
+                    { kode: "AK102", matkul: "Akuntansi Dasar", sks: 3, nilai: "B", semester: "Semester 1" },
+                    { kode: "MA103", matkul: "Matematika Diskrit", sks: 3, nilai: "A-", semester: "Semester 2" }
+                ]
+            }
+        ];
+
+        // Variabel global
+        let currentUser = null;
+        let uploadedFile = null;
+        let prestasiChart = null;
+
+        // Inisialisasi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tampilkan login modal
+            document.getElementById('loginContainer').style.display = 'flex';
+            
+            // Setup event listeners
+            document.getElementById('loginForm').addEventListener('submit', loginUser);
+            document.getElementById('registerBtn').addEventListener('click', showRegister);
+            document.getElementById('logoutBtn').addEventListener('click', logoutUser);
+            document.getElementById('uploadArea').addEventListener('click', () => document.getElementById('fileInput').click());
+            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+            document.getElementById('processFile').addEventListener('click', processUploadedFile);
+            document.getElementById('exportPdfBtn').addEventListener('click', exportToPDF);
+            
+            // Setup drag and drop
+            setupDragAndDrop();
+        });
+
+        // Fungsi login
+        function loginUser(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Cari pengguna
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                showNotification(`Selamat datang, ${user.name}!`, "success");
+                
+                // Sembunyikan login, tampilkan dashboard
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'grid';
+                
+                // Update UI dengan data pengguna
+                updateUserInterface();
+            } else {
+                showNotification("Email atau password salah!", "error");
+            }
+        }
+
+        // Fungsi logout
+        function logoutUser() {
+            currentUser = null;
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            showNotification("Anda telah keluar dari sistem", "info");
+        }
+
+        // Tampilkan halaman registrasi (simulasi)
+        function showRegister() {
+            showNotification("Fitur registrasi belum tersedia. Silakan gunakan akun demo.", "info");
+        }
+
+        // Update UI dengan data pengguna
+        function updateUserInterface() {
+            if (!currentUser) return;
+            
+            // Update info pengguna
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            
+            // Update tabel transkrip
+            updateTranskripTable();
+            
+            // Update grafik prestasi
+            updatePrestasiChart();
+            
+            // Update statistik
+            document.getElementById('ipkValue').textContent = "3.75";
+            document.getElementById('sksValue').textContent = "120";
+            document.getElementById('matkulValue').textContent = "42";
+            document.getElementById('statusValue').textContent = "Aktif";
+        }
+
+        // Update tabel transkrip
+        function updateTranskripTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            
+            if (!currentUser || !currentUser.data) return;
+            
+            currentUser.data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.kode}</td>
+                    <td>${item.matkul}</td>
+                    <td>${item.sks}</td>
+                    <td>${item.nilai}</td>
+                    <td>${item.semester}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Update grafik prestasi
+        function updatePrestasiChart() {
+            const ctx = document.getElementById('prestasiChart').getContext('2d');
+            
+            // Hancurkan chart sebelumnya jika ada
+            if (prestasiChart) {
+                prestasiChart.destroy();
+            }
+            
+            // Data simulasi
+            const data = {
+                labels: ['Semester 1', 'Semester 2', 'Semester 3', 'Semester 4', 'Semester 5'],
+                datasets: [{
+                    label: 'IPK',
+                    data: [3.2, 3.5, 3.7, 3.8, 3.9],
+                    backgroundColor: 'rgba(67, 97, 238, 0.2)',
+                    borderColor: 'rgba(67, 97, 238, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            };
+            
+            // Buat chart baru
+            prestasiChart = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 2.5,
+                            max: 4.0,
+                            ticks: {
+                                stepSize: 0.5
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Setup drag and drop
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                uploadArea.style.borderColor = var(--primary);
+                uploadArea.style.backgroundColor = 'rgba(67, 97, 238, 0.1)';
+            }
+            
+            function unhighlight() {
+                uploadArea.style.borderColor = var(--border);
+                uploadArea.style.backgroundColor = '';
+            }
+            
+            uploadArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                document.getElementById('fileInput').files = files;
+                handleFileUpload();
+            }
+        }
+
+        // Handle file upload
+        function handleFileUpload() {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) return;
+            
+            uploadedFile = fileInput.files[0];
+            
+            // Tampilkan info file
+            document.getElementById('fileInfo').style.display = 'block';
+            document.getElementById('fileName').textContent = uploadedFile.name;
+            document.getElementById('fileSize').textContent = `Ukuran: ${Math.round(uploadedFile.size / 1024)} KB`;
+            document.getElementById('fileType').textContent = `Tipe: ${uploadedFile.type || uploadedFile.name.split('.').pop().toUpperCase()}`;
+            
+            showNotification("File berhasil dipilih", "success");
+        }
+
+        // Proses file yang diunggah
+        function processUploadedFile() {
+            if (!uploadedFile) {
+                showNotification("Silakan pilih file terlebih dahulu", "error");
+                return;
+            }
+            
+            const fileExtension = uploadedFile.name.split('.').pop().toLowerCase();
+            
+            if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+                processExcelFile(uploadedFile);
+            } else if (fileExtension === 'pdf') {
+                processPDFFile(uploadedFile);
+            } else {
+                showNotification("Format file tidak didukung. Harap unggah file Excel (.xlsx/.xls) atau PDF", "error");
+            }
+        }
+
+        // Proses file Excel (simulasi)
+        function processExcelFile(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    // Simulasi pemrosesan file Excel
+                    // Di dunia nyata, gunakan library seperti SheetJS untuk parsing
+                    const data = [
+                        { kode: "CS303", matkul: "Algoritma Lanjut", sks: 3, nilai: "A", semester: "Semester 4" },
+                        { kode: "CS304", matkul: "Basis Data", sks: 3, nilai: "A-", semester: "Semester 4" }
+                    ];
+                    
+                    // Tambahkan ke data pengguna
+                    currentUser.data = [...currentUser.data, ...data];
+                    
+                    // Update UI
+                    updateTranskripTable();
+                    updatePrestasiChart();
+                    
+                    showNotification("Data Excel berhasil diproses dan ditambahkan ke transkrip", "success");
+                } catch (error) {
+                    showNotification("Gagal memproses file Excel: " + error.message, "error");
+                }
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Proses file PDF (simulasi)
+        function processPDFFile(file) {
+            // Simulasi pemrosesan file PDF
+            // Di dunia nyata, gunakan PDF.js untuk ekstraksi teks
+            showNotification("File PDF berhasil diunggah. Sistem akan memproses data secara offline", "success");
+            
+            // Simulasi penambahan data dari PDF
+            setTimeout(() => {
+                const newData = [
+                    { kode: "EN301", matkul: "English for Business", sks: 2, nilai: "B+", semester: "Semester 5" },
+                    { kode: "CS401", matkul: "Machine Learning", sks: 4, nilai: "A", semester: "Semester 5" }
+                ];
+                
+                // Tambahkan ke data pengguna
+                currentUser.data = [...currentUser.data, ...newData];
+                
+                // Update UI
+                updateTranskripTable();
+                updatePrestasiChart();
+                
+                showNotification("Data dari PDF berhasil ditambahkan ke transkrip", "success");
+            }, 3000);
+        }
+
+        // Ekspor ke PDF
+        function exportToPDF() {
+            if (!currentUser) {
+                showNotification("Silakan login terlebih dahulu", "error");
+                return;
+            }
+            
+            // Simulasi ekspor PDF
+            showNotification("Transkrip akademik sedang dibuat...", "info");
+            
+            setTimeout(() => {
+                showNotification("Transkrip akademik berhasil diekspor ke PDF", "success");
+                
+                // Di dunia nyata, gunakan jsPDF untuk membuat PDF
+                // Contoh: 
+                // const doc = new jsPDF();
+                // doc.text('Transkrip Akademik', 10, 10);
+                // doc.save('transkrip.pdf');
+            }, 2000);
+        }
+
+        // Tampilkan notifikasi
+        function showNotification(message, type = "success") {
+            const notification = document.getElementById("notification");
+            const notificationContent = notification.querySelector(".notification-content");
+            const icon = notification.querySelector("i");
+            
+            notificationContent.querySelector("h3").textContent = 
+                type === "success" ? "Sukses!" : 
+                type === "error" ? "Terjadi Kesalahan" : 
+                type === "info" ? "Informasi" : "Pemberitahuan";
+                
+            notificationContent.querySelector("p").textContent = message;
+            
+            // Update icon berdasarkan tipe
+            icon.className = 
+                type === "success" ? "fas fa-check-circle" :
+                type === "error" ? "fas fa-exclamation-circle" : "fas fa-info-circle";
+            
+            // Update warna border
+            notification.style.borderLeftColor = 
+                type === "success" ? "#4cc9f0" :
+                type === "error" ? "#e63946" : "#4361ee";
+            
+            notification.classList.add("show");
+            
+            // Sembunyikan notifikasi setelah 3 detik
+            setTimeout(() => {
+                notification.classList.remove("show");
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

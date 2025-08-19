@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2BCycleChain: Posting Aksi Baru</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align at the top */
+            min-height: 100vh;
+        }
+        .post-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input[type="file"],
+        .form-group input[type="text"],
+        .form-group textarea,
+        .form-group select {
+            width: calc(100% - 20px);
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input[type="file"]:focus,
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .preview-area {
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            border: 1px dashed #ccc;
+            padding: 10px;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+        }
+        .preview-area img, .preview-area video {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 4px;
+            display: none; /* Hidden by default */
+            margin: auto;
+        }
+        .submit-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .submit-button:hover {
+            background-color: #27ad60;
+            transform: translateY(-2px);
+        }
+        .output-messages {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f6f3;
+            border: 1px solid #c8e6c9;
+            border-radius: 6px;
+            font-size: 0.9em;
+            color: #27ae60;
+            display: none; /* Hidden by default */
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .output-messages.error {
+            background-color: #ffebee;
+            border-color: #ffcdd2;
+            color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="post-container">
+        <h1>Posting Aksi Baru</h1>
+
+        <div class="form-group">
+            <label for="mediaUpload">Unggah Gambar/Video Aksi:</label>
+            <input type="file" id="mediaUpload" accept="image/*,video/*">
+            <div class="preview-area">
+                <img id="mediaPreviewImage" src="#" alt="Pratinjau Gambar">
+                <video id="mediaPreviewVideo" controls style="display: none;"></video>
+                <p id="previewPlaceholder">Pilih file untuk pratinjau</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="aksiTitle">Judul Aksi:</label>
+            <input type="text" id="aksiTitle" placeholder="Misal: Pembersihan Pantai Cemara" required>
+        </div>
+
+        <div class="form-group">
+            <label for="aksiDescription">Deskripsi Aksi:</label>
+            <textarea id="aksiDescription" placeholder="Jelaskan detail aksi Anda..." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="aksiLocation">Lokasi Aksi:</label>
+            <input type="text" id="aksiLocation" placeholder="Misal: Pantai Cemara, Palembang" required>
+        </div>
+
+        <div class="form-group">
+            <label for="aksiCategory">Kategori Aksi:</label>
+            <select id="aksiCategory">
+                <option value="Lingkungan">Lingkungan</option>
+                <option value="Sosial">Sosial</option>
+                <option value="Edukasi">Edukasi</option>
+                <option value="Kesehatan">Kesehatan</option>
+                <option value="Lainnya">Lainnya</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="trustScoreEstimate">Perkiraan TrustScore Anda (opsional):</label>
+            <input type="number" id="trustScoreEstimate" min="0" max="100" placeholder="0-100">
+        </div>
+
+        <button class="submit-button" id="postActionButton">Posting Aksi & Mint NFT</button>
+
+        <div class="output-messages" id="outputMessages"></div>
+    </div>
+
+    <script>
+        // --- Integrasi dengan logika blockchain (dari file sebelumnya) ---
+        // Karena kita tidak punya backend server IPFS atau Smart Contract sungguhan di sini,
+        // kita akan simulasikan output CID dan proses minting NFT.
+        // Di aplikasi nyata, bagian ini akan berkomunikasi dengan API IPFS dan Web3 library (misal ethers.js, web3.js).
+
+        // Kita akan menggunakan kelas Block dan TwoBCycleChain dari script sebelumnya
+        // untuk simulasi penambahan aksi ke pendingActions dan mining.
+        // Kopi dan tempelkan definisi kelas Block dan TwoBCycleChain Anda di sini:
+
+        // START: Definisi Kelas Block dan TwoBCycleChain (salin dari script sebelumnya)
+        // Pastikan CryptoJS sudah dimuat sebelum digunakan
+        if (typeof CryptoJS === 'undefined') {
+            console.error("CryptoJS library not loaded. Please check the script tag for CryptoJS CDN.");
+            throw new Error("CryptoJS is required but not loaded.");
+        }
+
+        class Block {
+            constructor(timestamp, aksi, lokasi, trustScore, CID, previousHash = '') {
+                this.timestamp = timestamp;
+                this.aksi = aksi;
+                this.lokasi = lokasi;
+                this.trustScore = trustScore;
+                this.CID = CID; // Content ID dari IPFS
+                this.previousHash = previousHash;
+                this.nonce = 0; // Digunakan untuk Proof of Work/Attention (PoAV)
+                this.hash = this.calculateHash(); // Hash blok ini
+            }
+
+            calculateHash() {
+                return CryptoJS.SHA256(
+                    this.timestamp +
+                    this.aksi +
+                    this.lokasi +
+                    this.trustScore +
+                    this.CID +
+                    this.previousHash +
+                    this.nonce
+                ).toString();
+            }
+
+            mineBlock(difficulty) {
+                this.logToOutput(`[${this.timestamp}] Mulai memverifikasi aksi: "${this.aksi}" di ${this.lokasi}...`);
+                while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
+                    this.nonce++;
+                    this.hash = this.calculateHash();
+                }
+                this.logToOutput(`[${this.timestamp}] Aksi diverifikasi (PoAV)! Hash blok: ${this.hash}, Nonce: ${this.nonce}`);
+            }
+
+            static verifyAttentionValue(aksi, trustScore, lokasi, evidenceCID) {
+                if (trustScore < 50) {
+                    this.logToOutputError(`[PoAV] Peringatan: TrustScore rendah (${trustScore}) untuk aksi "${aksi}".`);
+                    return false;
+                }
+                if (!aksi || !lokasi || !evidenceCID) {
+                    this.logToOutputError("[PoAV] Data aksi tidak lengkap.");
+                    return false;
+                }
+                this.logToOutput(`[PoAV] Aksi "${aksi}" di ${lokasi} dengan TrustScore ${trustScore} diverifikasi sebagai bernilai.`);
+                return true;
+            }
+
+            // Fungsi helper untuk logging ke div output
+            logToOutput(message) {
+                const outputDiv = document.getElementById('outputMessages');
+                outputDiv.style.display = 'block';
+                outputDiv.textContent += message + '\n';
+                outputDiv.scrollTop = outputDiv.scrollHeight;
+            }
+            logToOutputError(message) {
+                const outputDiv = document.getElementById('outputMessages');
+                outputDiv.style.display = 'block';
+                outputDiv.classList.add('error');
+                outputDiv.textContent += 'ERROR: ' + message + '\n';
+                outputDiv.scrollTop = outputDiv.scrollHeight;
+            }
+        }
+
+        class TwoBCycleChain {
+            constructor() {
+                this.chain = [this.createGenesisBlock()];
+                this.difficulty = 4;
+                this.pendingActions = [];
+            }
+
+            createGenesisBlock() {
+                const palembangTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" });
+                return new Block(palembangTime, "Genesis Block: Awal Mula 2BCycleChain", "Palembang, South Sumatra, Indonesia", 100, "bafybeig5fg4d7p6h7g6e4j5k4l3m2n1o0p9q8r7s6t5u4v3w2x1y0z");
+            }
+
+            getLatestBlock() {
+                return this.chain[this.chain.length - 1];
+            }
+
+            addPendingAction(aksi, lokasi, trustScore, CID) {
+                if (!Block.verifyAttentionValue(aksi, trustScore, lokasi, CID)) {
+                    this.logToOutputError("Aksi ditolak: Gagal verifikasi PoAV.");
+                    return;
+                }
+                const currentTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" });
+                this.pendingActions.push({ timestamp: currentTime, aksi, lokasi, trustScore, CID });
+                this.logToOutput(`Aksi "${aksi}" ditambahkan ke daftar tunggu.`);
+            }
+
+            minePendingActions() {
+                if (this.pendingActions.length === 0) {
+                    this.logToOutput("Tidak ada aksi tertunda untuk diverifikasi.");
+                    return;
+                }
+                const allActionsData = JSON.stringify(this.pendingActions);
+                const newBlock = new Block(
+                    new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }),
+                    `Kumpulan Aksi: ${this.pendingActions.length} item`,
+                    "Berbagai Lokasi",
+                    this.calculateAggregateTrustScore(this.pendingActions),
+                    CryptoJS.SHA256(allActionsData).toString(),
+                    this.getLatestBlock().hash
+                );
+
+                newBlock.mineBlock(this.difficulty);
+                this.chain.push(newBlock);
+                this.pendingActions = [];
+                this.logToOutput("Blok baru berhasil ditambahkan ke rantai!");
+            }
+
+            calculateAggregateTrustScore(actions) {
+                if (actions.length === 0) return 0;
+                const totalScore = actions.reduce((sum, action) => sum + action.trustScore, 0);
+                return totalScore / actions.length;
+            }
+
+            isChainValid() {
+                for (let i = 1; i < this.chain.length; i++) {
+                    const currentBlock = this.chain[i];
+                    const previousBlock = this.chain[i - 1];
+                    if (currentBlock.hash !== currentBlock.calculateHash()) {
+                        this.logToOutputError("Integritas rantai terkompromi: Hash blok saat ini tidak valid!");
+                        return false;
+                    }
+                    if (currentBlock.previousHash !== previousBlock.hash) {
+                        this.logToOutputError("Integritas rantai terkompromi: Previous hash tidak cocok!");
+                        return false;
+                    }
+                }
+                this.logToOutput("Rantai blockchain valid dan aman.");
+                return true;
+            }
+
+            // Tambahkan fungsi logToOutput untuk TwoBCycleChain juga
+            logToOutput(message) {
+                const outputDiv = document.getElementById('outputMessages');
+                outputDiv.style.display = 'block';
+                outputDiv.textContent += message + '\n';
+                outputDiv.scrollTop = outputDiv.scrollHeight;
+            }
+            logToOutputError(message) {
+                const outputDiv = document.getElementById('outputMessages');
+                outputDiv.style.display = 'block';
+                outputDiv.classList.add('error');
+                outputDiv.textContent += 'ERROR: ' + message + '\n';
+                outputDiv.scrollTop = outputDiv.scrollHeight;
+            }
+        }
+        // END: Definisi Kelas Block dan TwoBCycleChain
+
+        const my2BCycleChain = new TwoBCycleChain();
+
+        // --- Variabel Global untuk CID ---
+        let uploadedMediaCID = '';
+
+        // --- Elemen DOM ---
+        const mediaUploadInput = document.getElementById('mediaUpload');
+        const mediaPreviewImage = document.getElementById('mediaPreviewImage');
+        const mediaPreviewVideo = document.getElementById('mediaPreviewVideo');
+        const previewPlaceholder = document.getElementById('previewPlaceholder');
+        const aksiTitleInput = document.getElementById('aksiTitle');
+        const aksiDescriptionTextarea = document.getElementById('aksiDescription');
+        const aksiLocationInput = document.getElementById('aksiLocation');
+        const aksiCategorySelect = document.getElementById('aksiCategory');
+        const trustScoreEstimateInput = document.getElementById('trustScoreEstimate');
+        const postActionButton = document.getElementById('postActionButton');
+        const outputMessages = document.getElementById('outputMessages');
+
+        // --- Fungsi Helper untuk Logging ke Div HTML ---
+        function logToDiv(message, isError = false) {
+            outputMessages.style.display = 'block';
+            if (isError) {
+                outputMessages.classList.add('error');
+                outputMessages.textContent += 'ERROR: ' + message + '\n';
+            } else {
+                outputMessages.classList.remove('error'); // Hapus kelas error jika pesan sukses
+                outputMessages.textContent += message + '\n';
+            }
+            outputMessages.scrollTop = outputMessages.scrollHeight; // Auto-scroll
+        }
+
+        // --- Event Listener untuk Upload Media (Simulasi IPFS) ---
+        mediaUploadInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                mediaPreviewImage.style.display = 'none';
+                mediaPreviewVideo.style.display = 'none';
+                previewPlaceholder.style.display = 'block';
+                logToDiv("Tidak ada file yang dipilih.");
+                uploadedMediaCID = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Tampilkan pratinjau
+                if (file.type.startsWith('image/')) {
+                    mediaPreviewImage.src = e.target.result;
+                    mediaPreviewImage.style.display = 'block';
+                    mediaPreviewVideo.style.display = 'none';
+                } else if (file.type.startsWith('video/')) {
+                    mediaPreviewVideo.src = e.target.result;
+                    mediaPreviewVideo.style.display = 'block';
+                    mediaPreviewImage.style.display = 'none';
+                }
+                previewPlaceholder.style.display = 'none';
+
+                // --- SIMULASI UPLOAD KE IPFS ---
+                // Di sini, kita akan membuat CID palsu berdasarkan nama file dan ukuran
+                // Di aplikasi nyata, Anda akan menggunakan library IPFS seperti 'ipfs-http-client'
+                // untuk mengirim file ke node IPFS.
+                const simulatedCID = CryptoJS.SHA256(file.name + file.size + file.type + new Date().getTime()).toString().substring(0, 46); // Contoh CID
+                uploadedMediaCID = `bafybeic${simulatedCID}xyz`; // Prefix standar CIDv0 atau mirip
+
+                logToDiv(`File "${file.name}" berhasil disimulasikan diunggah ke IPFS.`);
+                logToDiv(`CID yang dihasilkan: ${uploadedMediaCID}`);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // --- Event Listener untuk Tombol Posting (Simulasi Mint NFT & Add Aksi) ---
+        postActionButton.addEventListener('click', function() {
+            const aksiTitle = aksiTitleInput.value.trim();
+            const aksiDescription = aksiDescriptionTextarea.value.trim();
+            const aksiLocation = aksiLocationInput.value.trim();
+            const aksiCategory = aksiCategorySelect.value;
+            const trustScoreEstimate = parseInt(trustScoreEstimateInput.value) || 0; // Default 0 jika kosong
+
+            // Validasi input
+            if (!uploadedMediaCID) {
+                logToDiv("Harap unggah gambar atau video aksi terlebih dahulu!", true);
+                return;
+            }
+            if (!aksiTitle || !aksiDescription || !aksiLocation) {
+                logToDiv("Harap lengkapi semua kolom judul, deskripsi, dan lokasi!", true);
+                return;
+            }
+
+            logToDiv("\n--- Memulai Proses Posting Aksi & Minting NFT (Simulasi) ---");
+            
+            // --- SIMULASI MINTING NFT ---
+            // Di sini, Anda akan memanggil smart contract Anda untuk mint NFT.
+            // Data metadata NFT akan mencakup CID, judul, deskripsi, lokasi, dll.
+            // Contoh metadata (akan disimpan di IPFS dan CID-nya jadi bagian dari NFT):
+            const nftMetadata = {
+                name: aksiTitle,
+                description: aksiDescription,
+                image: `ipfs://${uploadedMediaCID}`, // Link ke media di IPFS
+                attributes: [
+                    { trait_type: "Lokasi", value: aksiLocation },
+                    { trait_type: "Kategori", value: aksiCategory },
+                    { trait_type: "TrustScore Estimasi", value: trustScoreEstimate },
+                    // Atribut lain yang relevan dengan aksi nyata
+                    { trait_type: "Tanggal Aksi", value: new Date().toLocaleDateString("en-US", { timeZone: "Asia/Jakarta" }) }
+                ]
+            };
+
+            // Simulasi hash metadata (seolah-olah metadata ini juga diupload ke IPFS)
+            const nftMetadataCID = CryptoJS.SHA256(JSON.stringify(nftMetadata) + new Date().getTime()).toString().substring(0, 46);
+            const finalNftCID = `bafybeig${nftMetadataCID}nft`; // CID untuk metadata NFT
+
+            logToDiv(`Metadata NFT disiapkan:\n${JSON.stringify(nftMetadata, null, 2)}`);
+            logToDiv(`CID Metadata NFT: ${finalNftCID}`);
+            logToDiv("Memanggil Smart Contract untuk mint NFT Aksi...");
+
+            // --- SIMULASI PEMANGGILAN SMART CONTRACT ---
+            // Di aplikasi nyata, Anda akan menggunakan Ethers.js/Web3.js untuk berinteraksi
+            // dengan smart contract minting NFT Anda.
+            // Contoh: contract.methods.mintNFT(userWalletAddress, finalNftCID).send()
+            
+            // Setelah smart contract "berhasil" di-mint (simulasi), tambahkan aksi ke 2BCycleChain
+            my2BCycleChain.addPendingAction(aksiTitle, aksiLocation, trustScoreEstimate, uploadedMediaCID);
+            
+            logToDiv(`\nNFT Aksi "${aksiTitle}" berhasil dimint!`);
+            logToDiv(`Silakan cek portofolio Anda. Aksi Anda sekarang menunggu verifikasi PoAV.`);
+            logToDiv(`Transaksi NFT (Simulasi): 0x${CryptoJS.SHA256(aksiTitle + new Date().getTime()).toString().substring(0, 40)}`);
+            logToDiv(`NFT ID (Simulasi): ${Math.floor(Math.random() * 1000000)}`);
+
+
+            // --- SIMULASI PROSES MINING/VERIFIKASI BLOK ---
+            // Dalam sistem nyata, mining/verifikasi ini bisa terjadi secara berkala oleh node lain,
+            // atau dipicu setelah sejumlah aksi terkumpul.
+            // Di sini, kita akan memicunya langsung setelah 1 aksi diposting untuk demo.
+            logToDiv("\n--- Memicu Proses Verifikasi Jaringan (Mining) ---");
+            my2BCycleChain.minePendingActions();
+            logToDiv(`Apakah rantai valid? ${my2BCycleChain.isChainValid()}`);
+            logToDiv("\n--- Aksi berhasil diproses oleh blockchain (simulasi) ---");
+
+            // Reset form setelah posting
+            mediaUploadInput.value = '';
+            mediaPreviewImage.src = '#';
+            mediaPreviewVideo.src = '#';
+            mediaPreviewImage.style.display = 'none';
+            mediaPreviewVideo.style.display = 'none';
+            previewPlaceholder.style.display = 'block';
+            aksiTitleInput.value = '';
+            aksiDescriptionTextarea.value = '';
+            aksiLocationInput.value = '';
+            aksiCategorySelect.value = 'Lingkungan';
+            trustScoreEstimateInput.value = '';
+            uploadedMediaCID = '';
+        });
+
+        // Contoh: Memanggil minePendingActions saat halaman dimuat jika ada pendingActions (misal dari sesi sebelumnya)
+        // my2BCycleChain.minePendingActions();
+        // my2BCycleChain.isChainValid();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Embed Viewer + Editor Notion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #ff9e00;
+            --info: #7209b7;
+            --dark: #1a1c23;
+            --darker: #15171e;
+            --light: #f8f9fa;
+            --light-gray: #e9ecef;
+            --gray: #6c757d;
+            --border: #2d3038;
+            --card-bg: #23262e;
+            --hover-bg: #2c2f39;
+            --editor-bg: #1e2028;
+            --block-bg: #2a2d36;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(26, 28, 35, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        
+        header {
+            background: linear-gradient(135deg, #ff4e50, #f9d423);
+            color: white;
+            padding: 35px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.05)"/></svg>');
+            background-size: cover;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .logo i {
+            font-size: 3.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 50%;
+            backdrop-filter: blur(5px);
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(90deg, #fff, #ffeb3b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            color: #fff9c4;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 25px;
+            padding: 30px;
+        }
+        
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--light);
+        }
+        
+        .section-title i {
+            color: #ffeb3b;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #b0c4de;
+        }
+        
+        input[type="text"], input[type="url"], select, textarea {
+            width: 100%;
+            padding: 15px;
+            background: var(--darker);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1.05rem;
+            transition: all 0.3s;
+            color: var(--light);
+        }
+        
+        input[type="text"]:focus, input[type="url"]:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-sm {
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            border-radius: 8px;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        .btn-success:hover {
+            background: #3db7d9;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background: #d1146a;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+        }
+        
+        .btn-warning:hover {
+            background: #e68f00;
+        }
+        
+        .btn-info {
+            background: var(--info);
+        }
+        
+        .btn-info:hover {
+            background: #5f0a9c;
+        }
+        
+        .btn-yellow {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-yellow:hover {
+            background: #e0a800;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .web-list {
+            list-style: none;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .web-list::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .web-list::-webkit-scrollbar-track {
+            background: var(--darker);
+            border-radius: 5px;
+        }
+        
+        .web-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 5px;
+        }
+        
+        .web-item {
+            background: var(--darker);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .web-item:hover {
+            background: var(--hover-bg);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .web-info {
+            flex: 1;
+        }
+        
+        .web-name {
+            font-weight: 700;
+            margin-bottom: 8px;
+            word-break: break-word;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+        }
+        
+        .web-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 8px;
+        }
+        
+        .web-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .web-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .web-viewer-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .viewer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .viewer-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .web-viewer {
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background: var(--darker);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .web-viewer iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+        
+        .viewer-bar {
+            display: flex;
+            padding: 15px;
+            background: #2c2f39;
+            border-top: 1px solid var(--border);
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .url-display {
+            flex: 1;
+            background: #1a1c23;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .empty-viewer {
+            color: var(--gray);
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        
+        .empty-viewer i {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.2;
+            color: #ffc107;
+        }
+        
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        .status-success {
+            background: rgba(76, 201, 240, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+        
+        .status-error {
+            background: rgba(247, 37, 133, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(247, 37, 133, 0.3);
+        }
+        
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .search-box {
+            flex: 1;
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .search-box input {
+            padding-left: 45px;
+        }
+        
+        .sort-select {
+            min-width: 180px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: var(--gray);
+            font-size: 1rem;
+            border-top: 1px solid var(--border);
+            background: rgba(0,0,0,0.1);
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        .feature-card {
+            background: var(--darker);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #ffc107;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+        
+        .feature-desc {
+            color: var(--gray);
+        }
+        
+        .favorite-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #ffc107;
+            font-size: 1.2rem;
+        }
+        
+        /* EDITOR STYLES */
+        #editor-container {
+            background: var(--editor-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+        
+        #editor {
+            background: var(--block-bg);
+            padding: 25px;
+            border-radius: 10px;
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+        
+        #editor::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #editor::-webkit-scrollbar-track {
+            background: var(--darker);
+            border-radius: 4px;
+        }
+        
+        #editor::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        .block {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            background: rgba(42, 45, 54, 0.6);
+            border-radius: 8px;
+            color: var(--light);
+        }
+        
+        .block:focus {
+            border-left-color: var(--primary);
+            background: rgba(42, 45, 54, 0.8);
+            outline: none;
+        }
+        
+        .editor-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .editor-controls button {
+            padding: 10px 16px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .editor-controls button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .editor-controls button.secondary {
+            background: var(--darker);
+            color: var(--light);
+        }
+        
+        #editor img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+            background: #000;
+        }
+        
+        #editor iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
+            border-radius: 8px;
+            margin-top: 10px;
+            background: #f8fafc;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #4caf50;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        #doc-id {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--gray);
+        }
+        
+        #doc-id input {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            width: 250px;
+            text-align: center;
+            background: var(--darker);
+            color: var(--light);
+        }
+        
+        .camera-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .camera-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        #video, #canvas {
+            width: 100%;
+            border-radius: 8px;
+            background: var(--darker);
+            border: 1px solid var(--border);
+        }
+        
+        #capture-btn, #close-camera {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .web-actions {
+                flex-direction: column;
+            }
+            
+            .editor-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-globe"></i>
+            </div>
+            <h1>Web Embed Viewer + Editor Notion</h1>
+            <p class="subtitle">Tampilkan situs web favorit dan buat konten dengan editor canggih</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="left-column">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="section-title"><i class="fas fa-plus-circle"></i> Tambah Situs Web</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="web-name"><i class="fas fa-heading"></i> Nama Situs:</label>
+                        <input type="text" id="web-name" placeholder="Contoh: YouTube" value="YouTube">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="web-url"><i class="fas fa-link"></i> URL Situs Web:</label>
+                        <input type="url" id="web-url" placeholder="https://www.youtube.com/embed/..." value="https://www.youtube.com/embed/dQw4w9WgXcQ">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="web-tags"><i class="fas fa-tags"></i> Tag/Kategori (opsional):</label>
+                        <input type="text" id="web-tags" placeholder="video, hiburan">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="is-favorite" checked> 
+                            <i class="fas fa-star"></i> Tambahkan ke Favorit
+                        </label>
+                    </div>
+                    
+                    <button id="add-web-btn" class="btn btn-yellow btn-block">
+                        <i class="fas fa-plus"></i> Tambahkan Situs
+                    </button>
+                    
+                    <div id="status-message" class="status"></div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="section-title"><i class="fas fa-star"></i> Fitur Unggulan</h2>
+                    </div>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                            <h3 class="feature-title">Embed Langsung</h3>
+                            <p class="feature-desc">Tampilkan situs web favorit dalam iframe seperti YouTube</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-bookmark"></i>
+                            </div>
+                            <h3 class="feature-title">Favorit</h3>
+                            <p class="feature-desc">Simpan situs web favorit untuk akses cepat</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <h3 class="feature-title">Riwayat</h3>
+                            <p class="feature-desc">Lihat kembali situs web yang pernah Anda kunjungi</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-cloud"></i>
+                            </div>
+                            <h3 class="feature-title">Penyimpanan</h3>
+                            <p class="feature-desc">Data tersimpan di browser Anda secara lokal</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card web-viewer-container">
+                <div class="card-header">
+                    <h2 class="section-title"><i class="fas fa-edit"></i> Editor Notion</h2>
+                </div>
+                
+                <div id="editor-container">
+                    <div id="editor">
+                        <div contenteditable="true" class="block">✨ Selamat datang di editor Notion-style! 🥰</div>
+                        <div contenteditable="true" class="block">📝 Klik tombol di bawah untuk menambahkan berbagai jenis konten...</div>
+                    </div>
+                    
+                    <div class="editor-controls">
+                        <button onclick="addBlock('text')">
+                            <i class="fas fa-font"></i> Teks
+                        </button>
+                        <button onclick="addBlock('heading')">
+                            <i class="fas fa-heading"></i> Heading
+                        </button>
+                        <button onclick="addBlock('list')">
+                            <i class="fas fa-list"></i> List
+                        </button>
+                        <button onclick="addBlock('image')">
+                            <i class="fas fa-image"></i> Gambar
+                        </button>
+                        <button onclick="addBlock('embed')">
+                            <i class="fas fa-globe"></i> Embed
+                        </button>
+                        <button onclick="startCamera()">
+                            <i class="fas fa-camera"></i> Selfie
+                        </button>
+                        <button onclick="saveContent()" style="background:#10b981;">
+                            <i class="fas fa-save"></i> Simpan ke Cloud
+                        </button>
+                        <button onclick="loadContent()" class="secondary">
+                            <i class="fas fa-folder-open"></i> Muat dari Cloud
+                        </button>
+                        <button onclick="downloadContent()" style="background:#007bff;">
+                            <i class="fas fa-download"></i> Unduh HTML
+                        </button>
+                    </div>
+                    
+                    <div id="doc-id">
+                        <p>ID Dokumen:</p>
+                        <input type="text" id="doc-id-input" placeholder="Kosongkan untuk dokumen baru">
+                    </div>
+                    
+                    <div class="camera-container">
+                        <video id="video" autoplay playsinline style="display:none;"></video>
+                        <canvas id="canvas" style="display:none;"></canvas>
+                        <div class="camera-actions">
+                            <button id="capture-btn" style="display:none;" onclick="capturePhoto()">
+                                <i class="fas fa-camera"></i> Ambil Foto
+                            </button>
+                            <button id="close-camera" style="display:none;" onclick="closeCamera()">
+                                <i class="fas fa-times"></i> Tutup Kamera
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="viewer-header" style="margin-top: 30px;">
+                    <h2 class="section-title"><i class="fas fa-eye"></i> Penampil Situs Web</h2>
+                    <div class="viewer-controls">
+                        <button id="refresh-btn" class="btn btn-success btn-sm">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button id="fullscreen-btn" class="btn btn-warning btn-sm">
+                            <i class="fas fa-expand"></i> Layar Penuh
+                        </button>
+                    </div>
+                </div>
+                <div id="web-viewer" class="web-viewer">
+                    <div class="empty-viewer">
+                        <i class="fas fa-globe-americas"></i>
+                        <p>Pilih situs web dari daftar untuk melihatnya di sini</p>
+                        <p>Atau tambahkan situs baru menggunakan form di samping</p>
+                    </div>
+                </div>
+                <div class="viewer-bar">
+                    <div class="url-display" id="current-url">Belum ada situs yang dipilih</div>
+                    <button id="new-tab-btn" class="btn btn-info btn-sm">
+                        <i class="fas fa-external-link-alt"></i> Buka Tab Baru
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="notification" id="notification">Pesan notifikasi</div>
+        
+        <footer>
+            <p>© 2023 Web Embed Viewer | Versi 2.0 | Data disimpan di penyimpanan lokal browser</p>
+        </footer>
+    </div>
+
+    <script>
+        // ======================== EDITOR FUNCTIONS ========================
+        // Inisialisasi Supabase
+        // PENTING: GANTI DENGAN KUNCI SUPABASE ANDA YANG SEBENARNYA!
+        const SUPABASE_URL = 'https://YOUR_SUPABASE_ID.supabase.co';
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        let currentDocId = '';
+        const notification = document.getElementById('notification');
+        
+        // Fungsi untuk menampilkan notifikasi
+        function showNotification(message, isSuccess = true) {
+            notification.textContent = message;
+            notification.style.background = isSuccess ? '#4caf50' : '#f44336';
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Fungsi untuk menambahkan blok konten
+        function addBlock(type) {
+            const editor = document.getElementById("editor");
+            const block = document.createElement("div");
+            block.className = "block";
+            block.contentEditable = true;
+            block.setAttribute('data-type', type);
+
+            if (type === "heading") {
+                block.innerHTML = "Judul Section";
+                block.style.fontSize = "24px";
+                block.style.fontWeight = "bold";
+            } else if (type === "list") {
+                block.innerHTML = "• Item 1<br>• Item 2";
+            } else if (type === "image") {
+                const url = prompt("Masukkan URL gambar:");
+                if (url) {
+                    const img = document.createElement("img");
+                    img.src = url;
+                    img.style.maxWidth = "100%";
+                    img.style.borderRadius = "8px";
+                    img.style.marginTop = "10px";
+                    block.appendChild(img);
+                } else {
+                    showNotification("URL gambar kosong, blok tidak ditambahkan.", false);
+                    return;
+                }
+            } else if (type === "embed") {
+                const url = prompt("Masukkan URL iframe/embed (YouTube, website):");
+                if (url) {
+                    const iframe = document.createElement("iframe");
+                    iframe.src = url;
+                    iframe.setAttribute('allowfullscreen', '');
+                    block.appendChild(iframe);
+                } else {
+                    showNotification("URL embed kosong, blok tidak ditambahkan.", false);
+                    return;
+                }
+            } else {
+                block.innerHTML = "Tulis sesuatu di sini...";
+            }
+
+            editor.appendChild(block);
+            block.focus();
+        }
+
+        // Fungsi kamera
+        function startCamera() {
+            const video = document.getElementById('video');
+            const captureBtn = document.getElementById('capture-btn');
+            const closeBtn = document.getElementById('close-camera');
+            
+            video.style.display = 'block';
+            captureBtn.style.display = 'block';
+            closeBtn.style.display = 'block';
+            
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    showNotification("Gagal membuka kamera: " + err.message + ". Pastikan browser Anda memiliki izin kamera.", false);
+                    closeCamera();
+                });
+        }
+        
+        function capturePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const dataUrl = canvas.toDataURL('image/png');
+            
+            const block = document.createElement("div");
+            block.className = "block";
+            block.setAttribute('data-type', 'image');
+            
+            const img = document.createElement("img");
+            img.src = dataUrl;
+            img.style.maxWidth = "100%";
+            img.style.borderRadius = "8px";
+            img.style.marginTop = "10px";
+            block.appendChild(img);
+            
+            document.getElementById("editor").appendChild(block);
+            
+            closeCamera();
+            showNotification("Foto berhasil ditambahkan!");
+        }
+        
+        function closeCamera() {
+            const video = document.getElementById('video');
+            const captureBtn = document.getElementById('capture-btn');
+            const closeBtn = document.getElementById('close-camera');
+            const stream = video.srcObject;
+            
+            if (stream) {
+                const tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+            
+            video.style.display = 'none';
+            captureBtn.style.display = 'none';
+            closeBtn.style.display = 'none';
+            video.srcObject = null;
+        }
+        
+        // Fungsi untuk menyimpan konten ke Supabase
+        async function saveContent() {
+            const editor = document.getElementById('editor');
+            const docIdInput = document.getElementById('doc-id-input');
+            const content = editor.innerHTML;
+            
+            if (SUPABASE_URL === 'https://YOUR_SUPABASE_ID.supabase.co' || SUPABASE_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+                showNotification("Harap ganti SUPABASE_URL dan SUPABASE_KEY dengan kunci Anda yang sebenarnya!", false);
+                return;
+            }
+
+            try {
+                let result;
+                
+                if (docIdInput.value) {
+                    result = await supabase
+                        .from('documents')
+                        .update({ content })
+                        .eq('id', docIdInput.value)
+                        .select();
+                } else {
+                    result = await supabase
+                        .from('documents')
+                        .insert([{ content }])
+                        .select();
+                }
+                
+                if (result.error) throw result.error;
+                
+                if (!docIdInput.value && result.data && result.data.length > 0) {
+                    docIdInput.value = result.data[0].id;
+                }
+                
+                showNotification("Dokumen berhasil disimpan ke cloud!");
+            } catch (error) {
+                console.error("Error menyimpan dokumen:", error);
+                showNotification("Gagal menyimpan ke cloud: " + error.message, false);
+            }
+        }
+        
+        // Fungsi untuk memuat konten dari Supabase
+        async function loadContent() {
+            const editor = document.getElementById('editor');
+            const docIdInput = document.getElementById('doc-id-input');
+            
+            if (!docIdInput.value) {
+                showNotification("Masukkan ID dokumen terlebih dahulu", false);
+                return;
+            }
+
+            if (SUPABASE_URL === 'https://YOUR_SUPABASE_ID.supabase.co' || SUPABASE_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+                showNotification("Harap ganti SUPABASE_URL dan SUPABASE_KEY dengan kunci Anda yang sebenarnya!", false);
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('documents')
+                    .select('content')
+                    .eq('id', docIdInput.value)
+                    .single();
+                
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        throw new Error("Dokumen dengan ID tersebut tidak ditemukan.");
+                    }
+                    throw error;
+                }
+                if (!data) throw new Error("Dokumen tidak ditemukan.");
+                
+                editor.innerHTML = data.content;
+                showNotification("Dokumen berhasil dimuat dari cloud!");
+            } catch (error) {
+                console.error("Error memuat dokumen:", error);
+                showNotification("Gagal memuat dari cloud: " + error.message, false);
+            }
+        }
+
+        // Fungsi untuk mengunduh konten sebagai file HTML
+        function downloadContent() {
+            const editor = document.getElementById('editor');
+            const content = editor.innerHTML;
+            const filename = 'dokumen_editor.html';
+
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification("Konten berhasil diunduh sebagai HTML!");
+        }
+        
+        // ======================== WEB VIEWER FUNCTIONS ========================
+        // Elemen DOM
+        const webNameInput = document.getElementById('web-name');
+        const webUrlInput = document.getElementById('web-url');
+        const webTagsInput = document.getElementById('web-tags');
+        const isFavoriteCheckbox = document.getElementById('is-favorite');
+        const addWebBtn = document.getElementById('add-web-btn');
+        const webList = document.getElementById('web-list');
+        const webViewer = document.getElementById('web-viewer');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const newTabBtn = document.getElementById('new-tab-btn');
+        const statusMessage = document.getElementById('status-message');
+        const searchInput = document.getElementById('search-input');
+        const sortSelect = document.getElementById('sort-select');
+        const currentUrlDisplay = document.getElementById('current-url');
+        
+        // Key untuk localStorage
+        const STORAGE_KEY = 'webEmbedFavorites';
+        
+        // Muat data dari localStorage
+        let webFavorites = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        let currentViewingWeb = null;
+        
+        // Contoh data default
+        const defaultWebs = [
+            {
+                id: 1,
+                name: "YouTube",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                tags: "video, hiburan",
+                isFavorite: true,
+                addedAt: Date.now()
+            },
+            {
+                id: 2,
+                name: "Google Maps",
+                url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126906.40525889555!2d106.76358205!3d-6.229379949999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3e945e34b9d%3A0x100c5e82dd4b820!2sJakarta!5e0!3m2!1sen!2sid!4v1689683200000!5m2!1sen!2sid",
+                tags: "peta, navigasi",
+                isFavorite: true,
+                addedAt: Date.now() - 86400000
+            },
+            {
+                id: 3,
+                name: "Wikipedia",
+                url: "https://id.wikipedia.org/wiki/Indonesia",
+                tags: "ensiklopedia, edukasi",
+                isFavorite: true,
+                addedAt: Date.now() - 172800000
+            }
+        ];
+        
+        // Tambahkan data default jika tidak ada data
+        if (webFavorites.length === 0) {
+            webFavorites = defaultWebs;
+            saveToLocalStorage();
+        }
+        
+        // Fungsi untuk menyimpan data ke localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(webFavorites));
+            showStatus('Data situs web berhasil diperbarui!', 'success');
+        }
+        
+        // Fungsi untuk menampilkan status
+        function showStatus(message, type = 'success') {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status';
+            statusMessage.classList.add(`status-${type}`);
+            
+            setTimeout(() => {
+                statusMessage.textContent = '';
+                statusMessage.className = 'status';
+            }, 4000);
+        }
+        
+        // Fungsi untuk menampilkan daftar situs web
+        function renderWebList() {
+            webList.innerHTML = '';
+            
+            if (webFavorites.length === 0) {
+                webList.innerHTML = `
+                    <li class="web-item">
+                        <div class="web-info">
+                            <p>Belum ada situs web di favorit. Tambahkan situs web untuk memulai.</p>
+                        </div>
+                    </li>
+                `;
+                return;
+            }
+            
+            let filteredWebs = [...webFavorites];
+            
+            const searchTerm = searchInput.value.toLowerCase();
+            if (searchTerm) {
+                filteredWebs = filteredWebs.filter(web => 
+                    web.name.toLowerCase().includes(searchTerm) || 
+                    (web.tags && web.tags.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            const sortValue = sortSelect.value;
+            switch(sortValue) {
+                case 'date-desc':
+                    filteredWebs.sort((a, b) => b.addedAt - a.addedAt);
+                    break;
+                case 'date-asc':
+                    filteredWebs.sort((a, b) => a.addedAt - b.addedAt);
+                    break;
+                case 'name-asc':
+                    filteredWebs.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'name-desc':
+                    filteredWebs.sort((a, b) => b.name.localeCompare(a.name));
+                    break;
+            }
+            
+            filteredWebs.forEach((web) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'web-item';
+                listItem.dataset.id = web.id;
+                
+                const date = new Date(web.addedAt);
+                const dateStr = date.toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                listItem.innerHTML = `
+                    <div class="web-info">
+                        <div class="web-name">
+                            <i class="fas fa-globe"></i> 
+                            ${web.name}
+                        </div>
+                        <p>${web.tags || 'Tidak ada tag'}</p>
+                        <div class="web-meta">
+                            <span><i class="fas fa-calendar"></i> ${dateStr}</span>
+                            <span><i class="fas fa-link"></i> ${new URL(web.url).hostname}</span>
+                        </div>
+                    </div>
+                    ${web.isFavorite ? '<div class="favorite-badge"><i class="fas fa-star"></i></div>' : ''}
+                `;
+                
+                webList.appendChild(listItem);
+            });
+            
+            document.querySelectorAll('.web-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    viewWeb(id);
+                });
+            });
+        }
+        
+        // Fungsi untuk menambahkan situs web
+        function addWeb() {
+            const name = webNameInput.value.trim();
+            const url = webUrlInput.value.trim();
+            const tags = webTagsInput.value.trim();
+            const isFavorite = isFavoriteCheckbox.checked;
+            
+            if (!name) {
+                showStatus('Silakan masukkan nama situs web', 'error');
+                return;
+            }
+            
+            if (!url) {
+                showStatus('Silakan masukkan URL situs web', 'error');
+                return;
+            }
+            
+            try {
+                new URL(url);
+            } catch (e) {
+                showStatus('URL tidak valid', 'error');
+                return;
+            }
+            
+            webFavorites.push({
+                id: Date.now(),
+                name: name,
+                url: url,
+                tags: tags || undefined,
+                isFavorite: isFavorite,
+                addedAt: Date.now()
+            });
+            
+            saveToLocalStorage();
+            renderWebList();
+            
+            webNameInput.value = '';
+            webUrlInput.value = '';
+            webTagsInput.value = '';
+            isFavoriteCheckbox.checked = true;
+            
+            showStatus('Situs web berhasil ditambahkan!');
+        }
+        
+        // Fungsi untuk melihat situs web
+        function viewWeb(id) {
+            const web = webFavorites.find(w => w.id == id);
+            if (!web) return;
+            
+            currentViewingWeb = web;
+            
+            webViewer.innerHTML = `
+                <iframe src="${web.url}" allowfullscreen></iframe>
+            `;
+            
+            currentUrlDisplay.textContent = web.url;
+        }
+        
+        // Fungsi untuk menghapus semua situs web
+        function clearAllWebs() {
+            if (!confirm('Apakah Anda yakin ingin menghapus SEMUA situs web? Tindakan ini tidak dapat dibatalkan.')) return;
+            
+            webFavorites = [];
+            
+            saveToLocalStorage();
+            renderWebList();
+            
+            webViewer.innerHTML = `
+                <div class="empty-viewer">
+                    <i class="fas fa-globe-americas"></i>
+                    <p>Pilih situs web dari daftar untuk melihatnya di sini</p>
+                    <p>Atau tambahkan situs baru menggunakan form di samping</p>
+                </div>
+            `;
+            currentUrlDisplay.textContent = 'Belum ada situs yang dipilih';
+            currentViewingWeb = null;
+            
+            showStatus('Semua situs web berhasil dihapus!');
+        }
+        
+        // Fungsi untuk refresh viewer
+        function refreshViewer() {
+            if (!currentViewingWeb) {
+                showStatus('Tidak ada situs web yang dipilih', 'error');
+                return;
+            }
+            
+            const iframe = webViewer.querySelector('iframe');
+            if (iframe) {
+                iframe.src = iframe.src;
+                showStatus('Situs web berhasil direfresh!');
+            }
+        }
+        
+        // Fungsi untuk fullscreen viewer
+        function fullscreenViewer() {
+            if (!currentViewingWeb) {
+                showStatus('Tidak ada situs web yang dipilih', 'error');
+                return;
+            }
+            
+            const iframe = webViewer.querySelector('iframe');
+            if (iframe) {
+                if (iframe.requestFullscreen) {
+                    iframe.requestFullscreen();
+                } else if (iframe.mozRequestFullScreen) {
+                    iframe.mozRequestFullScreen();
+                } else if (iframe.webkitRequestFullscreen) {
+                    iframe.webkitRequestFullscreen();
+                } else if (iframe.msRequestFullscreen) {
+                    iframe.msRequestFullscreen();
+                }
+            }
+        }
+        
+        // Fungsi untuk buka di tab baru
+        function openInNewTab() {
+            if (!currentViewingWeb) {
+                showStatus('Tidak ada situs web yang dipilih', 'error');
+                return;
+            }
+            
+            window.open(currentViewingWeb.url, '_blank');
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Editor initialization
+            const urlParams = new URLSearchParams(window.location.search);
+            const docId = urlParams.get('id');
+            
+            if (docId) {
+                document.getElementById('doc-id-input').value = docId;
+                setTimeout(loadContent, 500); 
+            }
+            
+            // Web viewer initialization
+            addWebBtn.addEventListener('click', addWeb);
+            clearAllBtn.addEventListener('click', clearAllWebs);
+            refreshBtn.addEventListener('click', refreshViewer);
+            fullscreenBtn.addEventListener('click', fullscreenViewer);
+            newTabBtn.addEventListener('click', openInNewTab);
+            
+            webNameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addWeb();
+            });
+            
+            webUrlInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addWeb();
+            });
+            
+            searchInput.addEventListener('input', renderWebList);
+            sortSelect.addEventListener('change', renderWebList);
+            
+            renderWebList();
+            
+            setTimeout(() => {
+                if (webFavorites.length === defaultWebs.length) {
+                    viewWeb(defaultWebs[0].id);
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

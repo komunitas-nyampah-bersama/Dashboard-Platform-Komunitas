@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Jejak Karbon Pribadi</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+            background: linear-gradient(to right, #27ae60, #2c3e50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .intro {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .calculator-section, .certificate-section {
+            padding: 25px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .calculator-section h2, .certificate-section h2 {
+            color: #27ae60;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #27ae60;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.2);
+        }
+        
+        button {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, #27ae60, #219653);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+        
+        #generateSertifikatBtn {
+            background: linear-gradient(to right, #2c3e50, #34495e);
+        }
+        
+        #downloadBtn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+        }
+        
+        #hasilKarbon {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(to right, #e8f5e9, #c8e6c9);
+            border-radius: 10px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #27ae60;
+            border: 2px dashed #4caf50;
+            display: none;
+        }
+        
+        .info-text {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        /* Certificate Styles */
+        .certificate-container {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .certificate {
+            background: linear-gradient(to bottom right, #ffffff, #f9f9f9);
+            border: 15px solid #27ae60;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 700px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .certificate::before {
+            content: "";
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 120px;
+            height: 120px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="none" stroke="%2327ae60" stroke-width="1" d="M20,20 Q40,5 60,20 T100,20 M20,50 Q40,35 60,50 T100,50 M20,80 Q40,65 60,80 T100,80"></path></svg>');
+            opacity: 0.1;
+        }
+        
+        .certificate-title {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .certificate-subtitle {
+            font-size: 22px;
+            color: #27ae60;
+            margin-bottom: 40px;
+        }
+        
+        .certificate-content {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .carbon-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .certificate-info {
+            font-size: 18px;
+            color: #555;
+            margin: 10px 0;
+        }
+        
+        .certificate-date {
+            margin-top: 30px;
+            font-size: 16px;
+            color: #777;
+        }
+        
+        .signature {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-around;
+            border-top: 2px solid #ddd;
+            padding-top: 20px;
+        }
+        
+        .signature div {
+            text-align: center;
+            width: 45%;
+        }
+        
+        .signature p {
+            margin-top: 60px;
+            border-top: 1px solid #999;
+            padding-top: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+        
+        .watermark {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.1);
+            transform: rotate(-15deg);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .tip-section {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 25px;
+        }
+        
+        .tip-section h3 {
+            color: #2196f3;
+            margin-bottom: 10px;
+        }
+        
+        .tip-section ul {
+            padding-left: 20px;
+        }
+        
+        .tip-section li {
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .certificate {
+                padding: 20px;
+            }
+            
+            .certificate-title {
+                font-size: 24px;
+            }
+            
+            .certificate-subtitle {
+                font-size: 18px;
+            }
+            
+            .carbon-value {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Kalkulator Jejak Karbon Pribadi</h1>
+            <p class="intro">Hitung jejak karbon Anda dan dapatkan sertifikat digital sebagai bentuk komitmen terhadap lingkungan</p>
+        </header>
+        
+        <div class="form-container">
+            <section class="calculator-section">
+                <h2>Hitung Jejak Karbon Anda</h2>
+                <p>Isi informasi berikut untuk memperkirakan jejak karbon bulanan Anda.</p>
+                
+                <div class="form-group">
+                    <label for="listrik">Pemakaian Listrik Bulanan (kWh):</label>
+                    <input type="number" id="listrik" placeholder="Contoh: 200" min="0">
+                    <p class="info-text">Masukkan perkiraan penggunaan listrik rumah tangga Anda dalam kilowatt-jam (kWh) per bulan.</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="transportasi">Jarak Tempuh Transportasi Pribadi (km/bulan):</label>
+                    <input type="number" id="transportasi" placeholder="Contoh: 300" min="0">
+                    <p class="info-text">Total jarak yang ditempuh kendaraan pribadi (mobil/motor) Anda dalam kilometer per bulan.</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="jenisBahanBakar">Jenis Bahan Bakar Kendaraan:</label>
+                    <select id="jenisBahanBakar">
+                        <option value="bensin">Bensin</option>
+                        <option value="diesel">Diesel</option>
+                        <option value="hybrid">Hybrid</option>
+                        <option value="elektrik">Elektrik</option>
+                    </select>
+                    <p class="info-text">Pilih jenis bahan bakar yang biasa Anda gunakan.</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="penerbangan">Jumlah Jam Penerbangan (per bulan, estimasi):</label>
+                    <input type="number" id="penerbangan" placeholder="Contoh: 0" min="0">
+                    <p class="info-text">Perkiraan total jam penerbangan (pulang-pergi) Anda dalam sebulan.</p>
+                </div>
+
+                <button onclick="hitungKarbon()">Hitung Jejak Karbon</button>
+
+                <div id="hasilKarbon">
+                    Jejak Karbon Anda: <span id="totalKarbon">0</span> kg CO2e/bulan
+                </div>
+                
+                <button id="generateSertifikatBtn" style="display: none;" onclick="generateCertificate()">Generate Sertifikat</button>
+            </section>
+            
+            <section class="certificate-section">
+                <h2>Sertifikat Jejak Karbon Digital</h2>
+                <p>Sertifikat ini merupakan bentuk pengakuan atas kesadaran Anda terhadap dampak lingkungan. Cetak atau simpan sebagai komitmen untuk bumi yang lebih baik.</p>
+                
+                <div class="certificate-container" id="certificateContainer">
+                    <div class="certificate" id="certificate">
+                        <div class="certificate-title">Sertifikat Kesadaran Jejak Karbon</div>
+                        <div class="certificate-subtitle">Diberikan kepada:</div>
+                        <div class="certificate-content">
+                            <p class="certificate-info">Atas partisipasi dalam menghitung dan menyadari</p>
+                            <p class="certificate-info">dampak lingkungan dari aktivitas sehari-hari</p>
+                            <div class="carbon-value" id="certCarbonValue">0 kg CO2e</div>
+                            <p class="certificate-info">jejak karbon bulanan</p>
+                        </div>
+                        <div class="certificate-date">
+                            Tanggal: <span id="certDate"></span>
+                        </div>
+                        <div class="signature">
+                            <div>
+                                <p>Pemilik Sertifikat</p>
+                            </div>
+                            <div>
+                                <p>Bumi Kita</p>
+                            </div>
+                        </div>
+                        <div class="watermark">Kalkulator Jejak Karbon Pribadi</div>
+                    </div>
+                    
+                    <button id="downloadBtn" onclick="downloadCertificate()">Unduh Sertifikat</button>
+                </div>
+            </section>
+        </div>
+        
+        <div class="tip-section">
+            <h3>Tips Mengurangi Jejak Karbon:</h3>
+            <ul>
+                <li>Gunakan transportasi umum atau bersepeda untuk perjalanan jarak dekat</li>
+                <li>Matikan peralatan elektronik saat tidak digunakan</li>
+                <li>Kurangi konsumsi daging dan produk hewani</li>
+                <li>Tanam pohon atau ikut program penghijauan</li>
+                <li>Gunakan peralatan elektronik dengan efisiensi energi tinggi</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 Kalkulator Jejak Karbon Pribadi | Data emisi karbon bersifat perkiraan dan dapat berbeda berdasarkan wilayah dan kondisi aktual</p>
+        </div>
+    </div>
+
+    <script>
+        // Faktor emisi yang lebih akurat
+        const faktorEmisi = {
+            listrik: 0.42, // kg CO2e per kWh (rata-rata global)
+            bensinPerKm: 0.18, // kg CO2e per km
+            dieselPerKm: 0.22, // kg CO2e per km
+            hybridPerKm: 0.12, // kg CO2e per km
+            elektrikPerKm: 0.05, // kg CO2e per km (asumsi listrik dari grid)
+            penerbanganPerJam: 95 // kg CO2e per jam penerbangan
+        };
+        
+        let totalJejakKarbon = 0;
+        
+        function hitungKarbon() {
+            // Mengambil nilai dari input pengguna
+            const listrik = parseFloat(document.getElementById('listrik').value) || 0;
+            const transportasi = parseFloat(document.getElementById('transportasi').value) || 0;
+            const jenisBahanBakar = document.getElementById('jenisBahanBakar').value;
+            const penerbangan = parseFloat(document.getElementById('penerbangan').value) || 0;
+            
+            // Validasi input
+            if (listrik === 0 && transportasi === 0 && penerbangan === 0) {
+                alert("Silakan isi setidaknya satu bidang untuk menghitung jejak karbon.");
+                return;
+            }
+
+            // Menghitung emisi untuk setiap kategori
+            const emisiListrik = listrik * faktorEmisi.listrik;
+            
+            let emisiTransportasi = 0;
+            switch(jenisBahanBakar) {
+                case 'bensin':
+                    emisiTransportasi = transportasi * faktorEmisi.bensinPerKm;
+                    break;
+                case 'diesel':
+                    emisiTransportasi = transportasi * faktorEmisi.dieselPerKm;
+                    break;
+                case 'hybrid':
+                    emisiTransportasi = transportasi * faktorEmisi.hybridPerKm;
+                    break;
+                case 'elektrik':
+                    emisiTransportasi = transportasi * faktorEmisi.elektrikPerKm;
+                    break;
+            }
+            
+            const emisiPenerbangan = penerbangan * faktorEmisi.penerbanganPerJam;
+            
+            // Total jejak karbon
+            totalJejakKarbon = emisiListrik + emisiTransportasi + emisiPenerbangan;
+            
+            // Menampilkan hasil
+            document.getElementById('totalKarbon').textContent = totalJejakKarbon.toFixed(2);
+            document.getElementById('hasilKarbon').style.display = 'block';
+            
+            // Tampilkan tombol generate sertifikat
+            document.getElementById('generateSertifikatBtn').style.display = 'block';
+            
+            // Sembunyikan sertifikat jika sudah ada
+            document.getElementById('certificateContainer').style.display = 'none';
+        }
+        
+        function generateCertificate() {
+            if (totalJejakKarbon <= 0) {
+                alert("Silakan hitung jejak karbon terlebih dahulu.");
+                return;
+            }
+            
+            // Set tanggal sertifikat
+            const now = new Date();
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            document.getElementById('certDate').textContent = now.toLocaleDateString('id-ID', options);
+            
+            // Set nilai karbon
+            document.getElementById('certCarbonValue').textContent = totalJejakKarbon.toFixed(2) + " kg CO2e";
+            
+            // Tampilkan sertifikat
+            document.getElementById('certificateContainer').style.display = 'block';
+            
+            // Scroll ke sertifikat
+            document.getElementById('certificateContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function downloadCertificate() {
+            if (totalJejakKarbon <= 0) {
+                alert("Silakan generate sertifikat terlebih dahulu.");
+                return;
+            }
+            
+            // Buat nama file yang bermakna
+            const now = new Date();
+            const formattedDate = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}`;
+            const filename = `sertifikat-jejak-karbon-${formattedDate}.pdf`;
+            
+            // Simulasi download (dalam implementasi nyata, ini akan menggunakan library seperti jsPDF)
+            alert(`Sertifikat "${filename}" akan diunduh. Dalam implementasi nyata, sertifikat akan diunduh sebagai PDF.`);
+            
+            // Di sini biasanya Anda akan menggunakan library seperti jsPDF untuk menghasilkan PDF
+            // Contoh: 
+            // const doc = new jsPDF();
+            // doc.addHTML(document.getElementById('certificate'), function() {
+            //     doc.save(filename);
+            // });
+        }
+    </script>
+</body>
+</html>

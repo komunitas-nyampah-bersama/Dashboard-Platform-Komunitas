@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CertiCard Pro+ - Sistem Profesional Pembuat Sertifikat & ID Card</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --danger: #e63946;
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --platinum: #e5e4e2;
+            --emerald: #50C878;
+            --sapphire: #0F52BA;
+            --ruby: #E0115F;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e6e9ff 100%);
+            color: #333;
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--sapphire) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 30px 0;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar-header {
+            padding: 0 30px 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--sapphire);
+            font-size: 28px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+
+        .nav-links {
+            padding: 0 30px;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.12);
+            transform: translateX(5px);
+        }
+
+        .nav-item i {
+            width: 28px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h2 {
+            font-size: 2rem;
+            color: var(--sapphire);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        .header-title p {
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: var(--sapphire);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.25);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.35);
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn.btn-outline {
+            background: transparent;
+            border: 2px solid var(--sapphire);
+            color: var(--sapphire);
+        }
+
+        .btn.btn-outline:hover {
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(0,0,0,0.06);
+            padding-bottom: 20px;
+        }
+
+        .card-header h3 {
+            font-size: 1.6rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+        }
+
+        .card-header h3 i {
+            width: 42px;
+            height: 42px;
+            background: rgba(114, 9, 183, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            font-size: 1.4rem;
+        }
+
+        /* Form Styles */
+        .form-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            color: var(--sapphire);
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(67, 97, 238, 0.2);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #444;
+            font-size: 1.05rem;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 14px 18px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: #f9faff;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+            background: white;
+        }
+
+        /* Preview Area */
+        .preview-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .preview-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .preview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .preview-header {
+            font-size: 1.5rem;
+            color: var(--sapphire);
+            margin-bottom: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Certificate Design */
+        .certificate {
+            width: 100%;
+            max-width: 800px;
+            background: linear-gradient(135deg, #fef9e7 0%, #fffdf5 100%);
+            border: 25px solid;
+            border-image: url('https://i.imgur.com/ZL7KQyY.png') 30 round;
+            padding: 50px;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            perspective: 1000px;
+        }
+
+        .certificate-inner {
+            position: relative;
+            z-index: 2;
+        }
+
+        .certificate::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://i.imgur.com/9Zv2Lv8.png') center/contain repeat;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        .certificate-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .certificate-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #8B4513;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            font-family: 'Times New Roman', serif;
+        }
+
+        .certificate-subtitle {
+            font-size: 1.4rem;
+            color: #5D4037;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        .certificate-body {
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .certificate-text {
+            font-size: 1.8rem;
+            margin: 30px 0;
+            font-weight: 500;
+            color: #333;
+            line-height: 1.8;
+            font-family: 'Georgia', serif;
+        }
+
+        .recipient-name {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--sapphire);
+            margin: 40px 0;
+            text-transform: uppercase;
+            display: inline-block;
+            padding: 0 30px 20px;
+            position: relative;
+            letter-spacing: 2px;
+        }
+
+        .recipient-name::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .certificate-details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+        }
+
+        .certificate-signature {
+            text-align: center;
+            width: 45%;
+        }
+
+        .signature-line {
+            border-top: 3px solid #333;
+            width: 80%;
+            margin: 0 auto 15px;
+            padding-top: 15px;
+        }
+
+        .signature-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #222;
+        }
+
+        .signature-title {
+            font-size: 1.2rem;
+            color: #555;
+        }
+
+        .certificate-date {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #444;
+            font-weight: 500;
+        }
+
+        .certificate-seal {
+            position: absolute;
+            bottom: 50px;
+            right: 50px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff 30%, #f0f0f0 100%);
+            border: 8px double var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #8B4513;
+            text-align: center;
+            padding: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            z-index: 3;
+            transform: rotate(-10deg);
+        }
+
+        .certificate-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 12rem;
+            font-weight: 800;
+            color: rgba(67, 97, 238, 0.05);
+            text-transform: uppercase;
+            letter-spacing: 20px;
+            z-index: 0;
+            white-space: nowrap;
+        }
+
+        /* ID Card Design */
+        .id-card {
+            width: 100%;
+            max-width: 420px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #d1e0ff 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            position: relative;
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateY(0deg);
+            transition: transform 0.5s ease;
+        }
+
+        .id-card:hover {
+            transform: perspective(1000px) rotateY(10deg);
+        }
+
+        .id-header {
+            background: linear-gradient(90deg, var(--sapphire), var(--secondary));
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .id-header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            transform: rotate(30deg);
+        }
+
+        .id-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .id-organization {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-top: 8px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .id-body {
+            padding: 30px;
+            display: flex;
+            gap: 25px;
+        }
+
+        .id-photo {
+            width: 140px;
+            height: 170px;
+            background: #f0f0f0;
+            border: 3px solid #ddd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .id-photo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .id-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .id-field {
+            display: flex;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 8px;
+        }
+
+        .id-label {
+            width: 120px;
+            font-weight: 600;
+            color: #555;
+            font-size: 1.05rem;
+        }
+
+        .id-value {
+            flex: 1;
+            font-weight: 500;
+            font-size: 1.05rem;
+        }
+
+        .id-name {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--sapphire);
+            margin: 15px 0 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .id-position {
+            color: var(--secondary);
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .id-footer {
+            background: #f0f4ff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px solid rgba(0,0,0,0.05);
+        }
+
+        .id-qr {
+            width: 100px;
+            height: 100px;
+            background: white;
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .id-number {
+            font-family: monospace;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #333;
+            letter-spacing: 1px;
+        }
+
+        .id-validity {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .id-chip {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #999, #333);
+            border-radius: 6px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .btn-large {
+            padding: 16px 35px;
+            font-size: 1.2rem;
+            border-radius: 15px;
+            box-shadow: 0 7px 20px rgba(0,0,0,0.15);
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold), #e6c200);
+            color: #333;
+            font-weight: 700;
+        }
+
+        .btn-sapphire {
+            background: linear-gradient(135deg, var(--sapphire), var(--primary));
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: relative;
+                top: 0;
+                max-width: 100%;
+            }
+            
+            .form-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .preview-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 20px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .certificate {
+                padding: 30px;
+                border-width: 20px;
+            }
+            
+            .certificate-title {
+                font-size: 2.2rem;
+            }
+            
+            .recipient-name {
+                font-size: 2.2rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo">
+                        <i class="fas fa-id-card-alt"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>CertiCard Pro+</h1>
+                        <p>Sistem Profesional Sertifikat & ID Card</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="nav-links">
+                <div class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-certificate"></i>
+                    <span>Template Sertifikat</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-address-card"></i>
+                    <span>Template ID Card</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Manajemen Penerima</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <span>Riwayat Pembuatan</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Pengaturan</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-star"></i>
+                    <span>Fitur Premium</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header>
+                <div class="header-title">
+                    <h2><i class="fas fa-id-card-alt"></i> CertiCard Pro+</h2>
+                    <p>Sistem profesional untuk membuat sertifikat dan ID card berkualitas tinggi dengan fitur lengkap</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-cloud-download-alt"></i> Impor Data
+                    </button>
+                    <button class="btn">
+                        <i class="fas fa-plus"></i> Proyek Baru
+                    </button>
+                </div>
+            </header>
+
+            <!-- Form Input -->
+            <div class="card floating">
+                <div class="card-header">
+                    <h3><i class="fas fa-edit"></i> Data Sertifikat & ID Card</h3>
+                    <div class="actions">
+                        <button class="btn btn-outline">
+                            <i class="fas fa-magic"></i> Desain Otomatis
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-container">
+                    <!-- Form Sertifikat -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-certificate"></i> Data Sertifikat
+                        </div>
+                        <div class="form-group">
+                            <label for="cert-title">Judul Sertifikat</label>
+                            <input type="text" id="cert-title" value="Sertifikat Prestasi Luar Biasa">
+                        </div>
+                        <div class="form-group">
+                            <label for="cert-subtitle">Subjudul</label>
+                            <input type="text" id="cert-subtitle" value="Diberikan dengan Penghargaan Tertinggi">
+                        </div>
+                        <div class="form-group">
+                            <label for="recipient-name">Nama Penerima</label>
+                            <input type="text" id="recipient-name" value="Dr. Sarah Wijaya, M.Sc">
+                        </div>
+                        <div class="form-group">
+                            <label for="cert-description">Deskripsi Penghargaan</label>
+                            <textarea id="cert-description" rows="4">Atas kontribusi luar biasa dalam bidang penelitian teknologi dan inovasi, serta dedikasi yang tinggi dalam memajukan ilmu pengetahuan selama lebih dari 10 tahun. Prestasi ini diakui secara internasional dan memberikan dampak signifikan bagi perkembangan sains di Indonesia.</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="cert-date">Tanggal Penghargaan</label>
+                            <input type="date" id="cert-date" value="2023-12-15">
+                        </div>
+                        <div class="form-group">
+                            <label for="cert-signer">Penandatangan</label>
+                            <input type="text" id="cert-signer" value="Prof. Ahmad Riyadi, Ph.D">
+                        </div>
+                        <div class="form-group">
+                            <label for="cert-position">Jabatan Penandatangan</label>
+                            <input type="text" id="cert-position" value="Rektor Universitas Teknologi Nusantara">
+                        </div>
+                    </div>
+                    
+                    <!-- Form ID Card -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-address-card"></i> Data ID Card
+                        </div>
+                        <div class="form-group">
+                            <label for="id-name">Nama Lengkap</label>
+                            <input type="text" id="id-name" value="Dr. Sarah Wijaya, M.Sc">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-position">Jabatan</label>
+                            <input type="text" id="id-position" value="Kepala Divisi Penelitian & Inovasi">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-department">Departemen</label>
+                            <input type="text" id="id-department" value="Pusat Teknologi Maju">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-number">Nomor ID</label>
+                            <input type="text" id="id-number" value="PTM-2023-001">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-valid">Berlaku Sampai</label>
+                            <input type="date" id="id-valid" value="2026-12-31">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-photo">Foto Profil</label>
+                            <input type="file" id="id-photo" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-organization">Organisasi</label>
+                            <input type="text" id="id-organization" value="Pusat Teknologi Maju Indonesia">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-address">Alamat Kantor</label>
+                            <input type="text" id="id-address" value="Jl. Inovasi No. 45, Jakarta Selatan 12950">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Preview Area -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-eye"></i> Preview Profesional</h3>
+                    <div class="actions">
+                        <button class="btn" id="refresh-preview">
+                            <i class="fas fa-sync-alt"></i> Perbarui Preview
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="preview-container">
+                    <!-- Sertifikat Preview -->
+                    <div class="preview-card">
+                        <div class="preview-header">
+                            <i class="fas fa-medal"></i> Sertifikat Premium
+                        </div>
+                        <div class="certificate" id="certificate-preview">
+                            <div class="certificate-watermark">PRESTASI</div>
+                            <div class="certificate-inner">
+                                <div class="certificate-header">
+                                    <div class="certificate-title" id="preview-cert-title">Sertifikat Prestasi Luar Biasa</div>
+                                    <div class="certificate-subtitle" id="preview-cert-subtitle">Diberikan dengan Penghargaan Tertinggi</div>
+                                </div>
+                                
+                                <div class="certificate-body">
+                                    <div class="recipient-name" id="preview-recipient">Dr. Sarah Wijaya, M.Sc</div>
+                                    
+                                    <div class="certificate-text" id="preview-description">
+                                        Atas kontribusi luar biasa dalam bidang penelitian teknologi dan inovasi, serta dedikasi yang tinggi dalam memajukan ilmu pengetahuan selama lebih dari 10 tahun. Prestasi ini diakui secara internasional dan memberikan dampak signifikan bagi perkembangan sains di Indonesia.
+                                    </div>
+                                </div>
+                                
+                                <div class="certificate-details">
+                                    <div class="certificate-signature">
+                                        <div class="signature-line"></div>
+                                        <div class="signature-name" id="preview-signer">Prof. Ahmad Riyadi, Ph.D</div>
+                                        <div class="signature-title" id="preview-position">Rektor Universitas Teknologi Nusantara</div>
+                                    </div>
+                                    
+                                    <div class="certificate-date">
+                                        <div>Diberikan pada:</div>
+                                        <div id="preview-date">15 Desember 2023</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="certificate-seal">
+                                <div>RESMI<br>DICETAK<br>OLEH<br>CERTICARD PRO</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ID Card Preview -->
+                    <div class="preview-card">
+                        <div class="preview-header">
+                            <i class="fas fa-id-badge"></i> ID Card Profesional
+                        </div>
+                        <div class="id-card" id="id-card-preview">
+                            <div class="id-chip"></div>
+                            <div class="id-header">
+                                <div class="id-title">KARTU IDENTITAS RESMI</div>
+                                <div class="id-organization" id="preview-org">Pusat Teknologi Maju Indonesia</div>
+                            </div>
+                            
+                            <div class="id-body">
+                                <div class="id-photo" id="preview-photo">
+                                    <i class="fas fa-user-tie" style="font-size: 4rem; color: #ccc;"></i>
+                                </div>
+                                
+                                <div class="id-info">
+                                    <div class="id-name" id="preview-id-name">Dr. Sarah Wijaya, M.Sc</div>
+                                    <div class="id-position" id="preview-id-position">Kepala Divisi Penelitian & Inovasi</div>
+                                    
+                                    <div class="id-field">
+                                        <div class="id-label">Departemen:</div>
+                                        <div class="id-value" id="preview-dept">Pusat Teknologi Maju</div>
+                                    </div>
+                                    
+                                    <div class="id-field">
+                                        <div class="id-label">ID Karyawan:</div>
+                                        <div class="id-value" id="preview-id-number">PTM-2023-001</div>
+                                    </div>
+                                    
+                                    <div class="id-field">
+                                        <div class="id-label">Lokasi:</div>
+                                        <div class="id-value" id="preview-address">Jakarta Selatan</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="id-footer">
+                                <div class="id-qr" id="qr-code">
+                                    <i class="fas fa-qrcode" style="font-size: 4rem; color: #ccc;"></i>
+                                </div>
+                                
+                                <div>
+                                    <div class="id-number" id="preview-full-id">PTM-2023-001</div>
+                                    <div class="id-validity">Berlaku hingga: <span id="preview-valid">31 Desember 2026</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-large btn-gold" id="download-cert">
+                        <i class="fas fa-download"></i> Unduh Sertifikat (PDF)
+                    </button>
+                    <button class="btn btn-large btn-sapphire" id="download-id">
+                        <i class="fas fa-download"></i> Unduh ID Card (PNG)
+                    </button>
+                    <button class="btn btn-large btn-outline" id="print-both">
+                        <i class="fas fa-print"></i> Cetak Profesional
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', function() {
+            // Format tanggal
+            const formatDate = (dateString) => {
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('id-ID', options);
+            };
+            
+            // Update preview
+            function updatePreview() {
+                // Sertifikat
+                document.getElementById('preview-cert-title').textContent = 
+                    document.getElementById('cert-title').value;
+                
+                document.getElementById('preview-cert-subtitle').textContent = 
+                    document.getElementById('cert-subtitle').value;
+                
+                document.getElementById('preview-recipient').textContent = 
+                    document.getElementById('recipient-name').value;
+                
+                document.getElementById('preview-description').textContent = 
+                    document.getElementById('cert-description').value;
+                
+                document.getElementById('preview-signer').textContent = 
+                    document.getElementById('cert-signer').value;
+                
+                document.getElementById('preview-position').textContent = 
+                    document.getElementById('cert-position').value;
+                
+                document.getElementById('preview-date').textContent = 
+                    formatDate(document.getElementById('cert-date').value);
+                
+                // ID Card
+                document.getElementById('preview-id-name').textContent = 
+                    document.getElementById('id-name').value;
+                
+                document.getElementById('preview-id-position').textContent = 
+                    document.getElementById('id-position').value;
+                
+                document.getElementById('preview-dept').textContent = 
+                    document.getElementById('id-department').value;
+                
+                document.getElementById('preview-id-number').textContent = 
+                    document.getElementById('id-number').value;
+                
+                document.getElementById('preview-full-id').textContent = 
+                    document.getElementById('id-number').value;
+                
+                document.getElementById('preview-org').textContent = 
+                    document.getElementById('id-organization').value;
+                
+                document.getElementById('preview-address').textContent = 
+                    document.getElementById('id-address').value;
+                
+                document.getElementById('preview-valid').textContent = 
+                    formatDate(document.getElementById('id-valid').value);
+                
+                // Generate QR Code
+                const qrData = `Nama: ${document.getElementById('id-name').value}
+ID: ${document.getElementById('id-number').value}
+Jabatan: ${document.getElementById('id-position').value}
+Dept: ${document.getElementById('id-department').value}
+Valid: ${formatDate(document.getElementById('id-valid').value)}`;
+                
+                const qrContainer = document.getElementById('qr-code');
+                qrContainer.innerHTML = '';
+                
+                QRCode.toCanvas(qrData, { 
+                    width: 200,
+                    margin: 1,
+                    color: {
+                        dark: '#000000',
+                        light: '#ffffff'
+                    },
+                    errorCorrectionLevel: 'H'
+                }, function (error, canvas) {
+                    if (error) {
+                        console.error(error);
+                        qrContainer.innerHTML = '<i class="fas fa-qrcode" style="font-size: 4rem; color: #ccc;"></i>';
+                    } else {
+                        canvas.style.width = '100%';
+                        canvas.style.height = '100%';
+                        qrContainer.appendChild(canvas);
+                    }
+                });
+            }
+            
+            // Handle photo upload
+            document.getElementById('id-photo').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'cover';
+                        
+                        const photoContainer = document.getElementById('preview-photo');
+                        photoContainer.innerHTML = '';
+                        photoContainer.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Download Certificate as PDF
+            document.getElementById('download-cert').addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('l', 'mm', 'a4');
+                
+                // Add certificate
+                html2canvas(document.getElementById('certificate-preview')).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 297; // A4 width in mm
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    
+                    doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                    
+                    // Add metadata
+                    const recipientName = document.getElementById('recipient-name').value;
+                    doc.setProperties({
+                        title: `Sertifikat - ${recipientName}`,
+                        subject: 'Sertifikat Penghargaan',
+                        author: 'CertiCard Pro+',
+                        creator: 'CertiCard Pro+'
+                    });
+                    
+                    doc.save(`sertifikat-${recipientName.replace(/\s+/g, '_')}.pdf`);
+                });
+            });
+            
+            // Download ID Card as PNG
+            document.getElementById('download-id').addEventListener('click', function() {
+                html2canvas(document.getElementById('id-card-preview')).then(canvas => {
+                    const link = document.createElement('a');
+                    const recipientName = document.getElementById('id-name').value;
+                    link.download = `id-card-${recipientName.replace(/\s+/g, '_')}.png`;
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    link.click();
+                });
+            });
+            
+            // Print both
+            document.getElementById('print-both').addEventListener('click', function() {
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Cetak Sertifikat dan ID Card</title>
+                        <style>
+                            @page { size: landscape; margin: 0; }
+                            body { 
+                                font-family: Arial, sans-serif; 
+                                margin: 0;
+                                padding: 20px;
+                                background: #f0f4ff;
+                            }
+                            .print-container { 
+                                max-width: 100%; 
+                                margin: 0 auto; 
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                            }
+                            .print-section { 
+                                margin-bottom: 40px;
+                                width: 100%;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                            }
+                            .print-header {
+                                margin-bottom: 20px;
+                                font-size: 1.5rem;
+                                color: #333;
+                                text-align: center;
+                            }
+                            .certificate-print {
+                                width: 90%;
+                                max-width: 1000px;
+                            }
+                            .id-card-print {
+                                width: 400px;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="print-container">
+                            <div class="print-section">
+                                <div class="print-header">SERTIFIKAT PENGHARGAAN</div>
+                                <div class="certificate-print">
+                                    ${document.getElementById('certificate-preview').outerHTML}
+                                </div>
+                            </div>
+                            <div class="print-section">
+                                <div class="print-header">KARTU IDENTITAS RESMI</div>
+                                <div class="id-card-print">
+                                    ${document.getElementById('id-card-preview').outerHTML}
+                                </div>
+                            </div>
+                        </div>
+                        <script>
+                            window.onload = function() {
+                                window.print();
+                                setTimeout(() => window.close(), 1000);
+                            };
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            });
+            
+            // Refresh preview
+            document.getElementById('refresh-preview').addEventListener('click', updatePreview);
+            
+            // Set default values and update preview
+            document.getElementById('cert-date').valueAsDate = new Date();
+            const nextYear = new Date();
+            nextYear.setFullYear(nextYear.getFullYear() + 3);
+            document.getElementById('id-valid').valueAsDate = nextYear;
+            
+            updatePreview();
+            
+            // Live update on input change
+            const inputs = document.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                input.addEventListener('input', updatePreview);
+            });
+            
+            // Add floating animation to certificate seal
+            const seal = document.querySelector('.certificate-seal');
+            if (seal) {
+                seal.classList.add('floating');
+            }
+        });
+        // ======================== EDITOR FUNCTIONS ========================
+        // Inisialisasi Supabase
+        const SUPABASE_URL = 'https://YOUR_SUPABASE_ID.supabase.co';
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        let currentDocId = '';
+        const notification = document.getElementById('notification');
+        
+        // Fungsi untuk menampilkan notifikasi
+        function showNotification(message, isSuccess = true) {
+            notification.textContent = message;
+            notification.style.background = isSuccess ? '#4caf50' : '#f44336';
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Fungsi untuk menambahkan blok konten
+        function addBlock(type) {
+            const editor = document.getElementById("editor");
+            const block = document.createElement("div");
+            block.className = "block";
+            block.contentEditable = true;
+            block.setAttribute('data-type', type);
+
+            if (type === "heading") {
+                block.innerHTML = "Judul Section";
+                block.style.fontSize = "24px";
+                block.style.fontWeight = "bold";
+            } else if (type === "list") {
+                block.innerHTML = "• Item 1<br>• Item 2";
+            } else if (type === "image") {
+                const url = prompt("Masukkan URL gambar:");
+                if (url) {
+                    const img = document.createElement("img");
+                    img.src = url;
+                    img.style.maxWidth = "100%";
+                    img.style.borderRadius = "8px";
+                    img.style.marginTop = "10px";
+                    block.appendChild(img);
+                } else {
+                    showNotification("URL gambar kosong, blok tidak ditambahkan.", false);
+                    return;
+                }
+            } else if (type === "embed") {
+                const url = prompt("Masukkan URL iframe/embed (YouTube, website):");
+                if (url) {
+                    const iframe = document.createElement("iframe");
+                    iframe.src = url;
+                    iframe.setAttribute('allowfullscreen', '');
+                    block.appendChild(iframe);
+                } else {
+                    showNotification("URL embed kosong, blok tidak ditambahkan.", false);
+                    return;
+                }
+            } else {
+                block.innerHTML = "Tulis sesuatu di sini...";
+            }
+
+            editor.appendChild(block);
+            block.focus();
+        }
+
+        // Fungsi kamera
+        function startCamera() {
+            const video = document.getElementById('video');
+            const captureBtn = document.getElementById('capture-btn');
+            const closeBtn = document.getElementById('close-camera');
+            
+            video.style.display = 'block';
+            captureBtn.style.display = 'block';
+            closeBtn.style.display = 'block';
+            
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    showNotification("Gagal membuka kamera: " + err.message + ". Pastikan browser Anda memiliki izin kamera.", false);
+                    closeCamera();
+                });
+        }
+        
+        function capturePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const dataUrl = canvas.toDataURL('image/png');
+            
+            const block = document.createElement("div");
+            block.className = "block";
+            block.setAttribute('data-type', 'image');
+            
+            const img = document.createElement("img");
+            img.src = dataUrl;
+            img.style.maxWidth = "100%";
+            img.style.borderRadius = "8px";
+            img.style.marginTop = "10px";
+            block.appendChild(img);
+            
+            document.getElementById("editor").appendChild(block);
+            
+            closeCamera();
+            showNotification("Foto berhasil ditambahkan!");
+        }
+        
+        function closeCamera() {
+            const video = document.getElementById('video');
+            const captureBtn = document.getElementById('capture-btn');
+            const closeBtn = document.getElementById('close-camera');
+            const stream = video.srcObject;
+            
+            if (stream) {
+                const tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+            
+            video.style.display = 'none';
+            captureBtn.style.display = 'none';
+            closeBtn.style.display = 'none';
+            video.srcObject = null;
+        }
+        
+        // ======================== EDITOR HISTORY & AUTOSAVE ========================
+        let history = [];
+        let historyIndex = -1;
+        let autosaveInterval;
+        let lastSavedState = '';
+
+        function saveEditorState() {
+            const editor = document.getElementById('editor');
+            const currentState = editor.innerHTML;
+            
+            if (history.length > 0 && currentState === history[historyIndex]) return;
+            
+            // Jika tidak di awal history, hapus redo history
+            if (historyIndex < history.length - 1) {
+                history = history.slice(0, historyIndex + 1);
+            }
+            
+            history.push(currentState);
+            historyIndex = history.length - 1;
+            
+            // Batasi history max 50 state
+            if (history.length > 50) {
+                history.shift();
+                historyIndex--;
+            }
+        }
+
+        function undo() {
+            if (historyIndex > 0) {
+                historyIndex--;
+                document.getElementById('editor').innerHTML = history[historyIndex];
+                showNotification("Undo berhasil");
+            } else {
+                showNotification("Tidak ada aksi untuk di-undo", false);
+            }
+        }
+
+        function redo() {
+            if (historyIndex < history.length - 1) {
+                historyIndex++;
+                document.getElementById('editor').innerHTML = history[historyIndex];
+                showNotification("Redo berhasil");
+            } else {
+                showNotification("Tidak ada aksi untuk di-redo", false);
+            }
+        }
+
+        function startAutosave() {
+            autosaveInterval = setInterval(() => {
+                const editor = document.getElementById('editor');
+                const currentContent = editor.innerHTML;
+                
+                if (currentContent !== lastSavedState) {
+                    saveContent();
+                    lastSavedState = currentContent;
+                }
+            }, 30000); // Autosave setiap 30 detik
+        }
+
+        function createHistoryButtons() {
+            const toolbar = document.getElementById('editor-tools');
+            
+            if (toolbar && !document.getElementById('history-buttons')) {
+                const historyContainer = document.createElement('div');
+                historyContainer.id = 'history-buttons';
+                historyContainer.style.display = 'inline-block';
+                historyContainer.style.marginLeft = '10px';
+                
+                const undoBtn = document.createElement('button');
+                undoBtn.innerHTML = '<i class="fas fa-undo"></i> Undo';
+                undoBtn.onclick = undo;
+                undoBtn.classList.add('toolbar-button');
+                undoBtn.style.marginRight = '5px';
+                
+                const redoBtn = document.createElement('button');
+                redoBtn.innerHTML = '<i class="fas fa-redo"></i> Redo';
+                redoBtn.onclick = redo;
+                redoBtn.classList.add('toolbar-button');
+                
+                historyContainer.appendChild(undoBtn);
+                historyContainer.appendChild(redoBtn);
+                toolbar.appendChild(historyContainer);
+            }
+        }
+        
+        // ======================== EDITOR SAVE/LOAD FUNCTIONS ========================
+        // Fungsi untuk menyimpan konten ke Supabase
+        async function saveContent() {
+            const editor = document.getElementById('editor');
+            const docIdInput = document.getElementById('doc-id-input');
+            const content = editor.innerHTML;
+            
+            if (SUPABASE_URL === 'https://YOUR_SUPABASE_ID.supabase.co' || SUPABASE_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+                showNotification("Harap ganti SUPABASE_URL dan SUPABASE_KEY dengan kunci Anda yang sebenarnya!", false);
+                return;
+            }
+
+            try {
+                let result;
+                
+                if (docIdInput.value) {
+                    result = await supabase
+                        .from('documents')
+                        .update({ content })
+                        .eq('id', docIdInput.value)
+                        .select();
+                } else {
+                    result = await supabase
+                        .from('documents')
+                        .insert([{ content }])
+                        .select();
+                }
+                
+                if (result.error) throw result.error;
+                
+                if (!docIdInput.value && result.data && result.data.length > 0) {
+                    docIdInput.value = result.data[0].id;
+                }
+                
+                showNotification("Dokumen berhasil disimpan ke cloud!");
+            } catch (error) {
+                console.error("Error menyimpan dokumen:", error);
+                showNotification("Gagal menyimpan ke cloud: " + error.message, false);
+            }
+        }
+        
+        // Fungsi untuk memuat konten dari Supabase
+        async function loadContent() {
+            const editor = document.getElementById('editor');
+            const docIdInput = document.getElementById('doc-id-input');
+            
+            if (!docIdInput.value) {
+                showNotification("Masukkan ID dokumen terlebih dahulu", false);
+                return;
+            }
+
+            if (SUPABASE_URL === 'https://YOUR_SUPABASE_ID.supabase.co' || SUPABASE_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+                showNotification("Harap ganti SUPABASE_URL dan SUPABASE_KEY dengan kunci Anda yang sebenarnya!", false);
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('documents')
+                    .select('content')
+                    .eq('id', docIdInput.value)
+                    .single();
+                
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        throw new Error("Dokumen dengan ID tersebut tidak ditemukan.");
+                    }
+                    throw error;
+                }
+                if (!data) throw new Error("Dokumen tidak ditemukan.");
+                
+                editor.innerHTML = data.content;
+                showNotification("Dokumen berhasil dimuat dari cloud!");
+                
+                // Reset history state setelah load
+                history = [editor.innerHTML];
+                historyIndex = 0;
+                lastSavedState = editor.innerHTML;
+            } catch (error) {
+                console.error("Error memuat dokumen:", error);
+                showNotification("Gagal memuat dari cloud: " + error.message, false);
+            }
+        }
+
+        // Fungsi untuk mengunduh konten sebagai file HTML
+        function downloadContent() {
+            const editor = document.getElementById('editor');
+            const content = editor.innerHTML;
+            const filename = 'dokumen_editor.html';
+
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification("Konten berhasil diunduh sebagai HTML!");
+        }
+        
+        // ======================== WEB VIEWER FUNCTIONS ========================
+        // ... (kode web viewer functions tetap sama) ...
+        
+        // ======================== INITIALIZATION ========================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Editor initialization
+            const urlParams = new URLSearchParams(window.location.search);
+            const docId = urlParams.get('id');
+            
+            if (docId) {
+                document.getElementById('doc-id-input').value = docId;
+                setTimeout(loadContent, 500); 
+            }
+            
+            // Inisialisasi history dan autosave
+            const editor = document.getElementById('editor');
+            if (editor) {
+                // Simpan state awal
+                history = [editor.innerHTML];
+                historyIndex = 0;
+                lastSavedState = editor.innerHTML;
+                
+                // Buat tombol undo/redo
+                createHistoryButtons();
+                
+                // Mulai autosave
+                startAutosave();
+                
+                // Simpan state setiap kali ada perubahan
+                editor.addEventListener('input', saveEditorState);
+            }
+            
+            // ... (kode web viewer initialization tetap sama) ...
+        });
+    </script>
+</body>
+</html>

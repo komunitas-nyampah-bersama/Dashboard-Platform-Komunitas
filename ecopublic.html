@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoPublish - Akses Publik API</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary: #1683d9;
+            --primary-dark: #126db3;
+            --secondary: #2ecc71;
+            --warning: #e74c3c;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --gray: #eef2f7;
+            --border-radius: 12px;
+            --box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logo i {
+            font-size: 3.5rem;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 2.8rem;
+            color: var(--dark);
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            font-size: 1.3rem;
+            color: var(--dark);
+            max-width: 700px;
+            margin: 0 auto 25px;
+        }
+
+        .intro {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin: 0 auto 40px;
+        }
+
+        .intro p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            text-align: center;
+            transition: var(--transition);
+            border-top: 4px solid var(--primary);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+
+        .feature-card i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .api-interface {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .api-tabs {
+            display: flex;
+            background: var(--primary);
+        }
+
+        .api-tab {
+            padding: 18px 30px;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+        }
+
+        .api-tab.active {
+            background: rgba(255,255,255,0.15);
+            border-bottom: 3px solid #ffd43b;
+        }
+
+        .api-tab-content {
+            padding: 35px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1f0ff;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(22, 131, 217, 0.2);
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(22, 131, 217, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(22, 131, 217, 0.4);
+        }
+
+        .btn-lg {
+            padding: 18px 35px;
+            font-size: 1.2rem;
+        }
+
+        .api-response {
+            background: #f8fafc;
+            border: 2px dashed #c2e0ff;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-top: 30px;
+            font-family: monospace;
+            font-size: 1rem;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            padding: 20px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .result-card h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .result-item {
+            margin-bottom: 10px;
+            display: flex;
+        }
+
+        .result-item strong {
+            min-width: 120px;
+            color: var(--dark);
+        }
+
+        .demo-data {
+            background: #e6f7ff;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin: 25px 0;
+        }
+
+        .demo-data h4 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, var(--primary), #1a6bac);
+            color: white;
+            border-radius: var(--border-radius);
+            margin: 50px 0;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+
+        .btn-light {
+            background: white;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .btn-light:hover {
+            background: #f0f0f0;
+            transform: translateY(-3px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 1rem;
+            border-top: 1px solid #e1f0ff;
+            margin-top: 50px;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            .api-tabs {
+                flex-direction: column;
+            }
+            
+            .api-tab {
+                text-align: center;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo h1 {
+                font-size: 2.2rem;
+            }
+            
+            .tagline {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-leaf"></i>
+                <h1>EcoPublish</h1>
+            </div>
+            <p class="tagline">Akses Data Publikasi Ilmiah dan Pengelolaan Sampah Secara Terbuka</p>
+        </header>
+
+        <div class="intro">
+            <p>Platform EcoPublish memberikan akses terbuka kepada masyarakat untuk mengakses data publikasi ilmiah dan statistik pengelolaan sampah. Gunakan antarmuka sederhana ini untuk mengeksplorasi data tanpa perlu pengetahuan teknis.</p>
+            <p><strong>Tidak perlu registrasi - Cukup pilih data yang Anda butuhkan!</strong></p>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-book-open"></i>
+                <h3>Publikasi Ilmiah</h3>
+                <p>Akses ribuan publikasi ilmiah tentang lingkungan dan pengelolaan sampah</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-recycle"></i>
+                <h3>Data Sampah</h3>
+                <p>Statistik terbaru tentang daur ulang dan pengelolaan sampah di berbagai wilayah</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>Materi Edukasi</h3>
+                <p>Panduan praktis dan materi edukasi tentang pengelolaan sampah</p>
+            </div>
+        </div>
+
+        <div class="api-interface">
+            <div class="api-tabs">
+                <div class="api-tab active" data-tab="publications">Publikasi Ilmiah</div>
+                <div class="api-tab" data-tab="waste">Data Sampah</div>
+                <div class="api-tab" data-tab="education">Materi Edukasi</div>
+            </div>
+            
+            <div class="api-tab-content">
+                <!-- Tab Publikasi Ilmiah -->
+                <div class="tab-pane active" id="publications">
+                    <h2 style="margin-bottom: 20px;">Cari Publikasi Ilmiah</h2>
+                    <p style="margin-bottom: 25px; color: #555;">Temukan publikasi ilmiah tentang lingkungan dan pengelolaan sampah berdasarkan kriteria tertentu</p>
+                    
+                    <div class="form-group">
+                        <label for="topic">Topik (misal: daur ulang, polusi plastik, kompos):</label>
+                        <input type="text" id="topic" placeholder="Masukkan topik penelitian">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="year">Tahun Publikasi:</label>
+                        <select id="year">
+                            <option value="">Semua Tahun</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                            <option value="2019">2019</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="region">Wilayah (opsional):</label>
+                        <input type="text" id="region" placeholder="Contoh: Jawa Barat">
+                    </div>
+                    
+                    <button class="btn btn-primary btn-lg" id="searchPublications">
+                        <i class="fas fa-search"></i> Cari Publikasi
+                    </button>
+                    
+                    <div class="demo-data">
+                        <h4><i class="fas fa-lightbulb"></i> Contoh Pencarian</h4>
+                        <p>Coba: Topik "daur ulang plastik", Tahun "2023"</p>
+                    </div>
+                    
+                    <div class="api-response" id="publicationsResult">
+                        <p style="color: #888; text-align: center; margin-top: 70px;">Hasil pencarian akan muncul di sini</p>
+                    </div>
+                </div>
+                
+                <!-- Tab Data Sampah -->
+                <div class="tab-pane" id="waste">
+                    <h2 style="margin-bottom: 20px;">Data Pengelolaan Sampah</h2>
+                    <p style="margin-bottom: 25px; color: #555;">Akses statistik terbaru tentang pengelolaan sampah di berbagai wilayah</p>
+                    
+                    <div class="form-group">
+                        <label for="wasteRegion">Pilih Wilayah:</label>
+                        <select id="wasteRegion">
+                            <option value="nasional">Nasional</option>
+                            <option value="jawa-barat">Jawa Barat</option>
+                            <option value="jawa-tengah">Jawa Tengah</option>
+                            <option value="jawa-timur">Jawa Timur</option>
+                            <option value="bali">Bali</option>
+                            <option value="sumatera-utara">Sumatera Utara</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="period">Periode Waktu:</label>
+                        <select id="period">
+                            <option value="terbaru">Data Terbaru</option>
+                            <option value="bulanan">Bulanan</option>
+                            <option value="tahunan">Tahunan</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-lg" id="getWasteData">
+                        <i class="fas fa-chart-bar"></i> Tampilkan Data
+                    </button>
+                    
+                    <div class="demo-data">
+                        <h4><i class="fas fa-lightbulb"></i> Contoh Data</h4>
+                        <p>Coba: Wilayah "Jawa Barat", Periode "Data Terbaru"</p>
+                    </div>
+                    
+                    <div class="api-response" id="wasteDataResult">
+                        <p style="color: #888; text-align: center; margin-top: 70px;">Data akan muncul di sini</p>
+                    </div>
+                </div>
+                
+                <!-- Tab Materi Edukasi -->
+                <div class="tab-pane" id="education">
+                    <h2 style="margin-bottom: 20px;">Materi Edukasi Pengelolaan Sampah</h2>
+                    <p style="margin-bottom: 25px; color: #555;">Temukan panduan praktis dan materi edukasi tentang pengelolaan sampah</p>
+                    
+                    <div class="form-group">
+                        <label for="educationTopic">Topik Materi:</label>
+                        <select id="educationTopic">
+                            <option value="semua">Semua Topik</option>
+                            <option value="pemilahan">Pemilahan Sampah</option>
+                            <option value="kompos">Pembuatan Kompos</option>
+                            <option value="daur-ulang">Daur Ulang Kreatif</option>
+                            <option value="plastik">Pengurangan Plastik</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="audience">Untuk:</label>
+                        <select id="audience">
+                            <option value="semua">Semua Kalangan</option>
+                            <option value="keluarga">Keluarga</option>
+                            <option value="sekolah">Sekolah/Pelajar</option>
+                            <option value="komunitas">Komunitas</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-lg" id="getEducation">
+                        <i class="fas fa-book"></i> Cari Materi
+                    </button>
+                    
+                    <div class="result-grid" id="educationResult">
+                        <!-- Hasil materi edukasi akan muncul di sini -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <h2>Ingin Akses Lebih Lengkap?</h2>
+            <p>Daftar sebagai anggota EcoPublish untuk mendapatkan akses ke seluruh fitur, dataset lengkap, dan kemampuan ekspor data</p>
+            <button class="btn btn-light btn-lg">
+                <i class="fas fa-user-plus"></i> Daftar Sekarang
+            </button>
+        </div>
+
+        <footer>
+            <p>© 2023 EcoPublish - Platform Publikasi Ilmiah dan Pengelolaan Sampah</p>
+            <p>Data disediakan untuk kepentingan publik dan penelitian</p>
+        </footer>
+    </div>
+
+    <script>
+        // Fungsi untuk tab
+        document.querySelectorAll('.api-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Hapus active dari semua tab
+                document.querySelectorAll('.api-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Tambahkan active ke tab yang diklik
+                this.classList.add('active');
+                
+                const tabId = this.dataset.tab;
+                
+                // Sembunyikan semua tab pane
+                document.querySelectorAll('.tab-pane').forEach(pane => {
+                    pane.classList.remove('active');
+                });
+                
+                // Tampilkan tab pane yang sesuai
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Fungsi untuk publikasi ilmiah
+        document.getElementById('searchPublications').addEventListener('click', function() {
+            const topic = document.getElementById('topic').value;
+            const year = document.getElementById('year').value;
+            const region = document.getElementById('region').value;
+            
+            if (!topic) {
+                alert('Silakan masukkan topik pencarian');
+                return;
+            }
+            
+            // Tampilkan loading
+            const resultEl = document.getElementById('publicationsResult');
+            resultEl.innerHTML = '<p style="text-align: center; padding: 50px 0;"><i class="fas fa-spinner fa-spin"></i> Mencari publikasi...</p>';
+            
+            // Simulasi delay
+            setTimeout(() => {
+                // Hasil simulasi
+                const publications = [
+                    {
+                        id: "pub-2023-045",
+                        title: "Inovasi Daur Ulang Plastik Menjadi Bahan Konstruksi",
+                        authors: ["Tim Riset Sampah", "Dr. Lingkungan"],
+                        year: 2023,
+                        abstract: "Studi terbaru tentang pemanfaatan limbah plastik sebagai bahan bangunan ramah lingkungan dengan kekuatan yang setara beton.",
+                        link: "#"
+                    },
+                    {
+                        id: "pub-2022-128",
+                        title: "Dampak Mikroplastik pada Ekosistem Laut",
+                        authors: ["Marine Research Group"],
+                        year: 2022,
+                        abstract: "Penelitian selama 3 tahun tentang akumulasi mikroplastik di perairan Indonesia dan dampaknya terhadap biota laut.",
+                        link: "#"
+                    },
+                    {
+                        id: "pub-2023-067",
+                        title: "Model Pengelolaan Sampah Berbasis Komunitas di Perkotaan",
+                        authors: ["Aktivis Hijau", "Dr. Sosiologi"],
+                        year: 2023,
+                        abstract: "Studi kasus tentang efektivitas model pengelolaan sampah berbasis partisipasi masyarakat di 5 kota besar di Indonesia.",
+                        link: "#"
+                    }
+                ];
+                
+                // Render hasil
+                let html = `
+                    <h3 style="margin-bottom: 20px; color: var(--primary);">Hasil Pencarian: "${topic}"</h3>
+                    <p style="margin-bottom: 25px;">Ditemukan ${publications.length} publikasi</p>
+                    <div class="result-grid">
+                `;
+                
+                publications.forEach(pub => {
+                    html += `
+                        <div class="result-card">
+                            <h4>${pub.title}</h4>
+                            <div class="result-item">
+                                <strong>Penulis:</strong>
+                                <span>${pub.authors.join(', ')}</span>
+                            </div>
+                            <div class="result-item">
+                                <strong>Tahun:</strong>
+                                <span>${pub.year}</span>
+                            </div>
+                            <p style="margin-top: 15px; font-size: 0.95rem;">${pub.abstract}</p>
+                            <a href="${pub.link}" style="display: inline-block; margin-top: 15px; color: var(--primary); font-weight: 500;">
+                                <i class="fas fa-book-open"></i> Baca Publikasi
+                            </a>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+                resultEl.innerHTML = html;
+            }, 1500);
+        });
+
+        // Fungsi untuk data sampah
+        document.getElementById('getWasteData').addEventListener('click', function() {
+            const region = document.getElementById('wasteRegion').value;
+            const regionName = document.getElementById('wasteRegion').options[document.getElementById('wasteRegion').selectedIndex].text;
+            const period = document.getElementById('period').value;
+            
+            // Tampilkan loading
+            const resultEl = document.getElementById('wasteDataResult');
+            resultEl.innerHTML = '<p style="text-align: center; padding: 50px 0;"><i class="fas fa-spinner fa-spin"></i> Mengambil data...</p>';
+            
+            // Simulasi delay
+            setTimeout(() => {
+                // Data sampah simulasi
+                const wasteData = {
+                    region: regionName,
+                    last_updated: "15 Oktober 2023",
+                    total_recycled: "1.250 ton",
+                    recycling_rate: "48%",
+                    waste_reduction: "35% dibanding tahun lalu",
+                    categories: [
+                        { name: "Plastik", amount: "562 ton", percentage: "45%" },
+                        { name: "Kertas", amount: "375 ton", percentage: "30%" },
+                        { name: "Kaca", amount: "187 ton", percentage: "15%" },
+                        { name: "Elektronik", amount: "126 ton", percentage: "10%" }
+                    ],
+                    impact: "Pengurangan emisi karbon setara 2.800 ton CO2"
+                };
+                
+                // Render hasil
+                let html = `
+                    <h3 style="margin-bottom: 20px; color: var(--primary);">Data Pengelolaan Sampah - ${wasteData.region}</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                        <div style="background: #e6f7ff; padding: 20px; border-radius: var(--border-radius);">
+                            <div style="font-size: 1.1rem; margin-bottom: 10px; color: var(--dark);">Total Didaur Ulang</div>
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--primary);">${wasteData.total_recycled}</div>
+                        </div>
+                        <div style="background: #e6f7ff; padding: 20px; border-radius: var(--border-radius);">
+                            <div style="font-size: 1.1rem; margin-bottom: 10px; color: var(--dark);">Tingkat Daur Ulang</div>
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--primary);">${wasteData.recycling_rate}</div>
+                        </div>
+                        <div style="background: #e6f7ff; padding: 20px; border-radius: var(--border-radius);">
+                            <div style="font-size: 1.1rem; margin-bottom: 10px; color: var(--dark);">Pengurangan Sampah</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">${wasteData.waste_reduction}</div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-bottom: 15px; color: var(--dark);">Komposisi Sampah</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                `;
+                
+                wasteData.categories.forEach(cat => {
+                    html += `
+                        <div style="background: white; padding: 15px; border-radius: var(--border-radius); box-shadow: 0 3px 8px rgba(0,0,0,0.08);">
+                            <div style="font-weight: 600; margin-bottom: 10px;">${cat.name}</div>
+                            <div>${cat.amount} (${cat.percentage})</div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                    </div>
+                    <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: var(--border-radius);">
+                        <i class="fas fa-leaf" style="margin-right: 10px;"></i>
+                        <strong>Dampak Lingkungan:</strong> ${wasteData.impact}
+                    </div>
+                    <p style="margin-top: 15px; font-size: 0.9rem; color: #666; text-align: right;">Terakhir diperbarui: ${wasteData.last_updated}</p>
+                `;
+                
+                resultEl.innerHTML = html;
+            }, 1500);
+        });
+
+        // Fungsi untuk materi edukasi
+        document.getElementById('getEducation').addEventListener('click', function() {
+            const topic = document.getElementById('educationTopic').value;
+            const audience = document.getElementById('audience').value;
+            
+            // Tampilkan loading
+            const resultEl = document.getElementById('educationResult');
+            resultEl.innerHTML = '<p style="text-align: center; padding: 50px 0; width: 100%;"><i class="fas fa-spinner fa-spin"></i> Mencari materi edukasi...</p>';
+            
+            // Simulasi delay
+            setTimeout(() => {
+                // Materi edukasi simulasi
+                const materials = [
+                    {
+                        id: "edu-001",
+                        title: "Panduan Daur Ulang Sampah Rumah Tangga",
+                        description: "Langkah-langkah praktis memilah dan mendaur ulang sampah di rumah",
+                        duration: "15 menit",
+                        level: "Pemula",
+                        audience: ["Keluarga", "Komunitas"],
+                        link: "#"
+                    },
+                    {
+                        id: "edu-045",
+                        title: "Teknik Komposting Modern",
+                        description: "Cara membuat kompos dari sampah organik dengan metode modern",
+                        duration: "30 menit",
+                        level: "Menengah",
+                        audience: ["Keluarga", "Komunitas"],
+                        link: "#"
+                    },
+                    {
+                        id: "edu-078",
+                        title: "Kreatif Daur Ulang Plastik",
+                        description: "Ide-ide kreatif mendaur ulang plastik menjadi barang berguna",
+                        duration: "25 menit",
+                        level: "Pemula",
+                        audience: ["Sekolah/Pelajar", "Keluarga"],
+                        link: "#"
+                    },
+                    {
+                        id: "edu-102",
+                        title: "Program Bank Sampah",
+                        description: "Panduan mendirikan dan mengelola bank sampah komunitas",
+                        duration: "40 menit",
+                        level: "Lanjutan",
+                        audience: ["Komunitas"],
+                        link: "#"
+                    }
+                ];
+                
+                // Render hasil
+                let html = '<div class="result-grid">';
+                
+                materials.forEach(mat => {
+                    html += `
+                        <div class="result-card">
+                            <h4>${mat.title}</h4>
+                            <p style="margin-bottom: 15px;">${mat.description}</p>
+                            <div class="result-item">
+                                <strong>Durasi:</strong>
+                                <span>${mat.duration}</span>
+                            </div>
+                            <div class="result-item">
+                                <strong>Tingkat:</strong>
+                                <span>${mat.level}</span>
+                            </div>
+                            <div class="result-item">
+                                <strong>Untuk:</strong>
+                                <span>${mat.audience.join(', ')}</span>
+                            </div>
+                            <a href="${mat.link}" class="btn btn-primary" style="margin-top: 15px;">
+                                <i class="fas fa-download"></i> Unduh Materi
+                            </a>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                resultEl.innerHTML = html;
+            }, 1500);
+        });
+
+        // Inisialisasi dengan contoh data sampah
+        document.getElementById('getWasteData').click();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Karbon - Integrasi Fullstack</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a936f;
+            --secondary: #114b5f;
+            --accent: #88d498;
+            --light: #f3e9d2;
+            --dark: #1d1e2c;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+            color: var(--accent);
+        }
+        
+        .wallet-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 15px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .nav-btn {
+            flex: 1;
+            padding: 15px 0;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--dark);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-btn.active {
+            color: var(--primary);
+        }
+        
+        .nav-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+        }
+        
+        .nav-btn:hover:not(.active) {
+            background-color: rgba(26, 147, 111, 0.1);
+        }
+        
+        /* Main Content */
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        /* Profile Section */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            flex-shrink: 0;
+        }
+        
+        .profile-info h2 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .profile-info p {
+            color: var(--secondary);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        .info-card {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .edit-toggle {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        /* Dashboard Section */
+        .carbon-calculator {
+            background: linear-gradient(to right, #e6f7ff, #f0f9ff);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 147, 111, 0.2);
+        }
+        
+        .calculator-result {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.2rem;
+            border-left: 4px solid var(--success);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .certificate {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+        
+        .certificate-title {
+            font-size: 1.8rem;
+            color: var(--secondary);
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .certificate-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            color: var(--dark);
+        }
+        
+        .certificate-content {
+            margin: 25px 0;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .certificate-signature {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+        }
+        
+        .signature-block {
+            text-align: center;
+        }
+        
+        .signature-line {
+            width: 200px;
+            height: 1px;
+            background: var(--dark);
+            margin: 20px auto;
+        }
+        
+        /* Wallet Section */
+        .wallet-balance {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .balance-label {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .wallet-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .transaction-table th {
+            background-color: var(--light);
+            padding: 12px 15px;
+            text-align: left;
+            color: var(--secondary);
+        }
+        
+        .transaction-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .transaction-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        /* Letter Section */
+        .letter-container {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            min-height: 500px;
+        }
+        
+        .letter-header {
+            text-align: right;
+            margin-bottom: 40px;
+        }
+        
+        .letter-content {
+            line-height: 1.8;
+        }
+        
+        /* Embed Section */
+        .embed-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .embed-controls input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .embed-viewer {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .copyright {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Notifications and Loading */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            border-left: 4px solid var(--danger);
+        }
+        
+        .notification.success {
+            border-left: 4px solid var(--success);
+        }
+        
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+            font-size: 1.5rem;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .wallet-actions, .btn-group {
+                flex-direction: column;
+            }
+            
+            .certificate-signature {
+                flex-direction: column;
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <span>Memuat data...</span>
+    </div>
+    
+    <!-- Notification -->
+    <div id="global-notification" class="notification">
+        <i class="fas fa-info-circle"></i>
+        <span>Notifikasi</span>
+    </div>
+    
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-leaf logo-icon"></i>
+                <h1>Karbon<span style="color: var(--accent);">Tracker</span></h1>
+            </div>
+            <div class="wallet-info">
+                <i class="fas fa-wallet"></i>
+                <span id="wallet-address">0x742d35...Cc6634</span>
+                <span class="balance-amount">Rp 1.250.000</span>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-btn active" data-target="profile"><i class="fas fa-user"></i> Profil</button>
+            <button class="nav-btn" data-target="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
+            <button class="nav-btn" data-target="wallet"><i class="fas fa-wallet"></i> Dompet</button>
+            <button class="nav-btn" data-target="letter"><i class="fas fa-envelope"></i> Surat</button>
+            <button class="nav-btn" data-target="embed"><i class="fas fa-globe"></i> Embed</button>
+        </div>
+        
+        <!-- Profile Section -->
+        <section id="profile" class="content-section active">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-info">
+                    <h2 id="profile-name">Muhamad Oky Muhlisin</h2>
+                    <p id="profile-title">Independent Researcher — Teknologi dan Inovasi</p>
+                    <p><strong>EU ID:</strong> <span id="eu-id">n00jcciv</span></p>
+                    <p><strong>Saluran Pengajuan:</strong> <span id="submission-channels">Zenodo · EU OpenAIRE · HAL · OSF</span></p>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="card-title">
+                    <span>Bidang Fokus</span>
+                    <button class="edit-toggle"><i class="fas fa-edit"></i> Edit</button>
+                </div>
+                <ul id="focus-areas">
+                    <li>Proof of Attention Value</li>
+                    <li>Ekonomi Perilaku dan Kepercayaan</li>
+                    <li>Teknologi Blockchain Sosial</li>
+                    <li>Desentralisasi Sistem Sosial Digital</li>
+                    <li>Model Peer-to-Peer Trust & Reward Framework</li>
+                    <li>Sistem Tokenisasi Aksi dan Memori KolektiF</li>
+                </ul>
+            </div>
+            
+            <div class="info-card">
+                <div class="card-title">
+                    <span>Publikasi</span>
+                    <button class="edit-toggle"><i class="fas fa-edit"></i> Edit</button>
+                </div>
+                <div id="publications">
+                    <p><strong>Implementasi Proof of Attention Value dalam Ekosistem Digital Sosial</strong><br>
+                    Muhlisin, M.O. (2024). Jurnal Teknologi dan Inovasi, 12(3), 45-62.</p>
+                    
+                    <p><strong>Model Ekonomi Perilaku untuk Sistem Desentralisasi: Studi Kasus Nyampah Bersama</strong><br>
+                    Muhlisin, M.O. (2023). Dalam Prosiding Konferensi Nasional Teknologi Blockchain, Jakarta, Indonesia.</p>
+                    
+                    <p><strong>Trust Mechanism in Decentralized Social Applications</strong><br>
+                    Muhlisin, M.O. & Pratama, A. (2023). International Journal of Blockchain Innovation, 5(2), 78-95.</p>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="card-title">
+                    <span>Kompetensi</span>
+                    <button class="edit-toggle"><i class="fas fa-edit"></i> Edit</button>
+                </div>
+                <ul id="competencies">
+                    <li>Sistem Desentralisasi & Blockchain</li>
+                    <li>Pengembangan Framework Aplikasi Sosial</li>
+                    <li>Analisis Ekonomi Perilaku Digital</li>
+                    <li>Tokenisasi Sistem Sosial</li>
+                    <li>Desain Mekanisme Insentif</li>
+                </ul>
+            </div>
+            
+            <div class="info-card">
+                <div class="card-title">
+                    <span>Kontak & Link</span>
+                    <button class="edit-toggle"><i class="fas fa-edit"></i> Edit</button>
+                </div>
+                <div id="contacts">
+                    <p><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/in/oky-muhlisin/" target="_blank">LinkedIn</a></p>
+                    <p><i class="fab fa-researchgate"></i> <a href="https://www.researchgate.net/profile/Muhamad-Oky-Muhlisin" target="_blank">ResearchGate</a></p>
+                    <p><i class="fab fa-github"></i> <a href="https://github.com/okymuhlisin" target="_blank">GitHub</a></p>
+                </div>
+                <div id="links" class="mt-3">
+                    <p><i class="fas fa-link"></i> <a href="https://linktr.ee/MuhamadOkyMuhlisin" target="_blank">Linktree</a></p>
+                    <p><i class="fab fa-github"></i> <a href="https://github.com/enterprises/komunitas-nyampah-bersama" target="_blank">GitHub: komunitas-nyampah-bersama</a></p>
+                    <p><i class="fas fa-archive"></i> <a href="https://zenodo.org/communities/nyampahbersama" target="_blank">Zenodo: nyampahbersama community</a></p>
+                    <p><i class="fas fa-file-alt"></i> <a href="https://osf.io/preprints/search?q=Muhamad%20Oky%20Muhlisin" target="_blank">OSF Preprints</a></p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section">
+            <h2 class="section-title">Kalkulator Jejak Karbon</h2>
+            
+            <div class="carbon-calculator">
+                <div class="input-group">
+                    <label for="listrik">Konsumsi Listrik Bulanan (kWh)</label>
+                    <input type="number" id="listrik" placeholder="Masukkan konsumsi listrik">
+                </div>
+                
+                <div class="input-group">
+                    <label for="transportasi">Jarak Tempuh Transportasi (km/bulan)</label>
+                    <input type="number" id="transportasi" placeholder="Masukkan jarak tempuh">
+                </div>
+                
+                <div class="input-group">
+                    <label for="jenisBahanBakar">Jenis Bahan Bakar Kendaraan</label>
+                    <select id="jenisBahanBakar">
+                        <option value="bensin">Bensin</option>
+                        <option value="diesel">Diesel</option>
+                        <option value="hybrid">Hybrid</option>
+                        <option value="electric">Listrik</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="penerbangan">Jarak Penerbangan (km/tahun)</label>
+                    <input type="number" id="penerbangan" placeholder="Masukkan jarak penerbangan">
+                </div>
+                
+                <div class="calculator-result" id="hasilKarbon">
+                    Silakan masukkan data untuk menghitung jejak karbon Anda.
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="hitung-karbon-btn">
+                        <i class="fas fa-calculator"></i> Hitung Jejak Karbon
+                    </button>
+                    <button class="btn btn-secondary" id="generate-certificate-btn">
+                        <i class="fas fa-certificate"></i> Generate Sertifikat
+                    </button>
+                </div>
+            </div>
+            
+            <div id="certificate-container"></div>
+        </section>
+        
+        <!-- Wallet Section -->
+        <section id="wallet" class="content-section">
+            <h2 class="section-title">Dompet Digital</h2>
+            
+            <div class="wallet-balance">
+                <div class="balance-label">Saldo Anda</div>
+                <div class="balance-amount">Rp 1.250.000</div>
+                <div class="wallet-address">0x742d35Cc6634C893292...Cc6634</div>
+            </div>
+            
+            <div class="wallet-actions">
+                <button class="btn btn-primary" id="transfer-btn">
+                    <i class="fas fa-paper-plane"></i> Transfer
+                </button>
+                <button class="btn btn-secondary" id="topup-btn">
+                    <i class="fas fa-plus-circle"></i> Top Up
+                </button>
+            </div>
+            
+            <h3 class="section-title">Riwayat Transaksi</h3>
+            <table class="transaction-table">
+                <thead>
+                    <tr>
+                        <th>Deskripsi</th>
+                        <th>Tanggal</th>
+                        <th>Jumlah</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Transfer ke Siti Rahayu</td>
+                        <td>15 Jul 2023</td>
+                        <td>Rp 350.000</td>
+                        <td style="color: #27ae60;">Berhasil</td>
+                    </tr>
+                    <tr>
+                        <td>Top Up via Bank BCA</td>
+                        <td>14 Jul 2023</td>
+                        <td>Rp 1.500.000</td>
+                        <td style="color: #27ae60;">Berhasil</td>
+                    </tr>
+                    <tr>
+                        <td>Pembayaran Toko Buku</td>
+                        <td>12 Jul 2023</td>
+                        <td>Rp 125.000</td>
+                        <td style="color: #27ae60;">Berhasil</td>
+                    </tr>
+                    <tr>
+                        <td>Transfer ke Budi Santoso</td>
+                        <td>10 Jul 2023</td>
+                        <td>Rp 500.000</td>
+                        <td style="color: #f39c12;">Pending</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <!-- Letter Section -->
+        <section id="letter" class="content-section">
+            <h2 class="section-title">Surat Resmi</h2>
+            
+            <div class="letter-container">
+                <div class="letter-header">
+                    <p>Palembang, <span id="current-date">15 Juli 2023</span></p>
+                </div>
+                
+                <div class="letter-content">
+                    <p>Kepada Yth,</p>
+                    <p>Direktur Eksekutif<br>Komunitas Nyampah Bersama<br>Jl. Pendidikan No. 123<br>Palembang, Sumatera Selatan</p>
+                    
+                    <p style="margin-top: 30px;">Dengan hormat,</p>
+                    
+                    <p style="text-indent: 40px; margin-top: 20px;">
+                        Melalui surat ini, saya Muhamad Oky Muhlisin, sebagai Independent Researcher di bidang Teknologi dan Inovasi, 
+                        bermaksud untuk mengajukan proposal penelitian kolaboratif dengan Komunitas Nyampah Bersama. 
+                        Penelitian ini akan berfokus pada pengembangan sistem tokenisasi berbasis blockchain untuk meningkatkan 
+                        partisipasi masyarakat dalam program daur ulang sampah.
+                    </p>
+                    
+                    <p style="text-indent: 40px;">
+                        Dalam proposal ini, kami menawarkan framework Proof of Attention Value yang dapat mengintegrasikan 
+                        aktivitas daur ulang dengan sistem reward berbasis token. Sistem ini diharapkan dapat meningkatkan 
+                        tingkat partisipasi masyarakat hingga 70% dalam program daur ulang, sekaligus menciptakan ekonomi 
+                        sirkular yang berkelanjutan.
+                    </p>
+                    
+                    <p style="text-indent: 40px;">
+                        Kami yakin bahwa kolaborasi antara keahlian riset kami dan jaringan komunitas Nyampah Bersama 
+                        dapat menghasilkan solusi inovatif untuk permasalahan pengelolaan sampah di Indonesia. 
+                        Proposal lengkap dapat diakses melalui tautan berikut: 
+                        <a href="https://osf.io/preprints/xyz123" target="_blank">https://osf.io/preprints/xyz123</a>.
+                    </p>
+                    
+                    <p style="margin-top: 30px;">
+                        Demikian surat permohonan ini kami sampaikan. Atas perhatian dan kerjasamanya, kami ucapkan terima kasih.
+                    </p>
+                    
+                    <p style="margin-top: 50px;">
+                        Hormat kami,<br><br><br>
+                        <strong>Muhamad Oky Muhlisin</strong><br>
+                        Independent Researcher<br>
+                        EU ID: n00jcciv
+                    </p>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" id="generate-letter-btn" style="width: 100%;">
+                <i class="fas fa-file-pdf"></i> Generate PDF
+            </button>
+        </section>
+        
+        <!-- Embed Section -->
+        <section id="embed" class="content-section">
+            <h2 class="section-title">Embed Website</h2>
+            
+            <div class="embed-controls">
+                <input type="text" id="embed-url" placeholder="Masukkan URL website (contoh: https://example.com)">
+                <button class="btn btn-primary" id="load-embed-btn">
+                    <i class="fas fa-sync"></i> Muat Website
+                </button>
+            </div>
+            
+            <iframe class="embed-viewer" src="" title="Embedded Website"></iframe>
+        </section>
+    </div>
+    
+    <footer>
+        <div class="container footer-content">
+            <div class="logo">
+                <i class="fas fa-leaf logo-icon"></i>
+                <h1>Karbon<span style="color: var(--accent);">Tracker</span></h1>
+            </div>
+            <div class="copyright">
+                &copy; 2023 Platform Karbon - Integrasi Fullstack. Hak cipta dilindungi.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===================== KONFIGURASI APLIKASI =====================
+        const CONFIG = {
+            BACKEND_URL: "http://localhost:3001", // Ganti dengan URL backend Anda
+            CONTRACT_ADDRESS: "0x742d35Cc6634C893292", // Alamat kontrak pintar
+            IPFS_GATEWAY: "https://ipfs.io/ipfs/",
+            DEFAULT_PROFILE: {
+                name: "Muhamad Oky Muhlisin",
+                title: "Independent Researcher — Teknologi dan Inovasi",
+                euId: "n00jcciv",
+                submissionChannels: "Zenodo · EU OpenAIRE · HAL · OSF",
+                focusAreas: [
+                    "Proof of Attention Value",
+                    "Ekonomi Perilaku dan Kepercayaan",
+                    "Teknologi Blockchain Sosial",
+                    "Desentralisasi Sistem Sosial Digital",
+                    "Model Peer-to-Peer Trust & Reward Framework",
+                    "Sistem Tokenisasi Aksi dan Memori KolektiF"
+                ],
+                publications: [
+                    {
+                        title: "Implementasi Proof of Attention Value dalam Ekosistem Digital Sosial",
+                        details: "Muhlisin, M.O. (2024). Jurnal Teknologi dan Inovasi, 12(3), 45-62."
+                    },
+                    {
+                        title: "Model Ekonomi Perilaku untuk Sistem Desentralisasi: Studi Kasus Nyampah Bersama",
+                        details: "Muhlisin, M.O. (2023). Dalam Prosiding Konferensi Nasional Teknologi Blockchain, Jakarta, Indonesia."
+                    },
+                    {
+                        title: "Trust Mechanism in Decentralized Social Applications",
+                        details: "Muhlisin, M.O. & Pratama, A. (2023). International Journal of Blockchain Innovation, 5(2), 78-95."
+                    }
+                ],
+                competencies: [
+                    "Sistem Desentralisasi & Blockchain",
+                    "Pengembangan Framework Aplikasi Sosial",
+                    "Analisis Ekonomi Perilaku Digital",
+                    "Tokenisasi Sistem Sosial",
+                    "Desain Mekanisme Insentif"
+                ],
+                contacts: [
+                    { label: "LinkedIn", value: "https://www.linkedin.com/in/oky-muhlisin/" },
+                    { label: "ResearchGate", value: "https://www.researchgate.net/profile/Muhamad-Oky-Muhlisin" },
+                    { label: "GitHub", value: "https://github.com/okymuhlisin" }
+                ],
+                links: [
+                    { title: "Linktree", url: "https://linktr.ee/MuhamadOkyMuhlisin" },
+                    { title: "GitHub: komunitas-nyampah-bersama", url: "https://github.com/enterprises/komunitas-nyampah-bersama" },
+                    { title: "Zenodo: nyampahbersama community", url: "https://zenodo.org/communities/nyampahbersama" },
+                    { title: "OSF Preprints", url: "https://osf.io/preprints/search?q=Muhamad%20Oky%20Muhlisin" }
+                ]
+            }
+        };
+
+        // ===================== STATE APLIKASI =====================
+        let appState = {
+            userProfile: null,
+            walletBalance: 0,
+            transactions: [],
+            web3: null,
+            contract: null,
+            currentAccount: null
+        };
+
+        // ===================== INISIALISASI APLIKASI =====================
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Tampilkan loading
+            showLoading();
+            
+            try {
+                // Inisialisasi Web3
+                await initWeb3();
+                
+                // Muat data profil
+                await loadProfileData();
+                
+                // Muat data dompet
+                await loadWalletData();
+                
+                // Inisialisasi event listeners
+                initEventListeners();
+                
+                // Perbarui UI
+                updateUI();
+                
+                // Perbarui tanggal
+                updateDate();
+            } catch (error) {
+                showNotification(`Error: ${error.message}`, true);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // ===================== FUNGSI UTAMA =====================
+
+        // Inisialisasi Web3 dan kontrak pintar
+        async function initWeb3() {
+            if (window.ethereum) {
+                try {
+                    // Minta akses ke akun
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    appState.currentAccount = accounts[0];
+                    
+                    // Update wallet address di UI
+                    document.getElementById('wallet-address').textContent = 
+                        `${appState.currentAccount.slice(0, 6)}...${appState.currentAccount.slice(-4)}`;
+                    
+                    // Inisialisasi Web3
+                    appState.web3 = new Web3(window.ethereum);
+                    
+                    // Inisialisasi kontrak pintar
+                    const contractABI = await fetchContractABI();
+                    appState.contract = new appState.web3.eth.Contract(
+                        contractABI, 
+                        CONFIG.CONTRACT_ADDRESS
+                    );
+                    
+                    // Set up listener untuk perubahan akun
+                    window.ethereum.on('accountsChanged', (accounts) => {
+                        if (accounts.length === 0) {
+                            showNotification("Silakan sambungkan kembali dompet Anda", true);
+                        } else {
+                            appState.currentAccount = accounts[0];
+                            // Update UI dengan akun baru
+                            document.getElementById('wallet-address').textContent = 
+                                `${appState.currentAccount.slice(0, 6)}...${appState.currentAccount.slice(-4)}`;
+                            // Muat ulang data
+                            loadProfileData();
+                            loadWalletData();
+                            updateUI();
+                        }
+                    });
+                    
+                    showNotification("Dompet blockchain terhubung!", false);
+                } catch (error) {
+                    throw new Error("Gagal menghubungkan ke dompet blockchain");
+                }
+            } else {
+                throw new Error("Instal ekstensi dompet blockchain (seperti MetaMask) terlebih dahulu");
+            }
+        }
+
+        // Muat data profil dari backend
+        async function loadProfileData() {
+            try {
+                // Gunakan alamat wallet sebagai userId
+                const userId = appState.currentAccount;
+                const response = await fetch(`${CONFIG.BACKEND_URL}/api/profile/${userId}`);
+                const profile = await response.json();
+                
+                // Gabungkan data default dengan data dari backend
+                appState.userProfile = {
+                    ...CONFIG.DEFAULT_PROFILE,
+                    ...profile
+                };
+                
+                showNotification("Profil berhasil dimuat", false);
+            } catch (error) {
+                // Gunakan data default jika backend tidak tersedia
+                appState.userProfile = CONFIG.DEFAULT_PROFILE;
+                showNotification("Menggunakan profil default", false);
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        // Muat data dompet dari blockchain
+        async function loadWalletData() {
+            if (!appState.web3) return;
+            
+            try {
+                // Dapatkan saldo ETH
+                const balance = await appState.web3.eth.getBalance(appState.currentAccount);
+                appState.walletBalance = appState.web3.utils.fromWei(balance, 'ether');
+                
+                // Dapatkan transaksi (contoh)
+                appState.transactions = [
+                    { description: "Transfer ke Siti Rahayu", date: "15 Jul 2023", amount: "Rp 350.000", status: "Berhasil" },
+                    { description: "Top Up via Bank BCA", date: "14 Jul 2023", amount: "Rp 1.500.000", status: "Berhasil" },
+                    { description: "Pembayaran Toko Buku", date: "12 Jul 2023", amount: "Rp 125.000", status: "Berhasil" },
+                    { description: "Transfer ke Budi Santoso", date: "10 Jul 2023", amount: "Rp 500.000", status: "Pending" }
+                ];
+                
+                showNotification("Data dompet berhasil dimuat", false);
+            } catch (error) {
+                throw new Error("Gagal memuat data dompet");
+            }
+        }
+
+        // Inisialisasi event listeners
+        function initEventListeners() {
+            // Navigasi
+            document.querySelectorAll('.nav-btn').forEach(button => {
+                button.addEventListener('click', handleNavigation);
+            });
+            
+            // Kalkulator karbon
+            document.getElementById('hitung-karbon-btn').addEventListener('click', hitungKarbon);
+            document.getElementById('generate-certificate-btn').addEventListener('click', generateCertificate);
+            
+            // Dompet
+            document.getElementById('transfer-btn').addEventListener('click', handleTransfer);
+            document.getElementById('topup-btn').addEventListener('click', handleTopUp);
+            
+            // Edit profil
+            document.querySelectorAll('.edit-toggle').forEach(button => {
+                button.addEventListener('click', enableEditMode);
+            });
+            
+            // Embed web
+            document.getElementById('load-embed-btn').addEventListener('click', loadEmbed);
+            
+            // Surat
+            document.getElementById('generate-letter-btn').addEventListener('click', generateLetterPDF);
+        }
+
+        // Perbarui UI dengan data terbaru
+        function updateUI() {
+            if (!appState.userProfile) return;
+            
+            // Perbarui profil
+            document.getElementById('profile-name').textContent = appState.userProfile.name;
+            document.getElementById('profile-title').textContent = appState.userProfile.title;
+            document.getElementById('eu-id').textContent = appState.userProfile.euId;
+            document.getElementById('submission-channels').textContent = appState.userProfile.submissionChannels;
+            
+            // Perbarui dompet
+            document.querySelector('.balance-amount').textContent = `Rp ${(appState.walletBalance * 15000).toLocaleString()}`;
+            
+            // Perbarui transaksi
+            const tbody = document.querySelector('.transaction-table tbody');
+            tbody.innerHTML = '';
+            
+            appState.transactions.forEach(tx => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${tx.description}</td>
+                    <td>${tx.date}</td>
+                    <td>${tx.amount}</td>
+                    <td><span style="color: ${tx.status === 'Berhasil' ? '#27ae60' : '#f39c12'};">${tx.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ===================== FUNGSI MODUL PROFIL =====================
+
+        // Aktifkan mode edit
+        function enableEditMode(event) {
+            const card = event.target.closest('.info-card');
+            alert('Fitur edit diaktifkan untuk bagian ini');
+            // Implementasi edit akan dilakukan di sini
+        }
+
+        // ===================== FUNGSI MODUL DASHBOARD =====================
+
+        // Hitung jejak karbon
+        function hitungKarbon() {
+            const listrik = parseFloat(document.getElementById('listrik').value) || 0;
+            const transportasi = parseFloat(document.getElementById('transportasi').value) || 0;
+            const jenisBahanBakar = document.getElementById('jenisBahanBakar').value;
+            const penerbangan = parseFloat(document.getElementById('penerbangan').value) || 0;
+            
+            // Faktor emisi
+            const faktorListrik = 0.85;
+            const faktorBensin = 2.32;
+            const faktorDiesel = 2.68;
+            const faktorPenerbangan = 90;
+            
+            let total = 0;
+            total += listrik * faktorListrik;
+            
+            if (jenisBahanBakar === 'bensin') {
+                total += transportasi * faktorBensin;
+            } else if (jenisBahanBakar === 'diesel') {
+                total += transportasi * faktorDiesel;
+            }
+            
+            total += penerbangan * faktorPenerbangan;
+            
+            document.getElementById('hasilKarbon').innerHTML = 
+                `Jejak Karbon Anda: <strong>${total.toFixed(2)} kg CO2e/bulan</strong>`;
+        }
+
+        // Generate sertifikat karbon
+        async function generateCertificate() {
+            const carbonResult = document.getElementById('hasilKarbon').textContent;
+            const carbonValue = carbonResult.match(/\d+\.\d+/)?.[0] || "0";
+            
+            if (carbonValue === "0") {
+                showNotification("Silakan hitung jejak karbon terlebih dahulu", true);
+                return;
+            }
+            
+            try {
+                showLoading("Mencetak sertifikat NFT...");
+                
+                // Buat pesan untuk ditandatangani
+                const message = `Mint certificate for ${carbonValue} kgCO2 at ${Date.now()}`;
+                
+                // Minta tanda tangan
+                const signature = await appState.web3.eth.personal.sign(
+                    message, 
+                    appState.currentAccount,
+                    "" // password (tidak diperlukan di frontend)
+                );
+                
+                // Kirim permintaan minting ke backend
+                const response = await fetch(`${CONFIG.BACKEND_URL}/api/mint-carbon-certificate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-signature': signature
+                    },
+                    body: JSON.stringify({
+                        userAddress: appState.currentAccount,
+                        carbonValue: parseFloat(carbonValue),
+                        message: message
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showNotification("Sertifikat NFT berhasil dicetak!", false);
+                    renderCertificate(carbonValue, result.txHash);
+                } else {
+                    throw new Error(result.message || "Gagal mencetak sertifikat");
+                }
+            } catch (error) {
+                showNotification(`Gagal mencetak sertifikat: ${error.message}`, true);
+                console.error('Minting error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Render sertifikat karbon
+        function renderCertificate(carbonValue, txHash) {
+            const dashboard = document.getElementById('dashboard');
+            const certificateContainer = document.getElementById('certificate-container');
+            
+            // Hapus sertifikat sebelumnya jika ada
+            certificateContainer.innerHTML = '';
+            
+            // Buat elemen sertifikat baru
+            const certificate = document.createElement('div');
+            certificate.className = 'certificate';
+            certificate.innerHTML = `
+                <div class="certificate-title">SERTIFIKAT JEJAK KARBON</div>
+                <div class="certificate-subtitle">Diberikan Kepada:</div>
+                <div class="certificate-content">
+                    <p>Atas nama: <strong>${appState.userProfile.name}</strong></p>
+                    <p>Dengan jejak karbon bulanan sebesar: <strong>${carbonValue} kg CO2e</strong></p>
+                    <p>Tx Hash: <a href="https://etherscan.io/tx/${txHash}" target="_blank">${txHash.slice(0,12)}...</a></p>
+                    <p>Ditetapkan pada: <strong>${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</strong></p>
+                </div>
+                <div class="certificate-signature">
+                    <div class="signature-block">
+                        <div class="signature-line"></div>
+                        <div>Koordinator Riset</div>
+                        <div>Komunitas Nyampah Bersama</div>
+                    </div>
+                    <div class="signature-block">
+                        <div class="signature-line"></div>
+                        <div>Direktur Eksekutif</div>
+                        <div>Komunitas Nyampah Bersama</div>
+                    </div>
+                </div>
+            `;
+            
+            certificateContainer.appendChild(certificate);
+            certificate.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Generate PDF surat
+        function generateLetterPDF() {
+            alert('Fitur ini akan membuat PDF dari surat yang telah dibuat.');
+            // Implementasi pembuatan PDF akan dilakukan di sini
+        }
+
+        // Load embed website
+        function loadEmbed() {
+            const url = document.getElementById('embed-url').value;
+            if (url) {
+                const iframe = document.querySelector('.embed-viewer');
+                iframe.src = url;
+            }
+        }
+
+        // ===================== FUNGSI MODUL DOMPET =====================
+
+        // Handle transfer
+        async function handleTransfer() {
+            const recipient = prompt("Masukkan alamat penerima:");
+            const amount = prompt("Masukkan jumlah:");
+            
+            if (!recipient || !amount) return;
+            
+            try {
+                showLoading("Memproses transfer...");
+                
+                // Kirim transaksi
+                await appState.web3.eth.sendTransaction({
+                    from: appState.currentAccount,
+                    to: recipient,
+                    value: appState.web3.utils.toWei(amount, 'ether')
+                });
+                
+                // Perbarui saldo
+                await loadWalletData();
+                updateUI();
+                
+                showNotification("Transfer berhasil!", false);
+            } catch (error) {
+                showNotification("Transfer gagal: " + error.message, true);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Handle top up
+        async function handleTopUp() {
+            const amount = prompt("Masukkan jumlah top up:");
+            
+            if (!amount) return;
+            
+            try {
+                showLoading("Memproses top up...");
+                
+                // Simulasikan top up (dalam implementasi nyata, ini akan melalui payment gateway)
+                appState.walletBalance += parseFloat(amount);
+                
+                // Perbarui UI
+                updateUI();
+                
+                showNotification("Top up berhasil!", false);
+            } catch (error) {
+                showNotification("Top up gagal: " + error.message, true);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ===================== FUNGSI UTILITAS =====================
+
+        // Tampilkan notifikasi
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('global-notification');
+            notification.textContent = message;
+            notification.className = `notification ${isError ? 'error' : 'success'} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        // Tampilkan loading overlay
+        function showLoading(message = "Memuat data...") {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.querySelector('span').textContent = message;
+            overlay.style.display = 'flex';
+            
+            // Nonaktifkan tombol selama loading
+            document.querySelectorAll('button').forEach(btn => {
+                btn.disabled = true;
+            });
+        }
+
+        // Sembunyikan loading overlay
+        function hideLoading() {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.style.display = 'none';
+            
+            // Aktifkan kembali tombol
+            document.querySelectorAll('button').forEach(btn => {
+                btn.disabled = false;
+            });
+        }
+
+        // Handle navigasi
+        function handleNavigation() {
+            // Remove active class from all buttons and sections
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Show corresponding section
+            const target = this.getAttribute('data-target');
+            document.getElementById(target).classList.add('active');
+        }
+
+        // Fetch contract ABI (contoh)
+        async function fetchContractABI() {
+            // Dalam implementasi nyata, ini akan mengambil ABI dari backend
+            return [
+                {
+                    "inputs": [
+                        {"internalType": "address", "name": "_stakingTokenAddress", "type": "address"}
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "constructor"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {"indexed": true, "internalType": "address", "name": "to", "type": "address"},
+                        {"indexed": true, "internalType": "uint256", "name": "tokenId", "type": "uint256"},
+                        {"indexed": false, "internalType": "string", "name": "uri", "type": "string"}
+                    ],
+                    "name": "Minted",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {"indexed": true, "internalType": "address", "name": "user", "type": "address"},
+                        {"indexed": true, "internalType": "uint256", "name": "tokenId", "type": "uint256"},
+                        {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"}
+                    ],
+                    "name": "StakingDeposit",
+                    "type": "event"
+                },
+                {
+                    "inputs": [
+                        {"internalType": "address", "name": "_to", "type": "address"},
+                        {"internalType": "string", "name": "_uri", "type": "string"}
+                    ],
+                    "name": "mintSoulboundNFT",
+                    "outputs": [
+                        {"internalType": "uint256", "name": "", "type": "uint256"}
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {"internalType": "uint256", "name": "amount", "type": "uint256"},
+                        {"internalType": "string", "name": "tokenURI_", "type": "string"}
+                    ],
+                    "name": "stakingDeposit",
+                    "outputs": [
+                        {"internalType": "uint256", "name": "", "type": "uint256"}
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }
+            ];
+        }
+
+        // Perbarui tanggal di surat
+        function updateDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const formattedDate = now.toLocaleDateString('id-ID', options);
+            document.getElementById('current-date').textContent = `Palembang, ${formattedDate}`;
+        }
+
+        // Simulasikan Web3 jika tidak tersedia
+        if (typeof Web3 === 'undefined') {
+            console.warn("Web3 not detected, using mock implementation");
+            window.Web3 = class {
+                eth = {
+                    Contract: class {},
+                    getBalance: async () => "1000000000000000000", // 1 ETH
+                    personal: {
+                        sign: async () => "mock-signature"
+                    },
+                    sendTransaction: async () => ({})
+                },
+                utils = {
+                    fromWei: (wei) => parseFloat(wei) / 1e18
+                }
+            };
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+</body>
+</html>

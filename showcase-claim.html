@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Showcase Klaim Piagam</title>
+  <style>
+    :root{
+      --bg:#0f1115; --card:#151923; --muted:#9aa4b2; --line:#232838; --brand:#3ddc97; --brand2:#8ef6c8;
+    }
+    *{box-sizing:border-box} body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif; background:linear-gradient(180deg,#0b0e13,#0f1115); color:#eef2f7;}
+    header{padding:28px 18px 10px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(15,17,21,.85); backdrop-filter:saturate(1.2) blur(10px); z-index:5}
+    .wrap{max-width:1100px; margin:0 auto;}
+    h1{margin:0 0 6px; font-size:clamp(18px,3.2vw,28px); letter-spacing:.2px}
+    .sub{color:var(--muted); font-size:14px}
+    .tools{display:flex; gap:10px; margin:14px 0 6px; flex-wrap:wrap}
+    input[type="search"], select{
+      background:#0c0f15; border:1px solid var(--line); color:#e7eef7; padding:12px 14px; border-radius:12px; outline:none; width:260px;
+    }
+    .filter{display:flex; align-items:center; gap:8px; background:#0c0f15; border:1px solid var(--line); padding:8px 10px; border-radius:12px}
+    .filter label{font-size:13px; color:var(--muted)}
+    .btn{background:linear-gradient(90deg,var(--brand),var(--brand2)); color:#07110c; border:none; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:700}
+    .btn.ghost{background:#0c0f15; color:#d7e2ee; border:1px solid var(--line)}
+    .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; padding:18px}
+    .card{background:linear-gradient(180deg,#0c1017,#121827); border:1px solid var(--line); border-radius:16px; overflow:hidden; display:flex; flex-direction:column}
+    .card img{width:100%; height:168px; object-fit:cover; background:#0a0d13; border-bottom:1px solid var(--line)}
+    .card .pad{padding:12px 14px 14px}
+    .tag{display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:6px 9px; border-radius:999px; border:1px solid var(--line); color:var(--muted)}
+    .tag.ok{border-color:#1f7a4e; color:#9ff1c5; background:#0c1913}
+    .nm{font-weight:700; margin:10px 0 4px; font-size:16px}
+    .meta{color:var(--muted); font-size:12px}
+    .act{display:flex; gap:8px; margin-top:12px}
+    .empty{opacity:.7; text-align:center; padding:40px 12px; color:var(--muted)}
+    footer{padding:30px 18px 50px; color:#b9c5d6; border-top:1px solid var(--line)}
+    /* modal */
+    .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(4,7,10,.65); backdrop-filter:blur(6px); z-index:40}
+    .modal.on{display:grid}
+    .sheet{width:min(760px,92vw); background:#0d121a; border:1px solid var(--line); border-radius:16px; overflow:hidden}
+    .sheet header{position:unset; background:#0d121a; padding:16px 18px; border-bottom:1px solid var(--line)}
+    .sheet h2{margin:0; font-size:18px}
+    .sheet .body{padding:16px 18px 18px; display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    .field{display:grid; gap:6px}
+    .field label{font-size:12px; color:var(--muted)}
+    .field input,.field textarea,.field select{background:#0a0f16; border:1px solid var(--line); color:#eaf2ff; padding:10px 12px; border-radius:10px; outline:none}
+    textarea{min-height:90px; resize:vertical}
+    .sheet .foot{display:flex; justify-content:space-between; padding:12px 18px 18px}
+    .note{font-size:12px; color:var(--muted)}
+    .toast{position:fixed; right:16px; bottom:16px; padding:12px 16px; border:1px solid var(--line); background:#0e141d; border-radius:12px; display:none}
+    .toast.on{display:block}
+    .kecil{font-size:12px; color:var(--muted)}
+    @media (max-width:740px){
+      .sheet .body{grid-template-columns:1fr}
+      input[type="search"]{width:100%}
+      .tools{flex-direction:column; align-items:stretch}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Showcase Klaim Piagam</h1>
+    <div class="sub">Cari nama di piagam → klik <b>Klaim</b> → verifikasi via WhatsApp/webhook. Aman, cepat, rapi.</div>
+    <div class="tools">
+      <input id="q" type="search" placeholder="Cari nama / kode..." />
+      <div class="filter">
+        <label><input type="radio" name="f" value="all" checked /> Semua</label>
+        <label><input type="radio" name="f" value="Belum Klaim" /> Belum Klaim</label>
+        <label><input type="radio" name="f" value="Sudah Klaim" /> Sudah Klaim</label>
+      </div>
+      <button class="btn ghost" id="btnExport">Export data (JSON)</button>
+      <button class="btn" id="btnAdmin">Admin</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="grid" class="grid"></div>
+  <div id="empty" class="empty" style="display:none">Tidak ada item cocok.</div>
+</main>
+
+<footer class="wrap">
+  <div class="kecil">
+    Tip: Bagikan link khusus kode (contoh <code>?code=SC-001</code>) agar pemilik langsung ke itemnya. <br/>
+    Mode submit default: <b>WhatsApp</b> (bisa diubah ke <i>webhook</i> / Google Form) di bagian <b>CONFIG</b> kode.
+  </div>
+</footer>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <header><h2 id="mTitle">Klaim Piagam</h2></header>
+    <div class="body">
+      <div class="field"><label>Kode Unik</label><input id="mCode" readonly /></div>
+      <div class="field"><label>Nama di Piagam</label><input id="mNameOn" readonly /></div>
+      <div class="field"><label>Nama Pemilik</label><input id="mOwner" placeholder="Nama lengkap Anda" /></div>
+      <div class="field"><label>Nomor WhatsApp</label><input id="mWa" placeholder="62xxxxxxxxxx" /></div>
+      <div class="field"><label>Email (opsional)</label><input id="mEmail" placeholder="email@domain.com" /></div>
+      <div class="field"><label>Catatan (opsional)</label><textarea id="mNote" placeholder="Tambahan info: alamat, perwakilan, dll"></textarea></div>
+      <div class="field"><label>Foto Bukti (opsional)</label><input id="mFile" type="file" accept="image/*" capture="environment" /></div>
+    </div>
+    <div class="foot">
+      <div class="note">Data Anda akan dikirim ke admin untuk verifikasi. Foto bisa dikirim via WhatsApp bila perlu.</div>
+      <div>
+        <button class="btn ghost" id="mCancel">Batal</button>
+        <button class="btn" id="mSubmit">Kirim Klaim</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ========================
+   KONFIGURASI & DATA
+======================== */
+const CONFIG = {
+  title: "Showcase Klaim Piagam",
+  adminPass: "nyampah", // ganti sesuai keinginan
+  submit: {
+    mode: "whatsapp", // "whatsapp" | "webhook" | "google_form"
+    whatsappNumber: "6281234567890", // ganti nomor admin
+    webhookUrl: "", // isi bila pakai webhook (POST JSON)
+    googleForm: { action:"", map:{} } // contoh di bawah
+  }
+};
+
+/* Contoh pemetaan Google Form (kalau dipakai)
+CONFIG.submit.googleForm = {
+  action: "https://docs.google.com/forms/u/0/d/e/FORM_ID/formResponse",
+  map: {
+    code: "entry.111111",
+    nameOn: "entry.222222",
+    owner: "entry.333333",
+    wa: "entry.444444",
+    email: "entry.555555",
+    note: "entry.666666"
+  }
+};
+*/
+
+/* DATA ITEM: ganti/extend sesuai kebutuhan.
+   image bisa diganti per item. */
+const ITEMS = [
+  { code:"SC-001", nameOn:"Ervinda Zakaria, M.A.", event:"Akademi Syah al-Fawaid", date:"2024-05-01", image:"assets_showcase/trophies.jpg", status:"Belum Klaim" },
+  { code:"SC-002", nameOn:"Samsudin, M.A.", event:"Akademi Syah al-Fawaid", date:"2024-05-01", image:"assets_showcase/trophies.jpg", status:"Belum Klaim" },
+  { code:"SC-003", nameOn:"Muhammad Fahri", event:"Akademi Syah al-Fawaid", date:"2024-05-01", image:"assets_showcase/trophies.jpg", status:"Sudah Klaim" }
+];
+
+/* ========================
+   RENDER GRID
+======================== */
+const grid = document.getElementById('grid');
+const empty = document.getElementById('empty');
+const q = document.getElementById('q');
+const radios = [...document.querySelectorAll('input[name="f"]')];
+
+function render(){
+  const term = (q.value||"").toLowerCase().trim();
+  const f = (radios.find(r=>r.checked)||{}).value || "all";
+  grid.innerHTML = "";
+  let data = ITEMS.filter(it => {
+    const matchTerm = !term || (it.nameOn.toLowerCase().includes(term) || it.code.toLowerCase().includes(term));
+    const matchStatus = f==="all" || it.status===f;
+    return matchTerm && matchStatus;
+  });
+  empty.style.display = data.length? "none":"block";
+  data.forEach(it => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `
+      <img src="${it.image}" alt="${it.nameOn}"/>
+      <div class="pad">
+        <span class="tag ${it.status==='Sudah Klaim'?'ok':''}">${it.status}</span>
+        <div class="nm">${it.nameOn}</div>
+        <div class="meta">Kode: <b>${it.code}</b></div>
+        <div class="meta">${it.event} • ${it.date}</div>
+        <div class="act">
+          <button class="btn" data-act="claim" data-code="${it.code}">Klaim</button>
+          <button class="btn ghost" data-act="share" data-code="${it.code}">Bagikan</button>
+        </div>
+      </div>`;
+    grid.appendChild(el);
+  });
+}
+
+q.addEventListener('input', render);
+radios.forEach(r=>r.addEventListener('change', render));
+grid.addEventListener('click', (e)=>{
+  const b = e.target.closest('button');
+  if(!b) return;
+  const code = b.dataset.code;
+  const item = ITEMS.find(x=>x.code===code);
+  if(!item) return;
+  if(b.dataset.act==="claim") openModal(item);
+  if(b.dataset.act==="share") shareItem(item);
+});
+
+function shareItem(it){
+  const url = new URL(window.location.href);
+  url.searchParams.set('code', it.code);
+  navigator.clipboard.writeText(url.toString()).then(()=>toast("Link disalin ke clipboard."));
+}
+
+/* ========================
+   MODAL + SUBMIT
+======================== */
+const modal = document.getElementById('modal');
+const mTitle = document.getElementById('mTitle');
+const mCode  = document.getElementById('mCode');
+const mNameOn= document.getElementById('mNameOn');
+const mOwner = document.getElementById('mOwner');
+const mWa    = document.getElementById('mWa');
+const mEmail = document.getElementById('mEmail');
+const mNote  = document.getElementById('mNote');
+const mFile  = document.getElementById('mFile');
+const mCancel= document.getElementById('mCancel');
+const mSubmit= document.getElementById('mSubmit');
+
+function openModal(it){
+  mTitle.textContent = `Klaim: ${it.nameOn}`;
+  mCode.value = it.code;
+  mNameOn.value = it.nameOn;
+  mOwner.value = ""; mWa.value=""; mEmail.value=""; mNote.value="";
+  mFile.value = "";
+  modal.classList.add('on');
+}
+function closeModal(){ modal.classList.remove('on'); }
+
+mCancel.addEventListener('click', closeModal);
+modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
+
+mSubmit.addEventListener('click', async ()=>{
+  const payload = {
+    code: mCode.value, nameOn: mNameOn.value,
+    owner: mOwner.value.trim(),
+    wa: mWa.value.trim(), email: mEmail.value.trim(),
+    note: mNote.value.trim(),
+    ts: new Date().toISOString()
+  };
+  if(!payload.owner || !payload.wa){ toast("Nama & nomor WA wajib diisi."); return; }
+
+  if(CONFIG.submit.mode==="whatsapp"){
+    const text = `CLAIM PLAKAT\nKode: ${payload.code}\nNama di Piagam: ${payload.nameOn}\nNama Pemilik: ${payload.owner}\nWA: ${payload.wa}\nEmail: ${payload.email||'-'}\nCatatan: ${payload.note||'-'}\nWaktu: ${payload.ts}\n\nMohon verifikasi. (Foto bukti bisa dikirim setelah pesan ini).`;
+    const url = `https://wa.me/${CONFIG.submit.whatsappNumber}?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank");
+    toast("Buka WhatsApp untuk kirim klaim."); closeModal();
+    return;
+  }
+
+  if(CONFIG.submit.mode==="webhook"){
+    let file64 = null;
+    if(mFile.files && mFile.files[0]) file64 = await fileToBase64(mFile.files[0]);
+    const res = await fetch(CONFIG.submit.webhookUrl, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({...payload, file64})
+    }).catch(e=>({ok:false}));
+    if(res && res.ok){ toast("Klaim terkirim. Terima kasih!"); closeModal(); }
+    else toast("Gagal kirim. Cek URL webhook/CORS.");
+    return;
+  }
+
+  if(CONFIG.submit.mode==="google_form"){
+    const f = CONFIG.submit.googleForm;
+    if(!f.action){ toast("Belum set action Google Form."); return; }
+    const fd = new FormData();
+    fd.append(f.map.code, payload.code);
+    fd.append(f.map.nameOn, payload.nameOn);
+    fd.append(f.map.owner, payload.owner);
+    fd.append(f.map.wa, payload.wa);
+    fd.append(f.map.email, payload.email);
+    fd.append(f.map.note, payload.note);
+    fetch(f.action, { method:'POST', body:fd, mode:'no-cors'});
+    toast("Klaim dikirim via Google Form."); closeModal();
+    return;
+  }
+});
+
+function fileToBase64(file){
+  return new Promise((res, rej)=>{
+    const r = new FileReader();
+    r.onload = () => res(String(r.result).split(',')[1]);
+    r.onerror = rej; r.readAsDataURL(file);
+  });
+}
+
+/* ========================
+   ADMIN (ringan)
+======================== */
+document.getElementById('btnAdmin').addEventListener('click', ()=>{
+  const pass = prompt('Masuk Admin – masukkan passphrase:');
+  if(pass !== CONFIG.adminPass) return alert('Salah pass.');
+  const json = prompt('Edit DATA (JSON). Contoh: [{"code":"SC-004","nameOn":"Nama Baru",...}]', JSON.stringify(ITEMS, null, 2));
+  if(!json) return;
+  try{
+    const arr = JSON.parse(json);
+    if(Array.isArray(arr)){ ITEMS.splice(0, ITEMS.length, ...arr); render(); toast('Data diperbarui (hanya di browser ini).'); }
+  }catch(e){ alert('JSON tidak valid.'); }
+});
+
+document.getElementById('btnExport').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(ITEMS,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'showcase-items.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+/* ========================
+   UTIL
+======================== */
+const toastBox = document.getElementById('toast');
+function toast(msg){
+  toastBox.textContent = msg;
+  toastBox.classList.add('on');
+  setTimeout(()=>toastBox.classList.remove('on'), 3000);
+}
+
+/* ========================
+   INIT
+======================== */
+document.title = CONFIG.title;
+render();
+
+// Open modal if ?code=... present
+const url = new URL(window.location.href);
+const want = url.searchParams.get('code');
+if(want){
+  const hit = ITEMS.find(x=>x.code===want);
+  if(hit) openModal(hit);
+}
+</script>
+</body>
+</html>

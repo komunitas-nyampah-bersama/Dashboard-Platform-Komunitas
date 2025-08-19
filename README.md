@@ -6,7 +6,9 @@ Platform berbasis blockchain untuk komunitas riset desentralisasi yang menginteg
 
 ## Struktur Proyek
 Dashboard-Platform-Komunitas/
+
 ├── index.html              # Halaman utama
+
 ├── 404.html               # Halaman error kustom
 ├── .gitignore             # File yang diabaikan Git
 ├── LICENSE                # Lisensi proyek
@@ -16,6 +18,7 @@ Dashboard-Platform-Komunitas/
     ├── js/                # File JavaScript
     └── images/            # Gambar yang digunakan
     
+
 ## Fitur Utama
 
 ✅ **Integrasi Blockchain**  

@@ -1,0 +1,186 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Abang Oky ORCID Scholar",
+  "name_for_model": "abang_oky_orcid_scholar",
+  "description_for_human": "Bimbingan akademik Safwa University dengan akses data ORCID untuk karya tulis ilmiah.",
+  "description_for_model": "Use this to authenticate with ORCID on behalf of Safwa University students, retrieve public ORCID profiles, and summarize works relevant to Islamic education and management research.",
+  "contact_email": "support@safwauniversity.ac.id",
+  "legal_info_url": "https://chatgpt.com/g/g-68d5b9c669c08191a513e9d75bc85c4e-abang-oky-ai",
+  "logo_url": "https://chatgpt.com/g/g-68d5b9c669c08191a513e9d75bc85c4e-abang-oky-ai.png",
+  "auth": {
+    "type": "oauth",
+    "client_url": "https://chatgpt.com/g/g-68d5b9c669c08191a513e9d75bc85c4e-abang-oky-ai",
+    "authorization_url": "https://orcid.org/oauth/authorize",
+    "token_url": "https://orcid.org/oauth/token",
+    "scopes": [
+      "/authenticate"
+    ],
+    "authorization_content_type": "application/x-www-form-urlencoded",
+    "verification_tokens": {}
+  },
+  "api": {
+    "type": "openapi",
+    "spec": {
+      "openapi": "3.1.0",
+      "info": {
+        "title": "Abang Oky ORCID Integration API",
+        "description": "Endpoints used by the Abang Oky GPT action to retrieve public ORCID profile information after OAuth authentication.",
+        "version": "1.0.0"
+      },
+      "servers": [
+        {
+          "url": "https://pub.orcid.org/v3.0"
+        }
+      ],
+      "paths": {
+        "/profiles/{orcid_id}": {
+          "get": {
+            "operationId": "getOrcidProfile",
+            "summary": "Ambil profil ORCID",
+            "description": "Mengambil catatan publik ORCID milik peneliti untuk keperluan pembimbingan karya tulis.",
+            "parameters": [
+              {
+                "name": "orcid_id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{4}-\\d{4}-\\d{3}[0-9X]$"
+                },
+                "description": "ORCID iD lengkap dalam format 0000-0000-0000-0000."
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Profil publik ORCID",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "orcid": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "object",
+                          "properties": {
+                            "givenNames": {
+                              "type": "string"
+                            },
+                            "familyName": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "biography": {
+                          "type": "string"
+                        },
+                        "educations": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "organization": {
+                                "type": "string"
+                              },
+                              "roleTitle": {
+                                "type": "string"
+                              },
+                              "startDate": {
+                                "type": "string"
+                              },
+                              "endDate": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "employments": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "organization": {
+                                "type": "string"
+                              },
+                              "roleTitle": {
+                                "type": "string"
+                              },
+                              "startDate": {
+                                "type": "string"
+                              },
+                              "endDate": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "works": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "title": {
+                                "type": "string"
+                              },
+                              "journal": {
+                                "type": "string"
+                              },
+                              "publicationDate": {
+                                "type": "string"
+                              },
+                              "url": {
+                                "type": "string",
+                                "format": "uri"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "required": [
+                        "orcid",
+                        "name"
+                      ]
+                    }
+                  }
+                }
+              },
+              "401": {
+                "description": "Token akses tidak valid atau kedaluwarsa"
+              },
+              "404": {
+                "description": "Profil tidak ditemukan"
+              }
+            },
+            "security": [
+              {
+                "OAuth2": [
+                  "read-public"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "components": {
+        "securitySchemes": {
+          "OAuth2": {
+            "type": "oauth2",
+            "flows": {
+              "authorizationCode": {
+                "authorizationUrl": "https://orcid.org/oauth/authorize",
+                "tokenUrl": "https://orcid.org/oauth/token",
+                "scopes": {
+                  "read-public": "Mengakses data profil publik ORCID"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "ui": {
+    "default_open": false
+  }
+}

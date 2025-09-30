@@ -174,12 +174,31 @@
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
-        
+
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .section-description {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1.25rem;
+        }
+
+        .section-subtitle {
+            margin: 1rem 0 0.75rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-subtitle i {
+            color: var(--success);
         }
         
         .api-list {
@@ -244,12 +263,135 @@
         .btn:hover {
             background: var(--secondary);
         }
-        
+
         .ai-recommendation {
             background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
             border-radius: 15px;
             padding: 1.5rem;
             margin-top: 2rem;
+        }
+
+        .credential-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .credential-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .credential-card h4 {
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .credential-card .badge {
+            background: rgba(76, 201, 240, 0.2);
+            color: var(--success);
+            border-radius: 20px;
+            padding: 0.15rem 0.6rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .credential-value {
+            font-family: "Fira Code", "Courier New", Courier, monospace;
+            background: rgba(13, 27, 42, 0.55);
+            padding: 0.6rem;
+            border-radius: 8px;
+            word-break: break-all;
+            font-size: 0.85rem;
+        }
+
+        .credential-note {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 1rem;
+        }
+
+        .code-examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .code-card {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .code-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-card pre {
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 10px;
+            padding: 0.9rem;
+            overflow-x: auto;
+            font-family: "Fira Code", "Courier New", Courier, monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            color: var(--light);
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: none;
+            color: var(--light);
+            padding: 0.4rem 0.75rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .prompt-wrapper {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .prompt-wrapper pre {
+            font-family: "Fira Code", "Courier New", Courier, monospace;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 10px;
+            padding: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 900px) {
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -261,7 +403,7 @@
                 <input type="text" id="global-search" placeholder="Cari API, analisis, atau rekomendasi...">
             </div>
             <div class="user-actions">
-                <button class="btn"><i class="fas fa-robot"></i> AI Assistant</button>
+                <button class="btn" id="ai-assistant-btn"><i class="fas fa-robot"></i> AI Assistant</button>
             </div>
         </header>
         
@@ -344,9 +486,35 @@
             <div class="ai-recommendation">
                 <h3><i class="fas fa-lightbulb"></i> AI Recommendation</h3>
                 <p id="ai-recommendation-text">Menganalisis pola penggunaan API... Depseek AI merekomendasikan untuk mengkonsolidasi 3 panggilan Algolia menjadi satu untuk mengurangi biaya sebesar $42/bulan.</p>
-                <button class="btn" style="background: white; color: var(--primary); margin-top: 1rem;">
+                <button class="btn" id="apply-recommendation-btn" style="background: white; color: var(--primary); margin-top: 1rem;">
                     <i class="fas fa-magic"></i> Terapkan Rekomendasi
                 </button>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-robot"></i> OpenAI GPT Integration</h2>
+                </div>
+                <p class="section-description">Ringkasan kredensial dan snippet kode untuk menghubungkan Dashboard API Nexus dengan proyek GPT (model <strong>gpt-5-nano</strong>). Pastikan semua rahasia disimpan sebagai variabel lingkungan sebelum dipakai di produksi.</p>
+
+                <h3 class="section-subtitle"><i class="fas fa-key"></i> Kunci &amp; Identitas</h3>
+                <div class="credential-grid" id="openai-credentials"></div>
+
+                <h3 class="section-subtitle"><i class="fas fa-code"></i> Contoh Implementasi</h3>
+                <div class="code-examples-grid" id="openai-examples"></div>
+
+                <h3 class="section-subtitle"><i class="fas fa-scroll"></i> Payload Prompt</h3>
+                <div class="prompt-wrapper">
+                    <pre id="prompt-template"></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-network-wired"></i> External Integrations</h2>
+                </div>
+                <p class="section-description">Kredensial tambahan untuk menghubungkan layanan pendukung (Zenodo, ORCID, Glide). Terapkan prinsip <em>least privilege</em> dan rotasi berkala.</p>
+                <div class="credential-grid" id="external-credentials"></div>
             </div>
         </main>
     </div>
@@ -367,7 +535,18 @@
                 apiKey: '88c70961cce43a01b9406b03e3f8d1f5'
             },
             openai: {
-                apiKey: 'sk-svcacct-jJoQt5DUW...'
+                apiKey: 'sk-proj-Gv4T-...QA',
+                adminKey: 'sk-admin-R2rt...28A',
+                projectId: 'proj_rhecgkaiLoVaqtWAxhKN03zC',
+                responseId: 'resp_68d58c39a14481939777ffc701a2e3d50da8e04362fe22f2',
+                makeScenario: '31789b7b-56a7-4609-82af-f83e0aef22bf',
+                zapierIntegration: '8367274e-930e-4e0b-b069-b2268ab93503',
+                webhookSecret: 'whsec_9lgQ...BkNL4=',
+                promptIds: {
+                    default: 'pmpt_68d5912ff87c81938591879bb1d33dc0036ef5511ef85f17',
+                    public: 'pmpt_68d5e3d963ec8197bbd23e3b4517d4e00877290b8d813046'
+                },
+                endpoint: 'https://api.openai.com/v1/responses'
             },
             pinata: {
                 jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
@@ -375,75 +554,268 @@
         };
 
         // Inisialisasi chart
-        const trafficCtx = document.getElementById('api-traffic-chart').getContext('2d');
-        const trafficChart = new Chart(trafficCtx, {
-            type: 'line',
-            data: {
-                labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
-                datasets: [{
-                    label: 'API Calls',
-                    data: [3200, 4100, 3800, 5200, 4700, 2900, 3800],
-                    borderColor: '#4cc9f0',
-                    tension: 0.3,
-                    fill: true,
-                    backgroundColor: 'rgba(76, 201, 240, 0.1)'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
+        function buildLineChart(ctx, label, data, color) {
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+                    datasets: [{
+                        label,
+                        data,
+                        borderColor: color,
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: `${color}1a`
+                    }]
                 },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
-                    x: { grid: { display: false } }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        x: { grid: { display: false } }
+                    }
                 }
-            }
-        });
+            });
+        }
+
+        const trafficCtx = document.getElementById('api-traffic-chart').getContext('2d');
+        const trafficChart = buildLineChart(trafficCtx, 'API Calls', [3200, 4100, 3800, 5200, 4700, 2900, 3800], '#4cc9f0');
+
+        const responseCtx = document.getElementById('response-chart').getContext('2d');
+        const responseChart = buildLineChart(responseCtx, 'Response Time', [160, 150, 140, 130, 155, 148, 142], '#f72585');
+
+        const errorCtx = document.getElementById('error-chart').getContext('2d');
+        const errorChart = buildLineChart(errorCtx, 'Error Rate', [1.4, 1.1, 1.9, 0.9, 1.0, 1.3, 1.2], '#fee440');
+
+        const costCtx = document.getElementById('cost-chart').getContext('2d');
+        const costChart = buildLineChart(costCtx, 'Cost (USD)', [360, 375, 358, 372, 381, 389, 382], '#48bfe3');
         
         // API Data (contoh)
         const apis = [
             { name: 'Supabase', icon: 'fa-database', status: 'up', usage: '1.2K calls' },
             { name: 'Algolia', icon: 'fa-search', status: 'up', usage: '4.5K calls' },
-            { name: 'OpenAI', icon: 'fa-robot', status: 'up', usage: '890 calls' },
+            { name: 'OpenAI GPT-5 Nano', icon: 'fa-robot', status: 'up', usage: '1.9K calls', metadata: 'Project ID: proj_rhecgkaiLoVaqtWAxhKN03zC' },
             { name: 'Pinata IPFS', icon: 'fa-cloud-upload-alt', status: 'down', usage: '120 calls' },
             { name: 'Twilio', icon: 'fa-sms', status: 'up', usage: '320 calls' },
             { name: 'Resend', icon: 'fa-envelope', status: 'up', usage: '210 calls' },
-            { name: 'Web3', icon: 'fa-ethereum', status: 'up', usage: '540 calls' },
+            { name: 'Glide Webhook', icon: 'fa-bolt', status: 'up', usage: '54 calls', metadata: 'whsec_9lgQ...BkNL4=' },
             { name: 'Climatiq', icon: 'fa-leaf', status: 'up', usage: '76 calls' }
         ];
         
-        // Render API cards
         const apiList = document.getElementById('api-list');
-        apis.forEach(api => {
-            const card = document.createElement('div');
-            card.className = 'api-card';
-            card.innerHTML = `
-                <div class="api-card-header">
-                    <div class="api-icon">
-                        <i class="fas ${api.icon}"></i>
+
+        function renderApiList() {
+            apiList.innerHTML = '';
+            apis.forEach((api, index) => {
+                const card = document.createElement('div');
+                card.className = 'api-card';
+                card.innerHTML = `
+                    <div class="api-card-header">
+                        <div class="api-icon">
+                            <i class="fas ${api.icon}"></i>
+                        </div>
+                        <h4>${api.name}</h4>
+                        <span class="api-status ${api.status === 'down' ? 'down' : ''}"></span>
                     </div>
-                    <h4>${api.name}</h4>
-                    <span class="api-status ${api.status === 'down' ? 'down' : ''}"></span>
-                </div>
-                <p><strong>Usage:</strong> ${api.usage}</p>
-                <p><strong>Status:</strong> <span class="${api.status === 'down' ? 'down' : ''}">${api.status === 'down' ? 'Offline' : 'Online'}</span></p>
-                <button class="btn" style="margin-top: 10px; width:100%;">
-                    <i class="fas fa-cog"></i> Manage
-                </button>
-            `;
-            apiList.appendChild(card);
-        });
-        
+                    <p><strong>Usage:</strong> ${api.usage}</p>
+                    <p><strong>Status:</strong> <span class="${api.status === 'down' ? 'down' : ''}">${api.status === 'down' ? 'Offline' : 'Online'}</span></p>
+                    ${api.metadata ? `<p><strong>Info:</strong> ${api.metadata}</p>` : ''}
+                    <div style="display:flex; gap:0.5rem; margin-top:10px;">
+                        <button class="btn manage-btn" data-index="${index}" style="flex:1;">
+                            <i class="fas fa-cog"></i> Manage
+                        </button>
+                        <button class="btn remove-btn" data-index="${index}" style="flex:1; background: var(--danger);">
+                            <i class="fas fa-trash"></i> Hapus
+                        </button>
+                    </div>
+                `;
+                apiList.appendChild(card);
+            });
+
+            apiList.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    const idx = Number(event.currentTarget.dataset.index);
+                    apis.splice(idx, 1);
+                    renderApiList();
+                });
+            });
+
+            apiList.querySelectorAll('.manage-btn').forEach(btn => {
+                btn.addEventListener('click', () => alert('Fitur manajemen detail akan hadir berikutnya.'));
+            });
+        }
+
         // AI Assistant
         const aiRecommendationText = document.getElementById('ai-recommendation-text');
-        
-        // Simulasi AI analysis
-        setTimeout(() => {
-            aiRecommendationText.innerHTML = "Depseek AI telah menganalisis: Penggunaan Algolia meningkat 40% minggu ini. Pertimbangkan untuk meningkatkan paket atau mengoptimalkan query.";
-        }, 3000);
-        
+
+        const openaiCredentials = [
+            { label: 'Project API Key', value: 'sk-proj-Gv4T-...QA', type: 'secret', note: 'Gunakan untuk request server-side dan simpan sebagai variabel lingkungan.' },
+            { label: 'Admin Key', value: 'sk-admin-R2rt...28A', type: 'secret', note: 'Akses tingkat admin - batasi pemakaian dan rotasi secara berkala.' },
+            { label: 'Project ID', value: API_CONFIG.openai.projectId, type: 'id', note: 'Identitas proyek utama untuk penagihan dan isolasi resource.' },
+            { label: 'Response ID', value: API_CONFIG.openai.responseId, type: 'id', note: 'Contoh respon yang sudah tersimpan untuk pengecekan cepat.' },
+            { label: 'Make Scenario ID', value: API_CONFIG.openai.makeScenario, type: 'id', note: 'Gunakan pada Make (Integromat) untuk otomasi lanjutan.' },
+            { label: 'Zapier Integration', value: API_CONFIG.openai.zapierIntegration, type: 'id', note: 'Hubungkan Zapier workflow ke project OpenAI.' },
+            { label: 'Webhook Glide', value: API_CONFIG.openai.webhookSecret, type: 'secret', note: 'Rahasia webhook Glide ↔ GPT, perlakukan sebagai kredensial sensitif.' },
+            { label: 'Prompt Template', value: API_CONFIG.openai.promptIds.default, type: 'id', note: 'Template prompt utama untuk permintaan dinamis.' },
+            { label: 'Prompt Publik', value: API_CONFIG.openai.promptIds.public, type: 'id', note: 'Variasi prompt publik (SUI_PUB).' }
+        ];
+
+        const externalCredentials = [
+            { label: 'Zenodo Client ID', value: 'jmERw3YqMQfTGNz5PWwA4WLIWelXWfmBxCEn7o3h', type: 'id', note: 'Digunakan untuk OAuth ke Zenodo community.' },
+            { label: 'Zenodo Client Secret', value: 'ulLmnxMZHgz...tEDn', type: 'secret', note: 'Simpan nilai asli di server & rotasi berkala.' },
+            { label: 'Zenodo Community', value: 'https://zenodo.org/communities/183915371', type: 'url', note: 'Endpoint publik untuk unggah publikasi.' },
+            { label: 'ORCID Client ID', value: 'APP-66KOLZ6JPYE3JS4D', type: 'id', note: 'Registrasi OAuth ORCID.' },
+            { label: 'ORCID Client Secret', value: '1a700963-...-3b0c356a7e59', type: 'secret', note: 'Gunakan untuk server-side exchange token ORCID.' }
+        ];
+
+        const codeExamples = [
+            {
+                title: 'cURL - Basic Response',
+                code: `curl https://api.openai.com/v1/responses \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer $OPENAI_API_KEY" \\
+  -d '{
+    "model": "gpt-5-nano",
+    "input": "write a haiku about ai",
+    "store": true
+  }'`
+            },
+            {
+                title: 'Node.js SDK',
+                code: `import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+async function main() {
+  const response = await client.responses.create({
+    model: "gpt-5-nano",
+    input: "write a haiku about ai",
+    store: true,
+  });
+
+  console.log(response.output_text);
+}
+
+main().catch(console.error);`
+            },
+            {
+                title: 'Python SDK',
+                code: `from openai import OpenAI
+
+client = OpenAI()
+
+response = client.responses.create(
+  model="gpt-5-nano",
+  input="write a haiku about ai",
+  store=True,
+)
+
+print(response.output_text)
+`
+            },
+            {
+                title: 'cURL - Prompt Template',
+                code: `curl https://api.openai.com/v1/responses \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer $OPENAI_API_KEY" \\
+  -d '{
+  "prompt": {
+    "id": "${API_CONFIG.openai.promptIds.default}",
+    "version": "1",
+    "variables": {
+      "topic": "example topic"
+    }
+  }
+}'`
+            }
+        ];
+
+        const openaiCredentialContainer = document.getElementById('openai-credentials');
+        const externalCredentialContainer = document.getElementById('external-credentials');
+        const codeExamplesContainer = document.getElementById('openai-examples');
+
+        function renderCredentialCard(container, item) {
+            const card = document.createElement('div');
+            card.className = 'credential-card';
+            card.innerHTML = `
+                <h4>${item.label} ${item.type ? `<span class="badge">${item.type}</span>` : ''}</h4>
+                <div class="credential-value">${item.value}</div>
+                <p class="credential-note">${item.note}</p>
+            `;
+            container.appendChild(card);
+        }
+
+        openaiCredentials.forEach(item => renderCredentialCard(openaiCredentialContainer, item));
+        externalCredentials.forEach(item => renderCredentialCard(externalCredentialContainer, item));
+
+        codeExamples.forEach(example => {
+            const card = document.createElement('div');
+            card.className = 'code-card';
+
+            const header = document.createElement('div');
+            header.className = 'code-card-header';
+
+            const title = document.createElement('h4');
+            title.textContent = example.title;
+
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i> Salin';
+            copyBtn.addEventListener('click', async () => {
+                try {
+                    if (!navigator.clipboard) {
+                        const textarea = document.createElement('textarea');
+                        textarea.value = example.code;
+                        textarea.style.position = 'fixed';
+                        textarea.style.top = '-9999px';
+                        document.body.appendChild(textarea);
+                        textarea.focus();
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                    } else {
+                        await navigator.clipboard.writeText(example.code);
+                    }
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Tersalin';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<i class="fas fa-copy"></i> Salin';
+                    }, 2000);
+                } catch (err) {
+                    alert('Clipboard tidak tersedia. Salin manual.');
+                }
+            });
+
+            header.appendChild(title);
+            header.appendChild(copyBtn);
+
+            const pre = document.createElement('pre');
+            const code = document.createElement('code');
+            code.textContent = example.code;
+            pre.appendChild(code);
+
+            card.appendChild(header);
+            card.appendChild(pre);
+
+            codeExamplesContainer.appendChild(card);
+        });
+
+        const promptTemplate = document.getElementById('prompt-template');
+        promptTemplate.textContent = JSON.stringify({
+            prompt: {
+                id: API_CONFIG.openai.promptIds.default,
+                version: '1',
+                variables: {
+                    topic: 'example topic'
+                }
+            }
+        }, null, 2);
+
         // Load real data
         async function loadDashboardData() {
             try {
@@ -470,6 +842,7 @@
         
         // Analisis API dengan Depseek AI
         async function analyzeWithDepseek() {
+            aiRecommendationText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menganalisis pola penggunaan API...';
             try {
                 const response = await axios.post(API_CONFIG.depseek.endpoint, {
                     api_data: apis,
@@ -480,13 +853,17 @@
                         'Content-Type': 'application/json'
                     }
                 });
-                
-                const recommendation = response.data.recommendations[0];
-                aiRecommendationText.textContent = recommendation.message;
-                
+
+                const recommendation = response.data?.recommendations?.[0];
+                if (recommendation?.message) {
+                    aiRecommendationText.textContent = recommendation.message;
+                } else {
+                    throw new Error('Recommendation missing');
+                }
+
             } catch (error) {
                 console.error("Depseek AI analysis failed:", error);
-                aiRecommendationText.textContent = "Gagal mendapatkan rekomendasi AI. Silakan coba lagi nanti.";
+                aiRecommendationText.textContent = "Gagal mendapatkan rekomendasi AI langsung. Berikut rekomendasi cadangan: Konsolidasikan request Algolia dan aktifkan caching sisi klien untuk mengurangi biaya 12%.";
             }
         }
         
@@ -514,17 +891,56 @@
         }
         
         // Event listeners
-        document.getElementById('add-api-btn').addEventListener('click', () => {
-            alert("Fitur penambahan API akan segera tersedia!");
-        });
-        
-        document.querySelector('.btn').addEventListener('click', () => {
+        const addApiBtn = document.getElementById('add-api-btn');
+        const aiAssistantBtn = document.getElementById('ai-assistant-btn');
+        const applyRecommendationBtn = document.getElementById('apply-recommendation-btn');
+
+        if (addApiBtn) {
+            addApiBtn.addEventListener('click', () => {
+                const name = prompt('Nama API baru:');
+                if (!name) return;
+                const usage = prompt('Penggunaan (contoh: 250 calls):', '0 calls');
+                const status = (prompt('Status (online/offline):', 'online') || 'online').toLowerCase();
+
+                const newApi = {
+                    name,
+                    icon: 'fa-plug',
+                    status: status === 'offline' ? 'down' : 'up',
+                    usage: usage || '0 calls'
+                };
+
+                apis.push(newApi);
+                renderApiList();
+            });
+        }
+
+        function triggerAnalysis() {
             analyzeWithDepseek();
-        });
-        
+        }
+
+        if (aiAssistantBtn) {
+            aiAssistantBtn.addEventListener('click', triggerAnalysis);
+        }
+
+        if (applyRecommendationBtn) {
+            applyRecommendationBtn.addEventListener('click', triggerAnalysis);
+        }
+
+        const globalSearchInput = document.getElementById('global-search');
+        if (globalSearchInput) {
+            globalSearchInput.addEventListener('input', (event) => {
+                const keyword = event.target.value.toLowerCase();
+                document.querySelectorAll('#api-list .api-card').forEach(card => {
+                    const name = card.querySelector('h4').textContent.toLowerCase();
+                    card.style.display = name.includes(keyword) ? 'flex' : 'none';
+                });
+            });
+        }
+
         // Inisialisasi
         loadDashboardData();
         connectToSupabase();
+        renderApiList();
     </script>
 </body>
 </html>

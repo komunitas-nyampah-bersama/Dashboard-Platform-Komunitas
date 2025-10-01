@@ -18,3 +18,40 @@ Dokumen ini menjelaskan bagaimana konfigurasi `gpt_custom_action_schema.json` be
 - Logo, URL legal, dan kebijakan privasi pada manifest mengarah ke halaman publik GPT yang sama sehingga memenuhi persyaratan Custom GPT.
 
 Dengan alur di atas, GPT dapat memanfaatkan data ORCID resmi untuk membantu bimbingan akademik tanpa harus menangani data sensitif secara langsung.
+
+## Panduan Pengujian
+Gunakan langkah berikut untuk memastikan konfigurasi bekerja sebelum dipasang ke Custom GPT produksi:
+
+1. **Validasi Manifest**  
+   Jalankan perintah berikut di repositori ini untuk memastikan file JSON valid:
+   ```bash
+   jq empty Master_json/gpt_custom_action_schema.json
+   ```
+
+2. **Uji Alur OAuth di Sandbox**  
+   a. Buka URL otorisasi dan ganti `REDIRECT_URI` sesuai yang terdaftar di dashboard ORCID:  
+   `https://sandbox.orcid.org/oauth/authorize?client_id=APP-XXXXX&response_type=code&scope=/read-public&redirect_uri=REDIRECT_URI`
+
+   b. Setelah login, ORCID akan mengarahkan ke URI pengalihan sambil membawa parameter `code`. Simpan nilai tersebut.
+
+   c. Tukarkan `code` menjadi `access_token` menggunakan `curl` berikut (ganti placeholder sesuai kredensial sandbox Anda):
+   ```bash
+   curl -i -L -H "Accept: application/json" \
+     --data "client_id=APP-XXXXX" \
+     --data "client_secret=CLIENT_SECRET" \
+     --data "grant_type=authorization_code" \
+     --data "redirect_uri=REDIRECT_URI" \
+     --data "code=AUTH_CODE" \
+     https://sandbox.orcid.org/oauth/token
+   ```
+
+3. **Verifikasi Endpoint ORCID**  
+   Ambil profil publik menggunakan token yang diterima pada langkah sebelumnya:
+   ```bash
+   curl -H "Accept: application/json" \
+     -H "Authorization: Bearer ACCESS_TOKEN" \
+     https://pub.sandbox.orcid.org/v3.0/0000-0000-0000-0000/record
+   ```
+
+4. **Konfirmasi di Custom GPT**  
+   Setelah tes sandbox berhasil, masukkan Client ID, Client Secret, dan URI pengalihan produksi ke pengaturan aksi Custom GPT, lalu lakukan percakapan percobaan untuk memastikan GPT dapat memicu aksi dan merangkum data ORCID yang diambil.

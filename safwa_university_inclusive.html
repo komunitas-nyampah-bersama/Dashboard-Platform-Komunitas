@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safwa University of Indonesia - Model Inovasi Pendidikan Inklusif</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2c5aa0;
+            --secondary: #1e3d6f;
+            --accent: #4a90e2;
+            --light: #f5f7fa;
+            --dark: #333;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray: #6c757d;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: var(--dark);
+            line-height: 1.7;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo img {
+            height: 80px;
+        }
+
+        .logo h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            padding: 1.2rem 0;
+            display: block;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .section-subtitle {
+            color: var(--secondary);
+            font-size: 1.3rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .abstract {
+            background: var(--light);
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 1.5rem;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .keyword {
+            background: rgba(44, 90, 160, 0.1);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .content p {
+            margin-bottom: 1.2rem;
+            text-align: justify;
+        }
+
+        .content ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            background: rgba(255, 193, 7, 0.1);
+            padding: 1.5rem;
+            border-radius: 5px;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--warning);
+        }
+
+        .references {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 5px;
+        }
+
+        .reference-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .reference-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 0 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-section p, .footer-section a {
+            color: #ccc;
+            margin-bottom: 0.8rem;
+            display: block;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .nav-links {
+                margin-top: 1rem;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .nav-links li {
+                margin-left: 0;
+            }
+
+            .logo {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .logo h1 {
+                font-size: 1.8rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .nav-links a.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <img src="https://drive.google.com/uc?export=view&id=1J-HSJP2kPnBP0CZ8ofmrGPe8NpiHtDXC" alt="Safwa University of Indonesia">
+                <h1>Safwa University of Indonesia</h1>
+            </div>
+            <div class="tagline">Model Inovasi Pendidikan Inklusif dan Riset Berbasis Komunitas</div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2 style="color: var(--primary);">SUI Research</h2>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#abstract">Abstrak</a></li>
+                <li><a href="#pendahuluan">Pendahuluan</a></li>
+                <li><a href="#tinjauan">Tinjauan Pustaka</a></li>
+                <li><a href="#metode">Metode</a></li>
+                <li><a href="#hasil">Hasil</a></li>
+                <li><a href="#kesimpulan">Kesimpulan</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Abstrak Section -->
+        <section id="abstract" class="section">
+            <h2 class="section-title">Abstrak</h2>
+            <div class="abstract">
+                <p>Safwa University of Indonesia (SUI) lahir sebagai respon terhadap tantangan pendidikan di Indonesia, khususnya di pondok pesantren dan daerah 3T (Terdepan, Terluar, Tertinggal). Banyak guru pesantren memiliki pengalaman panjang dalam mendidik, namun tidak diakui secara akademik karena ketiadaan gelar formal. Melalui program Recognition of Prior Learning (RPL) dan asesmen kompetensi, SUI menjadi pelopor dalam memberikan pengakuan akademik bagi para pendidik berbasis pengalaman.</p>
+                <p>Artikel ini mendiskusikan model inovasi SUI dalam membangun pendidikan inklusif, pengembangan SDM, dan publikasi riset terbuka melalui Zenodo dan OpenAIRE. Hasilnya menunjukkan bahwa SUI berperan sebagai universitas alternatif berbasis komunitas yang menghubungkan tradisi pesantren dengan standar akademik global.</p>
+            </div>
+            
+            <h3 class="section-subtitle">Kata Kunci</h3>
+            <div class="keywords">
+                <span class="keyword">Safwa University</span>
+                <span class="keyword">RPL</span>
+                <span class="keyword">Pendidikan Inklusif</span>
+                <span class="keyword">Pesantren</span>
+                <span class="keyword">3T</span>
+                <span class="keyword">Open Science</span>
+            </div>
+        </section>
+
+        <!-- Pendahuluan Section -->
+        <section id="pendahuluan" class="section">
+            <h2 class="section-title">1. Pendahuluan</h2>
+            <div class="content">
+                <p>Ketimpangan pendidikan di Indonesia masih tinggi, terutama di pondok pesantren dan sekolah berbasis agama di daerah 3T. Mayoritas guru pesantren memiliki keterampilan mengajar yang mumpuni, namun tidak memiliki gelar akademik formal. Hal ini menciptakan kesenjangan dalam pengakuan kompetensi.</p>
+                <p>SUI hadir untuk menjawab kebutuhan tersebut melalui program RPL dan asesmen, sekaligus membuka akses publikasi riset terbuka agar pengalaman dan karya guru dapat terdokumentasi secara global.</p>
+                
+                <div class="highlight">
+                    <p><strong>Fokus Utama SUI:</strong> Mengatasi kesenjangan pendidikan melalui pengakuan pembelajaran sebelumnya (RPL) dan membuka akses publikasi ilmiah bagi pendidik di daerah terpencil.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tinjauan Pustaka Section -->
+        <section id="tinjauan" class="section">
+            <h2 class="section-title">2. Tinjauan Pustaka</h2>
+            <div class="content">
+                <p>RPL (Recognition of Prior Learning) merupakan pendekatan internasional yang diadopsi untuk mengakui pengalaman kerja dan pembelajaran informal. Pendidikan berbasis komunitas memberikan kontribusi signifikan dalam mengurangi ketimpangan.</p>
+                <p>Konsep Open Science melalui Zenodo, ORCID, dan OpenAIRE memungkinkan publikasi terbuka yang memperkuat transparansi akademik.</p>
+                
+                <div class="highlight">
+                    <p><strong>Inovasi SUI:</strong> Menggabungkan pendekatan RPL dengan platform Open Science untuk menciptakan model pendidikan inklusif yang unik di Indonesia.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Metode Section -->
+        <section id="metode" class="section">
+            <h2 class="section-title">3. Metode</h2>
+            <div class="content">
+                <p>Penelitian ini menggunakan pendekatan deskriptif kualitatif dengan studi kasus pada SUI. Data dikumpulkan melalui:</p>
+                <ul>
+                    <li>Observasi lapangan di pondok pesantren dan daerah 3T</li>
+                    <li>Analisis dokumen publikasi Zenodo</li>
+                    <li>Pengalaman implementasi RPL di SUI</li>
+                    <li>Wawancara dengan guru pesantren peserta program</li>
+                </ul>
+                <p>Analisis dilakukan secara naratif dengan fokus pada dampak program terhadap SDM pesantren dan akses riset global.</p>
+            </div>
+        </section>
+
+        <!-- Hasil dan Pembahasan Section -->
+        <section id="hasil" class="section">
+            <h2 class="section-title">4. Hasil dan Pembahasan</h2>
+            <div class="content">
+                <p>Hasil implementasi RPL di SUI menunjukkan peningkatan signifikan dalam pengakuan akademik guru pesantren. Melalui asesmen kompetensi, banyak guru tanpa gelar formal dapat memperoleh sertifikasi setara akademik.</p>
+                
+                <div class="highlight">
+                    <p><strong>Pencapaian Utama:</strong> Lebih dari 200 guru pesantren telah mendapatkan pengakuan akademik melalui program RPL SUI dalam kurun waktu 2 tahun terakhir.</p>
+                </div>
+                
+                <p>Selain itu, publikasi melalui Zenodo memperkuat visibilitas karya ilmiah komunitas pesantren. SUI juga berhasil menghubungkan pendidik lokal dengan standar riset global, menciptakan model universitas inklusif berbasis komunitas.</p>
+                
+                <h3 class="section-subtitle">Dampak Program RPL SUI</h3>
+                <ul>
+                    <li>Peningkatan kualifikasi akademik guru pesantren</li>
+                    <li>Pengakuan kompetensi mengajar berbasis pengalaman</li>
+                    <li>Akses ke publikasi ilmiah internasional</li>
+                    <li>Peningkatan motivasi dan profesionalisme pendidik</li>
+                    <li>Penguatan jejaring akademik global</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Kesimpulan Section -->
+        <section id="kesimpulan" class="section">
+            <h2 class="section-title">5. Kesimpulan</h2>
+            <div class="content">
+                <p>SUI membuktikan bahwa universitas berbasis komunitas dapat menjadi model inovasi pendidikan inklusif di Indonesia. Dengan fokus pada guru pesantren dan daerah 3T, program RPL, asesmen kompetensi, dan publikasi terbuka, SUI menawarkan solusi praktis untuk kesenjangan pendidikan.</p>
+                <p>Ke depan, SUI dapat menjadi contoh global dalam menghubungkan tradisi pendidikan lokal dengan jejaring riset internasional.</p>
+                
+                <div class="highlight">
+                    <p><strong>Rekomendasi:</strong> Perluasan model SUI ke lebih banyak daerah 3T dan penguatan kolaborasi dengan institusi pendidikan global untuk memperkuat dampak program.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Daftar Pustaka Section -->
+        <section class="section">
+            <h2 class="section-title">Daftar Pustaka</h2>
+            <div class="references">
+                <div class="reference-item">
+                    <p>European Commission. (2022). <em>Recognition of Prior Learning (RPL) in Higher Education</em>. Brussels: EU Publications.</p>
+                </div>
+                <div class="reference-item">
+                    <p>Zenodo. (2025). <em>Safwa University of Indonesia Publications</em>. Diakses dari https://zenodo.org/communities/183915371</p>
+                </div>
+                <div class="reference-item">
+                    <p>ORCID. (2025). <em>Safwa University of Indonesia Research Profile</em>. Diakses dari https://orcid.org/0009-0001-7386-3769</p>
+                </div>
+                <div class="reference-item">
+                    <p>Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi. (2023). <em>Peta Jalan Pendidikan Indonesia 2020-2035</em>. Jakarta: Kemendikbudristek.</p>
+                </div>
+                <div class="reference-item">
+                    <p>UNESCO. (2022). <em>Inclusive Education: Towards Sustainable Development</em>. Paris: UNESCO Publishing.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Safwa University of Indonesia</h3>
+                <p>Model Inovasi Pendidikan Inklusif dan Riset Berbasis Komunitas</p>
+                <p>Bojonggede - Bogor, Jawa Barat</p>
+                <p>Email: info@safwauniversity.ac.id</p>
+                <p>Phone: +62 812 8084 1147</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Tautan Cepat</h3>
+                <a href="#abstract">Abstrak</a>
+                <a href="#pendahuluan">Pendahuluan</a>
+                <a href="#tinjauan">Tinjauan Pustaka</a>
+                <a href="#metode">Metode</a>
+                <a href="#hasil">Hasil &amp; Pembahasan</a>
+                <a href="#kesimpulan">Kesimpulan</a>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Publikasi Terkait</h3>
+                <a href="https://zenodo.org/communities/183915371" target="_blank">Zenodo Publications</a>
+                <a href="https://orcid.org/0009-0001-7386-3769" target="_blank">ORCID Profile</a>
+                <a href="#">OpenAIRE</a>
+                <a href="#">Google Scholar</a>
+                
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2024 Safwa University of Indonesia. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Add active class to navigation links on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-links a');
+            
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                const sectionHeight = section.clientHeight;
+                
+                if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Add active class to current section in navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-links a');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    navLinks.forEach(item => item.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

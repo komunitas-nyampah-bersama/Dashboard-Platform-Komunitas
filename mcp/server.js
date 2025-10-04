@@ -23,6 +23,45 @@ const allowedExtensions = new Set([
   '.js'
 ]);
 
+const SUPABASE_MCP_DEFAULT_URL =
+  'https://mcp.supabase.com/mcp?project_ref=vyvcgejvmdejssaysiny&read_only=true';
+const supabaseMcpUrlInput = process.env.SUPABASE_MCP_URL || SUPABASE_MCP_DEFAULT_URL;
+let supabaseBaseUrl = null;
+
+try {
+  supabaseBaseUrl = new URL(supabaseMcpUrlInput);
+} catch (error) {
+  console.warn('Konfigurasi SUPABASE_MCP_URL tidak valid:', error.message);
+}
+
+const supabaseMcpKey =
+  process.env.SUPABASE_MCP_ANON_KEY ||
+  process.env.SUPABASE_MCP_SERVICE_ROLE_KEY ||
+  process.env.SUPABASE_MCP_API_KEY ||
+  null;
+
+const supabaseExtraHeaders = (() => {
+  const raw = process.env.SUPABASE_MCP_HEADERS;
+  if (!raw) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return Object.fromEntries(
+        Object.entries(parsed).map(([key, value]) => [String(key).toLowerCase(), String(value)])
+      );
+    }
+  } catch (error) {
+    console.warn('Gagal mengurai SUPABASE_MCP_HEADERS:', error.message);
+  }
+
+  return {};
+})();
+
+const sensitiveHeaderNames = new Set(['authorization', 'apikey', 'api-key', 'supabase-key']);
+
 const server = new McpServer(
   {
     name: 'komunitas-mcp-server',
@@ -34,6 +73,139 @@ const server = new McpServer(
       'Seluruh path harus relatif terhadap root repositori dan hanya tipe file teks yang diperbolehkan.'
   }
 );
+
+function sanitizeHeadersForOutput(record) {
+  if (!record || typeof record !== 'object') {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(record).map(([key, value]) => {
+      if (sensitiveHeaderNames.has(key.toLowerCase())) {
+        return [key, '***'];
+      }
+      return [key, value];
+    })
+  );
+}
+
+function buildSupabaseHeaders(overrides = {}, accept) {
+  const headers = {
+    accept: accept || 'application/json',
+    ...supabaseExtraHeaders
+  };
+
+  if (supabaseMcpKey) {
+    headers.authorization = `Bearer ${supabaseMcpKey}`;
+    headers.apikey = supabaseMcpKey;
+  }
+
+  for (const [key, value] of Object.entries(overrides)) {
+    if (value === undefined || value === null) {
+      continue;
+    }
+    headers[String(key).toLowerCase()] = String(value);
+  }
+
+  return headers;
+}
+
+function resolveSupabaseUrl(pathSegment = '', query = {}) {
+  if (!supabaseBaseUrl) {
+    throw new Error('SUPABASE_MCP_URL belum dikonfigurasi dengan benar.');
+  }
+
+  let targetUrl = new URL(supabaseBaseUrl.toString());
+
+  if (pathSegment) {
+    if (/^https?:\/\//i.test(pathSegment)) {
+      targetUrl = new URL(pathSegment);
+    } else if (pathSegment.startsWith('/')) {
+      targetUrl.pathname = pathSegment;
+    } else {
+      const basePath = targetUrl.pathname.endsWith('/')
+        ? targetUrl.pathname
+        : `${targetUrl.pathname}/`;
+      targetUrl.pathname = `${basePath}${pathSegment}`.replace(/\/{2,}/g, '/');
+    }
+  }
+
+  for (const [key, value] of Object.entries(query || {})) {
+    if (value === undefined || value === null) {
+      continue;
+    }
+    targetUrl.searchParams.set(key, String(value));
+  }
+
+  return targetUrl;
+}
+
+async function requestSupabaseMcp(options = {}) {
+  const {
+    path: pathSegment = '',
+    method = 'GET',
+    query = {},
+    body,
+    headers = {},
+    accept
+  } = options;
+
+  if (!globalThis.fetch) {
+    throw new Error('Lingkungan Node.js tidak mendukung fetch. Gunakan Node.js 18+');
+  }
+
+  const normalizedMethod = String(method || 'GET').toUpperCase();
+  if (['GET', 'HEAD'].includes(normalizedMethod) && body !== undefined && body !== null) {
+    throw new Error('Permintaan GET/HEAD tidak boleh memiliki body.');
+  }
+
+  const url = resolveSupabaseUrl(pathSegment, query);
+  const requestHeaders = buildSupabaseHeaders(headers, accept);
+
+  let serializedBody;
+  if (body !== undefined && body !== null) {
+    if (typeof body === 'string') {
+      serializedBody = body;
+    } else {
+      serializedBody = JSON.stringify(body);
+      if (!requestHeaders['content-type']) {
+        requestHeaders['content-type'] = 'application/json';
+      }
+    }
+  }
+
+  const response = await fetch(url, {
+    method: normalizedMethod,
+    headers: requestHeaders,
+    body: serializedBody
+  });
+
+  const text = await response.text();
+  let json = null;
+  if (text) {
+    try {
+      json = JSON.parse(text);
+    } catch (error) {
+      json = null;
+    }
+  }
+
+  const rawHeaders = Object.fromEntries(response.headers.entries());
+  const maxPreviewLength = 20000;
+  const preview =
+    text.length > maxPreviewLength
+      ? `${text.slice(0, maxPreviewLength)}\n...[dipotong setelah ${maxPreviewLength} karakter]`
+      : text;
+
+  return {
+    url: url.toString(),
+    status: response.status,
+    ok: response.ok,
+    headers: rawHeaders,
+    bodyText: preview,
+    json
+  };
+}
 
 async function safeReadFile(relativePath) {
   const normalized = relativePath.replace(/^\/+/, '');
@@ -173,6 +345,49 @@ server.registerResource(
           uri: 'komunitas://datasets/index',
           mimeType: 'application/json',
           text: JSON.stringify(datasets, null, 2)
+        }
+      ]
+    };
+  }
+);
+
+server.registerResource(
+  'supabase-mcp-bridge',
+  'komunitas://external/supabase-mcp',
+  {
+    title: 'Bridge Supabase MCP',
+    description:
+      'Ringkasan konfigurasi bridge ke MCP Supabase serta petunjuk penggunaan tool supabase-mcp-request.',
+    mimeType: 'application/json'
+  },
+  async () => {
+    const payload = {
+      defaultUrl: SUPABASE_MCP_DEFAULT_URL,
+      configuredUrl: supabaseBaseUrl ? supabaseBaseUrl.toString() : null,
+      requiresApiKey: true,
+      apiKeyConfigured: Boolean(supabaseMcpKey),
+      extraHeadersConfigured: Object.keys(supabaseExtraHeaders),
+      environmentVariables: {
+        SUPABASE_MCP_URL: 'Opsional — ubah endpoint dasar Supabase MCP.',
+        SUPABASE_MCP_ANON_KEY: 'Opsional — kunci publik (akan digunakan juga sebagai Authorization Bearer).',
+        SUPABASE_MCP_SERVICE_ROLE_KEY: 'Alternatif untuk kunci layanan — gunakan dengan hati-hati.',
+        SUPABASE_MCP_API_KEY: 'Alias lain untuk kunci Supabase.',
+        SUPABASE_MCP_HEADERS:
+          'JSON string opsional untuk menambah header kustom (contoh: {"x-client-info":"komunitas-mcp"}).'
+      },
+      usage: {
+        tool: 'supabase-mcp-request',
+        description:
+          'Gunakan tool untuk meneruskan permintaan HTTP ke endpoint MCP Supabase, lengkap dengan query, header, dan body opsional.'
+      }
+    };
+
+    return {
+      contents: [
+        {
+          uri: 'komunitas://external/supabase-mcp',
+          mimeType: 'application/json',
+          text: JSON.stringify(payload, null, 2)
         }
       ]
     };
@@ -334,6 +549,154 @@ server.registerTool(
         {
           type: 'text',
           text: `Hasil pencarian untuk "${query}":\n${summary}`
+        }
+      ]
+    };
+  }
+);
+
+server.registerTool(
+  'supabase-mcp-request',
+  {
+    title: 'Proxy Permintaan ke Supabase MCP',
+    description:
+      'Meneruskan permintaan HTTP ke endpoint MCP Supabase yang dikonfigurasi, lengkap dengan query, header, dan body opsional.',
+    inputSchema: {
+      path: z
+        .string()
+        .optional()
+        .describe('Path relatif atau absolut untuk diteruskan (default mempertahankan endpoint dasar).'),
+      method: z
+        .enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'])
+        .default('GET')
+        .describe('Metode HTTP yang digunakan (default: GET).'),
+      query: z
+        .record(z.union([z.string(), z.number(), z.boolean()]))
+        .optional()
+        .describe('Parameter query opsional sebagai pasangan kunci → nilai.'),
+      body: z
+        .union([z.string(), z.record(z.any())])
+        .optional()
+        .describe('Isi permintaan untuk metode tulis. Terima string atau objek JSON.'),
+      headers: z
+        .record(z.string())
+        .optional()
+        .describe('Header tambahan (nilai string) yang akan digabungkan dengan konfigurasi default.'),
+      accept: z.string().optional().describe('Header Accept kustom.'),
+      parseJson: z
+        .boolean()
+        .default(true)
+        .describe('Apakah mencoba mengurai respons sebagai JSON untuk structuredContent.')
+    },
+    outputSchema: {
+      request: z.object({
+        url: z.string(),
+        method: z.string(),
+        headers: z.record(z.string()),
+        query: z.record(z.string()).optional(),
+        bodyPreview: z.string().optional()
+      }),
+      response: z.object({
+        status: z.number().int(),
+        ok: z.boolean(),
+        headers: z.record(z.string()),
+        bodyText: z.string(),
+        json: z.any().optional()
+      })
+    }
+  },
+  async ({
+    path: pathSegment = '',
+    method = 'GET',
+    query = {},
+    body,
+    headers = {},
+    accept,
+    parseJson = true
+  }) => {
+    if (!supabaseBaseUrl) {
+      throw new Error('Endpoint Supabase MCP belum dikonfigurasi dengan benar.');
+    }
+
+    const queryEntries = Object.entries(query || {});
+    if (queryEntries.length > 25) {
+      throw new Error('Jumlah parameter query melebihi batas aman (maksimal 25).');
+    }
+
+    const normalizedQuery = Object.fromEntries(
+      queryEntries.map(([key, value]) => [key, typeof value === 'string' ? value : String(value)])
+    );
+
+    const requestPreviewLimit = 8000;
+    let requestBodyPayload = body;
+    let requestBodyPreview = '';
+
+    if (body !== undefined && body !== null) {
+      if (typeof body === 'string') {
+        requestBodyPreview = body;
+      } else {
+        requestBodyPayload = body;
+        requestBodyPreview = JSON.stringify(body, null, 2);
+      }
+
+      if (requestBodyPreview.length > requestPreviewLimit) {
+        requestBodyPreview = `${requestBodyPreview.slice(0, requestPreviewLimit)}\n...[dipotong setelah ${requestPreviewLimit} karakter]`;
+      }
+    }
+
+    let result;
+    try {
+      result = await requestSupabaseMcp({
+        path: pathSegment,
+        method,
+        query: normalizedQuery,
+        body: requestBodyPayload,
+        headers,
+        accept
+      });
+    } catch (error) {
+      throw new Error(`Permintaan ke Supabase MCP gagal: ${error.message}`);
+    }
+
+    const sanitizedRequestHeaders = sanitizeHeadersForOutput(
+      buildSupabaseHeaders(headers, accept)
+    );
+    const sanitizedResponseHeaders = sanitizeHeadersForOutput(result.headers);
+
+    const summaryLines = [
+      `URL: ${result.url}`,
+      `Metode: ${String(method).toUpperCase()}`,
+      `Status: ${result.status} (${result.ok ? 'berhasil' : 'gagal'})`,
+      '--- Respons ---',
+      result.bodyText || '(tanpa konten)'
+    ];
+
+    const structuredContent = {
+      request: {
+        url: result.url,
+        method: String(method).toUpperCase(),
+        headers: sanitizedRequestHeaders,
+        query: queryEntries.length ? normalizedQuery : undefined,
+        bodyPreview: requestBodyPreview ? requestBodyPreview : undefined
+      },
+      response: {
+        status: result.status,
+        ok: result.ok,
+        headers: sanitizedResponseHeaders,
+        bodyText: result.bodyText
+      }
+    };
+
+    if (parseJson && result.json !== null) {
+      structuredContent.response.json = result.json;
+    }
+
+    return {
+      structuredContent,
+      content: [
+        {
+          type: 'text',
+          text: `Respons Supabase MCP:\n${summaryLines.join('\n')}`
         }
       ]
     };

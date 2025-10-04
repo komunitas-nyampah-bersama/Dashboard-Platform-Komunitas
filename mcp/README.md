@@ -49,6 +49,17 @@ Gunakan tool `supabase-mcp-request` untuk meneruskan permintaan HTTP ke endpoint
 2. Pilih transport STDIO ketika mendaftarkan server MCP pada ChatGPT.
 3. Setelah terhubung, gunakan tool-tool yang tersedia untuk mengambil dataset atau membaca file proyek.
 
+## Deployment ke GitHub
+
+Anda dapat langsung mendorong (push) perubahan MCP server ini ke GitHub. Pastikan langkah-langkah berikut telah dipenuhi agar repositori siap dibagikan secara publik:
+
+1. **Inisialisasi & Commit** – Pastikan `package.json`, direktori `mcp/`, dan berkas pendukung lain sudah berada di dalam repositori Git lalu lakukan commit.
+2. **Rahasiakan kredensial** – Jangan pernah menuliskan nilai variabel lingkungan Supabase (API key) di dalam kode. Simpan pada Secrets GitHub atau variabel lingkungan ketika server dijalankan.
+3. **Dokumentasi lengkap** – README ini telah memuat petunjuk menjalankan server dan integrasi Supabase; sertakan informasi tambahan di README root jika proyek utama membutuhkan konteks lebih luas.
+4. **Uji lokal** – Jalankan `npm install` dan `npm run mcp` secara lokal untuk memastikan server bebas dari error sebelum di-push.
+
+Setelah seluruh prasyarat terpenuhi, jalankan `git push origin <nama-branch>` untuk memublikasikan ke GitHub, kemudian Anda dapat membuka Pull Request atau menggabungkan sesuai alur kerja tim.
+
 ## Struktur Output
 
 - Semua tool mengembalikan `content` berupa teks yang siap dimasukkan ke konteks percakapan.

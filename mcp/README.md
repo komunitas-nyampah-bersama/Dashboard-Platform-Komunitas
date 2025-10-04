@@ -60,6 +60,30 @@ Anda dapat langsung mendorong (push) perubahan MCP server ini ke GitHub. Pastika
 
 Setelah seluruh prasyarat terpenuhi, jalankan `git push origin <nama-branch>` untuk memublikasikan ke GitHub, kemudian Anda dapat membuka Pull Request atau menggabungkan sesuai alur kerja tim.
 
+### Contoh Deploy ke `safwaindonesia91-ship-it/MCP-server`
+
+Jika Anda ingin menyalin kode ini ke repositori GitHub baru milik akun `safwaindonesia91-ship-it`, ikuti urutan berikut:
+
+1. **Buat repositori GitHub** – Anda dapat menggunakan tautan Codespaces siap pakai `https://codespaces.new/safwaindonesia91-ship-it/MCP-server` untuk membuat repositori dan Codespace baru sekaligus.
+2. **Tambahkan remote baru** – Dari direktori proyek lokal ini jalankan:
+
+   ```bash
+   git remote add ship-it git@github.com:safwaindonesia91-ship-it/MCP-server.git
+   ```
+
+   Gunakan `https://github.com/safwaindonesia91-ship-it/MCP-server.git` jika Anda lebih nyaman dengan autentikasi HTTPS.
+3. **Sinkronkan riwayat** – Pastikan commit lokal sudah bersih, lalu dorong branch utama (atau branch kerja Anda) ke remote baru:
+
+   ```bash
+   git push ship-it main
+   ```
+
+   Ganti `main` dengan nama branch yang ingin Anda gunakan di repositori tujuan.
+4. **Konfigurasikan Secrets** – Buka tab *Settings → Secrets and variables → Actions* pada repositori baru tersebut, kemudian buat secrets untuk `SUPABASE_MCP_API_KEY` (atau variabel lain yang dibutuhkan). Secrets ini dapat diakses oleh GitHub Actions ataupun Codespaces tanpa perlu menuliskannya ke dalam kode.
+5. **Verifikasi dari Codespaces** – Setelah Codespace terbuka, jalankan `npm install` dan `npm run mcp` di terminal Codespaces untuk memastikan server berjalan dengan benar pada lingkungan cloud GitHub.
+
+Dengan langkah di atas, kode pada repositori ini akan siap dipakai dan diuji langsung dari GitHub Codespaces tujuan Anda.
+
 ## Struktur Output
 
 - Semua tool mengembalikan `content` berupa teks yang siap dimasukkan ke konteks percakapan.

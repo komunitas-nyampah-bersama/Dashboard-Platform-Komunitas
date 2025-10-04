@@ -29,6 +29,7 @@ yarn-error.log*
 dist/
 build/
 out/
+.next/
 
 # Ignore environment files
 .env

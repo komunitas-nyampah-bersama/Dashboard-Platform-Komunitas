@@ -316,6 +316,55 @@
         .tab-content.active {
             display: block;
         }
+
+        .shipment-history {
+            margin-top: 25px;
+            padding: 18px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+
+        .shipment-history h4 {
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        .shipment-item {
+            padding: 12px 0;
+            border-bottom: 1px dashed #d0d0d0;
+        }
+
+        .shipment-item:last-child {
+            border-bottom: none;
+        }
+
+        .shipment-meta {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .inline-loader {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 3px solid #cfd9df;
+            border-top-color: var(--secondary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
         
         @media (max-width: 768px) {
             .content-section {
@@ -407,9 +456,9 @@
                                     <i class="fas fa-file-pdf"></i>
                                 </div>
                                 <div class="diploma-info">
-                                    <h3>Ijazah Sarjana Komputer</h3>
-                                    <p>Program Studi: Teknik Informatika | Tahun Lulus: 2024</p>
-                                    <p>Nomor Ijazah: IJZ/2024/IT/12345</p>
+                                    <h3 id="ijazah-title">Ijazah Sarjana Komputer</h3>
+                                    <p id="ijazah-meta">Program Studi: Teknik Informatika | Tahun Lulus: 2024</p>
+                                    <p id="ijazah-number">Nomor Ijazah: IJZ/2024/IT/12345</p>
                                 </div>
                                 <div class="diploma-actions">
                                     <button class="btn btn-download"><i class="fas fa-download"></i> Download</button>
@@ -421,26 +470,40 @@
                                     <i class="fas fa-file-pdf"></i>
                                 </div>
                                 <div class="diploma-info">
-                                    <h3>Transkrip Nilai</h3>
-                                    <p>Program Studi: Teknik Informatika | IPK: 3.75</p>
-                                    <p>Nomor Transkrip: TRX/2024/IT/12345</p>
+                                    <h3 id="transkrip-title">Transkrip Nilai</h3>
+                                    <p id="transkrip-meta">Program Studi: Teknik Informatika | IPK: 3.75</p>
+                                    <p id="transkrip-number">Nomor Transkrip: TRX/2024/IT/12345</p>
                                 </div>
                                 <div class="diploma-actions">
                                     <button class="btn btn-download"><i class="fas fa-download"></i> Download</button>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="shipment-history" aria-live="polite">
+                            <h4>Riwayat Permintaan Pengiriman</h4>
+                            <div id="shipment-empty">Belum ada permintaan pengiriman yang tercatat.</div>
+                            <div id="shipment-loader" class="inline-loader" style="display: none;">
+                                <span class="spinner" aria-hidden="true"></span>
+                                <span>Sedang memuat riwayat...</span>
+                            </div>
+                            <div id="shipment-list"></div>
+                        </div>
                         
                         <div style="margin-top: 30px;">
                             <button class="btn btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
                         </div>
                     </div>
-                    
+
                     <div class="tab-content" id="address-tab">
                         <h3 class="section-title">Form Pengiriman Ijazah</h3>
-                        
+
                         <p>Silakan lengkapi data diri dan alamat pengiriman untuk menerima ijazah fisik Anda.</p>
-                        
+
+                        <div class="notification error" id="address-error">
+                            Terjadi kesalahan saat menyimpan permintaan pengiriman. Silakan coba lagi.
+                        </div>
+
                         <form id="address-form">
                             <div class="form-row">
                                 <div class="form-group">
@@ -507,9 +570,45 @@
         </footer>
     </div>
     
-    <script>
-        // Simulasi data mahasiswa
-        const mahasiswaData = {
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getAnalytics, isSupported as analyticsIsSupported } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
+        import {
+            addDoc,
+            collection,
+            doc,
+            getDoc,
+            getDocs,
+            getFirestore,
+            limit,
+            orderBy,
+            query,
+            serverTimestamp,
+            setDoc
+        } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyATeGxPM7WJIlh0Nyx_Javfja2DOhMw7vw",
+            authDomain: "database-mahasiswa-sui.firebaseapp.com",
+            projectId: "database-mahasiswa-sui",
+            storageBucket: "database-mahasiswa-sui.firebasestorage.app",
+            messagingSenderId: "336900829622",
+            appId: "1:336900829622:web:c2887b85080e401f89d117",
+            measurementId: "G-EPXXY70ZN6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        analyticsIsSupported()
+            .then(supported => {
+                if (supported) {
+                    getAnalytics(app);
+                }
+            })
+            .catch(error => console.warn("Analytics tidak dapat diinisialisasi", error));
+
+        const fallbackMahasiswaData = {
             "123456": {
                 name: "Budi Santoso",
                 email: "budi.santoso@universitas.ac.id",
@@ -532,8 +631,7 @@
                 transkrip: "Transkrip Nilai"
             }
         };
-        
-        // DOM Elements
+
         const loginSection = document.querySelector('.login-section');
         const dashboardSection = document.querySelector('.dashboard-section');
         const loginForm = document.getElementById('login-form');
@@ -542,87 +640,245 @@
         const loginError = document.getElementById('login-error');
         const addressForm = document.getElementById('address-form');
         const successNotification = document.getElementById('success-notification');
+        const addressError = document.getElementById('address-error');
         const logoutBtn = document.querySelector('.btn-logout');
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
-        
-        // Update user info on dashboard
-        function updateUserInfo(nim) {
-            const user = mahasiswaData[nim];
+        const shipmentList = document.getElementById('shipment-list');
+        const shipmentEmpty = document.getElementById('shipment-empty');
+        const shipmentLoader = document.getElementById('shipment-loader');
+
+        let activeNim = null;
+        let activeUser = null;
+
+        function updateUserInfo(nim, user) {
             document.getElementById('user-name').textContent = user.name;
             document.getElementById('user-nim').textContent = nim;
             document.getElementById('user-prodi').textContent = user.prodi;
             document.getElementById('user-email').textContent = user.email;
-            
-            // Update diploma information
-            document.querySelector('.diploma-info h3').textContent = user.ijazah;
-            document.querySelector('.diploma-info p').innerHTML = 
-                `Program Studi: ${user.prodi} | Tahun Lulus: 2024<br>Nomor Ijazah: IJZ/2024/IT/${nim}`;
+
+            document.getElementById('ijazah-title').textContent = user.ijazah;
+            document.getElementById('ijazah-meta').innerHTML = `Program Studi: ${user.prodi} | Tahun Lulus: 2024`;
+            document.getElementById('ijazah-number').textContent = `Nomor Ijazah: IJZ/2024/IT/${nim}`;
+
+            document.getElementById('transkrip-title').textContent = user.transkrip;
+            document.getElementById('transkrip-meta').textContent = `Program Studi: ${user.prodi} | IPK: menyesuaikan data`;
+            document.getElementById('transkrip-number').textContent = `Nomor Transkrip: TRX/2024/IT/${nim}`;
         }
-        
-        // Login functionality
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const nim = nimInput.value;
-            const email = emailInput.value;
-            
-            if (mahasiswaData[nim] && mahasiswaData[nim].email === email) {
-                loginSection.style.display = 'none';
-                dashboardSection.style.display = 'block';
-                updateUserInfo(nim);
-                loginError.style.display = 'none';
+
+        function setButtonLoading(button, isLoading, loadingText = 'Memproses...') {
+            if (!button) return;
+            if (isLoading) {
+                button.dataset.originalText = button.innerHTML;
+                button.innerHTML = `<span class="inline-loader"><span class="spinner" aria-hidden="true"></span><span>${loadingText}</span></span>`;
+                button.disabled = true;
             } else {
-                loginError.style.display = 'block';
+                button.innerHTML = button.dataset.originalText || button.innerHTML;
+                button.disabled = false;
+            }
+        }
+
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'Waktu tidak tersedia';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+        }
+
+        function renderShipments(shipments) {
+            shipmentList.innerHTML = '';
+
+            if (!shipments.length) {
+                shipmentEmpty.style.display = 'block';
+                shipmentList.style.display = 'none';
+                return;
+            }
+
+            shipmentEmpty.style.display = 'none';
+            shipmentList.style.display = 'block';
+
+            shipments.forEach(entry => {
+                const item = document.createElement('div');
+                item.className = 'shipment-item';
+                item.innerHTML = `
+                    <strong>${entry.address}</strong>
+                    <div class="shipment-meta">${entry.city}, ${entry.province} (${entry.country})</div>
+                    <div class="shipment-meta">Dibuat: ${formatTimestamp(entry.createdAt)}</div>
+                `;
+                shipmentList.appendChild(item);
+            });
+        }
+
+        async function loadShipments(nim) {
+            shipmentLoader.style.display = 'inline-flex';
+            shipmentEmpty.style.display = 'none';
+            shipmentList.style.display = 'none';
+
+            try {
+                const shipmentQuery = query(
+                    collection(db, 'students', nim, 'shipments'),
+                    orderBy('createdAt', 'desc'),
+                    limit(5)
+                );
+                const snapshot = await getDocs(shipmentQuery);
+                const entries = snapshot.docs.map(docItem => docItem.data());
+                renderShipments(entries);
+            } catch (error) {
+                console.error('Gagal memuat riwayat pengiriman', error);
+                toggleNotification(addressError, true, 'Gagal memuat riwayat pengiriman. Silakan muat ulang halaman.');
+            } finally {
+                shipmentLoader.style.display = 'none';
+            }
+        }
+
+        async function fetchUserFromFirestore(nim) {
+            try {
+                const snapshot = await getDoc(doc(db, 'students', nim));
+                return snapshot.exists() ? snapshot.data() : null;
+            } catch (error) {
+                console.error('Gagal mengambil data mahasiswa dari Firestore', error);
+                return null;
+            }
+        }
+
+        async function persistFallbackUser(nim, user) {
+            try {
+                await setDoc(doc(db, 'students', nim), {
+                    ...user,
+                    seededFromFallback: true,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+            } catch (error) {
+                console.warn('Gagal menyimpan data fallback ke Firestore', error);
+            }
+        }
+
+        function toggleLoginState(isLoggedIn) {
+            loginSection.style.display = isLoggedIn ? 'none' : 'flex';
+            dashboardSection.style.display = isLoggedIn ? 'block' : 'none';
+        }
+
+        function toggleNotification(element, isVisible, message) {
+            element.style.display = isVisible ? 'block' : 'none';
+            if (message) {
+                element.textContent = message;
+            }
+        }
+
+        loginForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            const nim = nimInput.value.trim();
+            const email = emailInput.value.trim();
+            const submitButton = loginForm.querySelector('button');
+
+            setButtonLoading(submitButton, true, 'Memeriksa akun...');
+            toggleNotification(loginError, false);
+
+            try {
+                const firestoreUser = await fetchUserFromFirestore(nim);
+                const fallbackUser = fallbackMahasiswaData[nim];
+                let selectedUser = null;
+
+                if (firestoreUser && firestoreUser.email === email) {
+                    selectedUser = firestoreUser;
+                } else if (fallbackUser && fallbackUser.email === email) {
+                    selectedUser = fallbackUser;
+                    await persistFallbackUser(nim, fallbackUser);
+                }
+
+                if (selectedUser) {
+                    activeNim = nim;
+                    activeUser = selectedUser;
+                    updateUserInfo(nim, selectedUser);
+                    toggleLoginState(true);
+                    loadShipments(nim);
+                } else {
+                    toggleNotification(loginError, true, 'NIM atau email tidak valid. Silakan coba lagi.');
+                }
+            } catch (error) {
+                console.error('Kesalahan saat proses login', error);
+                toggleNotification(loginError, true, 'Terjadi kesalahan koneksi. Silakan coba beberapa saat lagi.');
+            } finally {
+                setButtonLoading(submitButton, false);
             }
         });
-        
-        // Address form submission
-        addressForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            successNotification.style.display = 'block';
-            
-            // Scroll to top to show notification
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-            
-            // Switch back to diploma tab after 3 seconds
-            setTimeout(() => {
-                document.querySelector('[data-tab="diploma"]').click();
-            }, 3000);
+
+        addressForm.addEventListener('submit', async event => {
+            event.preventDefault();
+
+            if (!activeNim || !activeUser) {
+                toggleNotification(addressError, true, 'Silakan login terlebih dahulu sebelum mengirim permintaan.');
+                return;
+            }
+
+            const submitButton = addressForm.querySelector('button');
+
+            const payload = {
+                nim: activeNim,
+                name: document.getElementById('fullname').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                city: document.getElementById('city').value,
+                province: document.getElementById('province').value,
+                postalcode: document.getElementById('postalcode').value,
+                country: document.getElementById('country').value,
+                notes: document.getElementById('notes').value,
+                email: activeUser.email,
+                prodi: activeUser.prodi,
+                createdAt: serverTimestamp()
+            };
+
+            toggleNotification(addressError, false);
+            setButtonLoading(submitButton, true, 'Menyimpan permintaan...');
+
+            try {
+                await addDoc(collection(db, 'students', activeNim, 'shipments'), payload);
+                successNotification.style.display = 'block';
+                addressForm.reset();
+                loadShipments(activeNim);
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+
+                setTimeout(() => {
+                    document.querySelector('[data-tab="diploma"]').click();
+                }, 3000);
+            } catch (error) {
+                console.error('Gagal menyimpan data pengiriman', error);
+                toggleNotification(addressError, true, 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.');
+            } finally {
+                setButtonLoading(submitButton, false);
+            }
         });
-        
-        // Logout functionality
-        logoutBtn.addEventListener('click', function() {
-            loginSection.style.display = 'flex';
-            dashboardSection.style.display = 'none';
+
+        logoutBtn.addEventListener('click', () => {
+            toggleLoginState(false);
             loginForm.reset();
             successNotification.style.display = 'none';
+            toggleNotification(addressError, false);
+            activeNim = null;
+            activeUser = null;
+            shipmentList.innerHTML = '';
+            shipmentEmpty.style.display = 'block';
+            shipmentList.style.display = 'none';
         });
-        
-        // Tab switching
+
         tabs.forEach(tab => {
             tab.addEventListener('click', function() {
-                // Remove active class from all tabs
                 tabs.forEach(t => t.classList.remove('active'));
                 tabContents.forEach(c => c.classList.remove('active'));
-                
-                // Add active class to clicked tab
+
                 this.classList.add('active');
-                
-                // Show corresponding content
                 const tabId = this.getAttribute('data-tab');
                 document.getElementById(`${tabId}-tab`).classList.add('active');
             });
         });
-        
-        // Simulate download buttons
+
         document.querySelectorAll('.btn-download').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert("Fitur download hanya simulasi. Pada implementasi nyata, file akan didownload.");
+            button.addEventListener('click', event => {
+                event.preventDefault();
+                alert("Fitur download terhubung dengan Firebase Storage pada implementasi produksi.");
             });
         });
     </script>
